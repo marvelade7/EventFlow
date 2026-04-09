@@ -9,16 +9,16 @@ import Navbar from './Navbar';
 const Hero = () => {
     return (
         <>
-            <div>
+            <div className=''>
                 <div id="carouselExampleSlidesOnly" className="carousel slide text-white" data-bs-ride="carousel">
                 {/* <Navbar /> */}
-                    <div className="carousel-fixed-content d-flex flex-column align-items-center justify-content-center">
-                        <h2 style={{ fontSize: '3em' }} className='fw-bold m-0 text'>Discover Events. Book Instantly.</h2>
-                        <h2 className='fw-bold m-0 text' style={{ color: 'rgb(255, 202, 44)', fontSize: '3em' }}>Experience More.</h2>
-                        <p className='w-50 fs-5 m-0 my-4 text'>The all-in-one platform for discovering unforgettable events and managing tickets effortlessly. From concerts to conferences — your next experience is one click away.</p>
-                        <div className='mt-3 d-flex align-items-center gap-4'>
-                            <button style={{fontSize: '1.1em'}} className='btn btn-warning text-dark px-4 w-auto py-2 fw-semibold '>Browse Events</button>
-                            <button style={{fontSize: '1.1em'}} className='btn btn-outline-light px-4 w-auto py-2 fw-semibold '>Create an event</button>
+                    <div className="hero-section carousel-fixed-content d-flex flex-column align-items-center justify-content-center">
+                        <h2 className='fw-bold m-0 text-center' style={{ fontSize: '3em' }}>Discover Events. Book Instantly.</h2>
+                        <h2 className='fw-bold m-0 text-center' style={{ color: 'rgb(255, 202, 44)', fontSize: '3em' }}>Experience More.</h2>
+                        <p className='w-50 fs-5 m-0 my-4 text-center px-4 py-4'>The all-in-one platform for discovering unforgettable events and managing tickets effortlessly. From concerts to conferences — your next experience is one click away.</p>
+                        <div className='btns mt-3 d-flex align-items-center gap-4'>
+                            <button style={{fontSize: '1.1em', padding: '8px 24px'}} className='hero-btn btn btn-warning text-dark w-auto fw-semibold '>Browse Events</button>
+                            <button style={{fontSize: '1.1em', padding: '8px 24px'}} className='hero-btn btn btn-outline-light w-auto fw-semibold '>Create an event</button>
                         </div>
                     </div>
 
