@@ -1,8 +1,8 @@
 import React from 'react';
 import LeftPanel from '../components/LeftPanel';
-import '../components/Auth.css'
+import '../components/Auth.css';
 import { Link } from 'react-router-dom';
-import googleIcon from '../assets/images/google-icon.png'
+import googleIcon from '../assets/images/google-icon.png';
 
 const SignUp = () => {
     return (
@@ -17,8 +17,8 @@ const SignUp = () => {
                     text4='Powerful features'
 
                 />
-                <div style={{backgroundColor: 'rgb(249,250,251)', padding: '2em'}} className='w-50'>
-                    <div style={{width: '450px'}} className='bg-white mx-auto py-5 px-4 shadow-sm rounded-3'>
+                <div style={{ backgroundColor: 'rgb(249,250,251)', padding: '2em' }} className='w-50'>
+                    <div style={{ width: '450px' }} className='bg-white mx-auto py-5 px-4 shadow-sm rounded-3'>
                         <h4 className='fw-semibold'>Create Your Account</h4>
                         <p className='text-secondary'>Join thousands of event lovers</p>
                         <form action='register' method='post'>
@@ -44,11 +44,12 @@ const SignUp = () => {
                                 <label htmlFor='terms' className="m-0">I agree to the <span className='text-primary'>Terms of Service</span> and <span className='text-primary'>Privacy Policy</span></label>
                             </div>
 
-                            <button style={{ backgroundColor: 'rgb(226,131,8)' }} className='btn w-100 py-2 text-white fw-semibold mb-3'>Create Account</button>
-
+                            <Link to='/signin'>
+                                <button style={{ backgroundColor: 'rgb(226,131,8)' }} className='btn w-100 py-2 text-white fw-semibold mb-3'>Create Account</button>
+                            </Link>
                             <div className='d-flex align-items-center justify-content-between'>
                                 <hr className='w-25' />
-                                <p style={{fontSize: '.9em'}} className="m-0">or continue with</p>
+                                <p style={{ fontSize: '.9em' }} className="m-0">or continue with</p>
                                 <hr className='w-25' />
                             </div>
 

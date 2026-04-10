@@ -6,6 +6,8 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import '/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js';
 import SignUp from './pages/SignUp';
 import SignIn from './pages/SignIn';
+import UserDashboard from './pages/UserDashboard';
+import CreateNewEventPage from './pages/CreateNewEventPage';
 
 const App = () => {
   return (
@@ -14,6 +16,8 @@ const App = () => {
         <Route path='/' element={<Home/>} />
         <Route path='/signup' element={<SignUp/>} />
         <Route path='/signin' element={<SignIn/>} />
+        <Route path='/dashboard' element={<UserDashboard/>} />
+        <Route path='/create-event' element={<CreateNewEventPage />} />
       </Routes>
     </>
   )

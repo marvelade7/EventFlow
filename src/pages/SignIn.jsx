@@ -1,7 +1,7 @@
 import React from 'react';
 import LeftPanel from '../components/LeftPanel';
 import { Link } from 'react-router-dom';
-import googleIcon from '../assets/images/google-icon.png'
+import googleIcon from '../assets/images/google-icon.png';
 
 const SignIn = () => {
     return (
@@ -30,8 +30,9 @@ const SignIn = () => {
                             <input className='form-control shadow-none border-2' type="password" placeholder='Your password' name='password' id='password' />
                         </div>
 
-                        <button style={{ backgroundColor: 'rgb(226,131,8)' }} className='btn w-100 py-2 text-white fw-semibold my-3'>Sign In</button>
-
+                        <Link to='/dashboard'>
+                            <button style={{ backgroundColor: 'rgb(226,131,8)' }} className='btn w-100 py-2 text-white fw-semibold my-3'>Sign In</button>
+                        </Link>
                         <div className='d-flex align-items-center justify-content-between gap-3'>
                             <hr className='w-50' />
                             <p style={{ fontSize: '.9em' }} className="m-0">or</p>

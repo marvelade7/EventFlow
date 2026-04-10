@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import Logo from './Logo';
 // import logo from '../assets/images/logo.png'
 
-const Navbar = () => {
+const Navbar = ({scrollToBrowse, scrollToContact, scrollToHero, scrollToWorks}) => {
     const nav = {
         position: 'sticky',
         top: 0,
@@ -36,25 +37,23 @@ const Navbar = () => {
         <>
             <nav id='navbar' style={nav} className="navbar navbar-expand-lg bg-body-tertiary py-2 px-5 shadow-sm ">
                 <div className="container-fluid">
-                    <Link to='/' className='text-decoration-none'>
-                        <p style={{ fontSize: '1.4em' }} className='navbar-brand d-flex align-items-center m-0 fw-semibold gap-1'><img src='eventLogo.png' className='nav-logo' width='50' />Event<span style={{ color: 'rgb(17, 213, 243)' }}>Flow</span></p>
-                    </Link>
+                    <Logo size={50} fontSize='1.4em'/>
                     <button className="navbar-toggler shadow-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                         <span className="navbar-toggler-icon"></span>
                     </button>
                     <div className="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul className="navbar-nav mx-auto mb-3 gap-3 mb-lg-0">
-                            <li className="nav-item">
-                                <a className="nav-link active" aria-current="page" href="#">Home</a>
+                            <li onClick={scrollToHero} className="nav-item">
+                                <button className="nav-link active" aria-current="page" href="#">Home</button>
                             </li>
-                            <li className="nav-item">
-                                <a className="nav-link active" href="#">Browse Events</a>
+                            <li onClick={scrollToBrowse} className="nav-item">
+                                <button className="nav-link active" href="#">Browse Events</button>
                             </li>
-                            <li className="nav-item">
-                                <a className="nav-link active" href="#">How It Works</a>
+                            <li onClick={scrollToWorks} className="nav-item">
+                                <button className="nav-link active" href="#">How It Works</button>
                             </li>
-                            <li className="nav-item">
-                                <a className="nav-link active" href="#">Contact</a>
+                            <li onClick={scrollToContact} className="nav-item">
+                                <button className="nav-link active" href="#">Contact</button>
                             </li>
                         </ul>
                         <div className="d-flex gap-3" role="search">
