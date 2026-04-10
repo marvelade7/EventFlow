@@ -22,7 +22,7 @@ const Tickets = () => {
                 </div>
             </div>
 
-            <div className="d-flex gap-3 mt-4">
+            <div className="d-flex align-items-start gap-3 mt-4">
                 <div className='form-group w-100'>
                     <label htmlFor="ticketPrice">Ticket Price</label>
                     <div className='form-control d-flex align-items-center shadow-none p-0 px-2'>
@@ -31,15 +31,15 @@ const Tickets = () => {
                     </div>
                 </div>
                 <div className='form-group w-100'>
-                    <label htmlFor="availableTickets">Total Tickets Available</label>
+                    <label htmlFor="availableTickets">Total Tickets Available <span className='text-secondary'>(min - 10)</span></label>
                     <div className='d-flex align-items-center justify-content-between px-0 py-0 gap-2 form-control shadow-none'>
-                        <button style={{fontSize: '1.1em'}} onClick={() => setTickets(prev => (prev > 10 ? prev - 5 : 10))} className='border-0 py-1 px-3'>-</button>
+                        <button style={{fontSize: '1.3em'}} onClick={() => setTickets(prev => (prev > 10 ? prev - 5 : 10))} className='border-0 py-1 px-3'>-</button>
                         <input onChange={(e) => {
                             const value = Number(e.target.value);
                             setTickets(value < 10 ? 10 : value);
                         }}
                             style={{ outline: 'none' }} type='number' value={tickets} className='border-0 text-center' />
-                        <button style={{fontSize: '1.1em'}} onClick={() => setTickets(prev => prev + 5)} className='border-0 py-1 px-3'>+</button>
+                        <button style={{fontSize: '1.3em'}} onClick={() => setTickets(prev => prev + 5)} className='border-0 py-1 px-3'>+</button>
                     </div>
                 </div>
             </div>
