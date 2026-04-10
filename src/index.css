@@ -124,3 +124,11 @@ input[type="number"]::-webkit-inner-spin-button {
 .tbody td {
     padding: 12px 30px !important;
 }
+
+.event-media{
+    transition: .2s;
+}
+
+.event-media:hover {
+    background-color: rgba(128, 128, 128, 0.04);
+}

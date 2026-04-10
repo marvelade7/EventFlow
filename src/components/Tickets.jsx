@@ -25,7 +25,10 @@ const Tickets = () => {
             <div className="d-flex gap-3 mt-4">
                 <div className='form-group w-100'>
                     <label htmlFor="ticketPrice">Ticket Price</label>
-                    <input onChange={(e) => setPrice(Number(e.target.value))} disabled={isFree} type="number" min='1' name="ticketPrice" id="ticketPrice" className='form-control shadow-none' value={price} />
+                    <div className='form-control d-flex align-items-center shadow-none p-0 px-2'>
+                        <i className='bi bi-currency-dollar'></i>
+                        <input onChange={(e) => setPrice(Number(e.target.value))} disabled={isFree} type="number" min='1' name="ticketPrice" id="ticketPrice" className='border-0 py-2 w-100' style={{outline: 'none'}} value={price} />
+                    </div>
                 </div>
                 <div className='form-group w-100'>
                     <label htmlFor="availableTickets">Total Tickets Available</label>

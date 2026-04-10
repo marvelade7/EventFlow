@@ -5,6 +5,7 @@ import EventBasis from '../components/EventBasis';
 import DateAndTimeForm from '../components/DateAndTimeForm';
 import Location from '../components/Location';
 import Tickets from '../components/Tickets';
+import EventMedia from '../components/EventMedia';
 
 const CreateNewEventPage = () => {
     return (
@@ -25,6 +26,9 @@ const CreateNewEventPage = () => {
                         </div>
                         <div className='my-4'>
                             <Tickets />
+                        </div>
+                        <div>
+                            <EventMedia />
                         </div>
                     </div>
                     <div>
