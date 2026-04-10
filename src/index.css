@@ -2,6 +2,12 @@
     scrollbar-width: none;
 }
 
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}   
+
 #carouselExampleSlidesOnly {
     max-height: 100vh;
     overflow: hidden;
@@ -94,18 +100,18 @@
     padding: 20px 40px;
     border-radius: 10px;
     cursor: pointer;
-    transition: .2s;
+    transition: 0.2s;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
 .create-event:hover {
-    background-color: rgba(27, 181, 204, .1);
+    background-color: rgba(27, 181, 204, 0.1);
 }
 
 .browse-card {
-    transition: .3s;
+    transition: 0.3s;
     cursor: pointer;
 }
 
@@ -114,6 +120,7 @@
     box-shadow: 5px 6px 10px rgba(0, 0, 0, 0.2) !important;
 }
 
-.thead th, .tbody td{
+.thead th,
+.tbody td {
     padding: 12px 30px !important;
 }
