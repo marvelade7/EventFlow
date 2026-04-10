@@ -132,3 +132,8 @@ input[type="number"]::-webkit-inner-spin-button {
 .event-media:hover {
     background-color: rgba(128, 128, 128, 0.04);
 }
+
+.preview-img {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}

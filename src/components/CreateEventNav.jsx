@@ -8,8 +8,8 @@ const CreateEventNav = () => {
         padding: '20px 30px',
         background: 'white',
         borderBottom: '1px solid rgba(0,0,0,.12)',
-        // position: 'sticky',
-        // top: 0,
+        position: 'sticky',
+        top: 0,
         zIndex: '1000'
     };
     return (

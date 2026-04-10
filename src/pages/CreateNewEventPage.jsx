@@ -6,6 +6,7 @@ import DateAndTimeForm from '../components/DateAndTimeForm';
 import Location from '../components/Location';
 import Tickets from '../components/Tickets';
 import EventMedia from '../components/EventMedia';
+import LivePreview from '../components/LivePreview';
 
 const CreateNewEventPage = () => {
     return (
@@ -13,7 +14,7 @@ const CreateNewEventPage = () => {
             <Sidebar />
             <div style={{ marginLeft: '300px', background: 'rgb(249,250,251)' }}>
                 <CreateEventNav />
-                <div className='d-flex px-4 py-4'>
+                <div className='d-flex gap-3 px-4 pb-4 mt-2'>
                     <div style={{width: '70%'}}>
                         <div className='my-4'>
                             <EventBasis />
@@ -31,8 +32,8 @@ const CreateNewEventPage = () => {
                             <EventMedia />
                         </div>
                     </div>
-                    <div>
-
+                    <div style={{width: '30%'}} className=' py-4'>
+                        <LivePreview />
                     </div>
                 </div>
             </div>
