@@ -30,13 +30,13 @@ const Tickets = () => {
                 <div className='form-group w-100'>
                     <label htmlFor="availableTickets">Total Tickets Available</label>
                     <div className='d-flex align-items-center justify-content-between px-0 py-0 gap-2 form-control shadow-none'>
-                        <button onClick={() => setTickets(prev => (prev > 10 ? prev - 5 : 10))} className='border-0 py-1 px-3'>-</button>
+                        <button style={{fontSize: '1.1em'}} onClick={() => setTickets(prev => (prev > 10 ? prev - 5 : 10))} className='border-0 py-1 px-3'>-</button>
                         <input onChange={(e) => {
                             const value = Number(e.target.value);
                             setTickets(value < 10 ? 10 : value);
                         }}
                             style={{ outline: 'none' }} type='number' value={tickets} className='border-0 text-center' />
-                        <button onClick={() => setTickets(prev => prev + 5)} className='border-0 py-1 px-3'>+</button>
+                        <button style={{fontSize: '1.1em'}} onClick={() => setTickets(prev => prev + 5)} className='border-0 py-1 px-3'>+</button>
                     </div>
                 </div>
             </div>
