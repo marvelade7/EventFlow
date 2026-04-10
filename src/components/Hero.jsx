@@ -1,9 +1,9 @@
 import React from 'react';
-import carousel1 from '../assets/images/carousel1.png';
-import carousel2 from '../assets/images/carousel2.png';
-import carousel3 from '../assets/images/carousel3.png';
-import carousel4 from '../assets/images/carousel4.png';
-import carousel5 from '../assets/images/carousel5.png';
+import carousel1 from '../assets/images/carousel1.webp';
+import carousel2 from '../assets/images/carousel2.webp';
+import carousel3 from '../assets/images/carousel3.webp';
+import carousel4 from '../assets/images/carousel4.webp';
+import carousel5 from '../assets/images/carousel5.webp';
 import Navbar from './Navbar';
 
 const Hero = () => {
