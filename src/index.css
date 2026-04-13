@@ -137,3 +137,17 @@ input[type="number"]::-webkit-inner-spin-button {
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
 }
+.error-link:hover {
+    cursor: pointer;
+    color: rgb(27, 181, 204) !important;
+    /* font-weight: 600; */
+}
+
+.error-page {
+    
+}
+
+/* .admin-input:active {
+    outline: 2px solid blue !important;
+    border: none;
+} */

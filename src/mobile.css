@@ -35,14 +35,14 @@
     .browse-events div,
     .how-it-works div,
     .host-events,
-    .footer div{
+    .footer div {
         flex-wrap: wrap;
     }
     .browse-events div .card {
         width: 300px;
     }
     .host-events button {
-        font-size: 1em !important   
+        font-size: 1em !important;
     }
     .browse-events div h2 {
         font-size: 1.4em;
@@ -50,17 +50,21 @@
     .footer div {
         justify-content: start !important;
     }
-    .footer-btns button{
+    .footer-btns button {
         width: 100%;
+    }
+    .error-page {
+        padding: 100px 50px !important;
+        text-align: center;
     }
 }
 
-@media (max-width:480px) {
+@media (max-width: 480px) {
     #navbar {
         padding: 5px 7px !important;
     }
     .navbar-toggler-icon {
-        font-size: .8em;
+        font-size: 0.8em;
     }
     .hero-section p {
         padding: 10px 15px !important;
@@ -70,5 +74,8 @@
     .host-events,
     .footer {
         padding: 3em 1.5em !important;
+    }
+    .error-page {
+        padding: 100px 20px !important;
     }
 }
