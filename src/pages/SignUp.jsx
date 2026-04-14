@@ -21,22 +21,34 @@ const SignUp = () => {
             console.log(values);
             navigate("/signin");
         },
+        validateOnMount: true, // 👈 important
+        validateOnChange: true,
+        validateOnBlur: true,
         validationSchema: yup.object({
             firstName: yup
                 .string()
+                .trim()
+                .matches(/^[A-Za-z]+(?:\s[A-Za-z]+)*$/, "Invalid name format")
+                .matches(/^[A-Za-z\s]+$/, "Name cannot contain numbers")
                 .min(2, "First name must be at least 2 characters")
                 .required("First name is required"),
             lastName: yup
                 .string()
+                .trim()
+                .matches(/^[A-Za-z]+(?:\s[A-Za-z]+)*$/, "Invalid name format")
+                .matches(/^[A-Za-z\s]+$/, "Name cannot contain numbers")
                 .min(2, "Last name must be at least 2 characters")
                 .required("Last name is required"),
             email: yup
                 .string()
+                .trim()
+                .lowercase()
                 .email("Invalid email address")
                 .required("Email is required"),
             password: yup
                 .string()
-                .min(6, "Password must be at least 8 characters")
+                .min(6, "Password must be at least 6 characters")
+                .matches(/^\S*$/, "Password cannot contain spaces")
                 .matches(/[a-z]/, "must contain at least one lowercase letter")
                 .matches(/[A-Z]/, "must contain at least one uppercase letter")
                 .matches(/[0-9]/, "must contain at least a number")
@@ -47,7 +59,7 @@ const SignUp = () => {
                 .required("Password is required"),
             confirmPassword: yup
                 .string()
-                .oneOf([yup.ref("password"), null], "Passwords must match")
+                .oneOf([yup.ref("password")], "Passwords must match")
                 .required("Confirm Password is required"),
             terms: yup
                 .boolean()
@@ -242,7 +254,7 @@ const SignUp = () => {
                                             }
                                         >
                                             {passwordRules.lowercase ? (
-                                                <i className="bi bi-check-circle text-success"></i>
+                                                <i className="bi bi-check-circle text-success tick"></i>
                                             ) : (
                                                 <i class="bi bi-x-circle"></i>
                                             )}{" "}
@@ -257,7 +269,7 @@ const SignUp = () => {
                                             }
                                         >
                                             {passwordRules.uppercase ? (
-                                                <i className="bi bi-check-circle text-success"></i>
+                                                <i className="bi bi-check-circle text-success tick"></i>
                                             ) : (
                                                 <i class="bi bi-x-circle"></i>
                                             )}{" "}
@@ -272,7 +284,7 @@ const SignUp = () => {
                                             }
                                         >
                                             {passwordRules.number ? (
-                                                <i className="bi bi-check-circle text-success"></i>
+                                                <i className="bi bi-check-circle text-success tick"></i>
                                             ) : (
                                                 <i class="bi bi-x-circle"></i>
                                             )}{" "}
@@ -287,7 +299,7 @@ const SignUp = () => {
                                             }
                                         >
                                             {passwordRules.special ? (
-                                                <i className="bi bi-check-circle text-success"></i>
+                                                <i className="bi bi-check-circle text-success tick"></i>
                                             ) : (
                                                 <i class="bi bi-x-circle"></i>
                                             )}{" "}
@@ -303,7 +315,7 @@ const SignUp = () => {
                                             }
                                         >
                                             {passwordRules.length ? (
-                                                <i className="bi bi-check-circle text-success"></i>
+                                                <i className="bi bi-check-circle text-success tick"></i>
                                             ) : (
                                                 <i class="bi bi-x-circle"></i>
                                             )}{" "}

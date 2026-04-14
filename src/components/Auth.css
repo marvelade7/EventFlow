@@ -36,3 +36,27 @@ input:focus,
     border: 2px solid #dc3545 !important;
     outline-color: #dc3545 !important;
 }
+
+.tick {
+    display: inline-block;
+    animation: pop 0.25s ease-in-out;
+}
+
+@keyframes pop {
+    0% {
+        transform: scale(0.3);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.small p {
+    transition: all 0.2s ease;
+}
+
+.small p.text-success {
+    transform: translateX(3px);
+}
