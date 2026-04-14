@@ -2,11 +2,22 @@
     .dashboard-menu-btn {
         display: none !important;
     }
+
+    .create-event-menu-btn {
+        display: none !important;
+    }
 }
 
 @media (max-width: 1024px) {
     .create-event-page .sidebar {
-        display: none !important;
+        display: flex !important;
+        transform: translateX(-105%);
+        transition: transform 0.25s ease;
+        z-index: 1200;
+    }
+
+    .create-event-page .sidebar.sidebar-mobile-open {
+        transform: translateX(0);
     }
 
     .dashboard-page .sidebar {
@@ -76,6 +87,14 @@
         height: 38px;
     }
 
+    .create-event-menu-btn {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+    }
+
     .dash-navbar-actions {
         width: 100%;
         justify-content: space-between;
@@ -95,12 +114,16 @@
         flex: 1 1 auto;
     }
 
-    .create-event-actions {
+    .create-event-nav .create-event-actions {
+        display: none !important;
+    }
+
+    .create-event-bottom-actions {
         width: 100%;
         flex-wrap: wrap;
     }
 
-    .create-event-actions .btn {
+    .create-event-bottom-actions .btn {
         flex: 1 1 190px;
     }
 
@@ -250,6 +273,10 @@
         padding: 14px !important;
     }
 
+    .create-event-nav .create-event-actions {
+        display: none !important;
+    }
+
     .dashboard-main .mx-4 {
         margin-left: 1rem !important;
         margin-right: 1rem !important;
@@ -270,6 +297,16 @@
 
     .create-event-form-column .d-flex.gap-3 > .w-100 {
         min-width: 100%;
+    }
+
+    .ticket-quantity-control .qty-btn {
+        width: 38px;
+        min-width: 38px;
+        flex: 0 0 38px;
+    }
+
+    .ticket-quantity-control .qty-input {
+        max-width: 90px;
     }
 
     .checkout-layout {
@@ -383,7 +420,15 @@
         padding: 12px !important;
     }
 
+    .create-event-nav .create-event-actions {
+        display: none !important;
+    }
+
     .dashboard-page .sidebar {
+        width: 280px;
+    }
+
+    .create-event-page .sidebar {
         width: 280px;
     }
 
@@ -396,7 +441,7 @@
         flex: 1 1 100%;
     }
 
-    .create-event-actions .btn {
+    .create-event-bottom-actions .btn {
         width: 100%;
         flex: 1 1 100%;
     }

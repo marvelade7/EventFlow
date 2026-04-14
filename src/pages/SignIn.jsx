@@ -18,7 +18,7 @@ const SignIn = () => {
             navigate("/dashboard");
         },
         validationSchema: yup.object({
-            email: yup.string().required("Email is required"),
+            email: yup.string().email('Invalid email').required("Email is required"),
             password: yup.string().required("Password is required"),
         }),
     });

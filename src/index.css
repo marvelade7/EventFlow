@@ -134,17 +134,35 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 .preview-img {
+    width: 100%;
+    max-width: 100%;
+    display: block;
+    object-fit: cover;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
+}
+
+.ticket-quantity-control {
+    overflow: hidden;
+}
+
+.ticket-quantity-control .qty-btn {
+    width: 42px;
+    min-width: 42px;
+    flex: 0 0 42px;
+    line-height: 1;
+}
+
+.ticket-quantity-control .qty-input {
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+    max-width: 110px;
 }
 .error-link:hover {
     cursor: pointer;
     color: rgb(27, 181, 204) !important;
     /* font-weight: 600; */
-}
-
-.error-page {
-    
 }
 
 /* .admin-input:active {
