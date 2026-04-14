@@ -55,6 +55,7 @@ const SignUp = () => {
         }),
     });
 
+    const [showPassword, setShowPassword] = useState(false);
     const [showPasswordRules, setShowPasswordRules] = useState(false);
     const password = formik.values.password;
 
@@ -154,7 +155,7 @@ const SignUp = () => {
                             <div className="form-group mb-3">
                                 <label htmlFor="email">Email Address</label>
                                 <input
-                                    className={`form-control shadow-none border-2 m-0 ${
+                                    className={`form-control border shadow-none border-2 m-0 ${
                                         formik.touched.email
                                             ? formik.errors.email
                                                 ? "is-invalid"
@@ -180,27 +181,57 @@ const SignUp = () => {
                             <div className="form-group mb-3">
                                 <label htmlFor="password">Password</label>
 
-                                <input
-                                    className={`form-control shadow-none border-2 m-0 ${
+                                <div
+                                    className={`input-group border rounded overflow-hidden ${
                                         formik.touched.password
                                             ? formik.errors.password
-                                                ? "is-invalid"
-                                                : "is-valid"
-                                            : ""
+                                                ? "border-danger border-2"
+                                                : "border-success"
+                                            : "border-secondary"
                                     }`}
-                                    type="password"
-                                    placeholder="Create a strong password"
-                                    name="password"
-                                    id="password"
-                                    onChange={formik.handleChange}
-                                    onBlur={(e) => {
-                                        formik.handleBlur(e);
-                                        setShowPasswordRules(false);
-                                    }}
-                                    onFocus={() => setShowPasswordRules(true)}
-                                    value={formik.values.password}
-                                />
+                                >
+                                    <input
+                                        className="form-control shadow-none m-0 border-0"
+                                        type={
+                                            showPassword ? "text" : "password"
+                                        }
+                                        placeholder="Create a strong password"
+                                        name="password"
+                                        id="password"
+                                        onChange={formik.handleChange}
+                                        onBlur={(e) => {
+                                            formik.handleBlur(e);
+                                            setShowPasswordRules(false);
+                                        }}
+                                        onFocus={() =>
+                                            setShowPasswordRules(true)
+                                        }
+                                        value={formik.values.password}
+                                    />
 
+                                    <span
+                                        className="input-group-text bg-white border-0"
+                                        onClick={() =>
+                                            setShowPassword(!showPassword)
+                                        }
+                                        style={{ cursor: "pointer" }}
+                                    >
+                                        <i
+                                            className={`bi ${
+                                                showPassword
+                                                    ? "bi-eye-slash"
+                                                    : "bi-eye"
+                                            }`}
+                                        ></i>
+                                    </span>
+                                </div>
+
+                                {formik.touched.password &&
+                                    formik.errors.password && (
+                                        <small className="text-danger mb-3">
+                                            {formik.errors.password}
+                                        </small>
+                                    )}
                                 {showPasswordRules && (
                                     <div className="mt-2 small">
                                         <p
@@ -280,13 +311,6 @@ const SignUp = () => {
                                         </p>
                                     </div>
                                 )}
-
-                                {formik.touched.password &&
-                                    formik.errors.password && (
-                                        <small className="text-danger mb-3">
-                                            {formik.errors.password}
-                                        </small>
-                                    )}
                             </div>
 
                             <div className="form-group mb-3">

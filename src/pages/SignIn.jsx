@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import LeftPanel from "../components/LeftPanel";
 import { Link } from "react-router-dom";
 import googleIcon from "../assets/images/google-icon.png";
@@ -7,6 +7,8 @@ import * as yup from "yup";
 import { useNavigate } from "react-router-dom";
 
 const SignIn = () => {
+    // useState
+    const [showPassword, setShowPassword] = useState(false)
     const navigate = useNavigate();
     const formik = useFormik({
         initialValues: {
@@ -85,22 +87,50 @@ const SignIn = () => {
                                     Forgot Password?
                                 </p>
                             </div>
-                            <input
-                                className={`form-control shadow-none border-2 m-0 ${
-                                    formik.touched.password
-                                        ? formik.errors.password
-                                            ? "is-invalid"
-                                            : "is-valid"
-                                        : ""
-                                }`}
-                                type="password"
-                                placeholder="Your password"
-                                name="password"
-                                id="password"
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                value={formik.values.password}
-                            />
+                            <div
+                                    className={`input-group border rounded overflow-hidden ${
+                                        formik.touched.password
+                                            ? formik.errors.password
+                                                ? "border-danger border-2"
+                                                : "border-success"
+                                            : "border-secondary"
+                                    }`}
+                                >
+                                    <input
+                                        className="form-control shadow-none m-0 border-0"
+                                        type={
+                                            showPassword ? "text" : "password"
+                                        }
+                                        placeholder="Create a strong password"
+                                        name="password"
+                                        id="password"
+                                        onChange={formik.handleChange}
+                                        onBlur={(e) => {
+                                            formik.handleBlur(e);
+                                            setShowPasswordRules(false);
+                                        }}
+                                        onFocus={() =>
+                                            setShowPasswordRules(true)
+                                        }
+                                        value={formik.values.password}
+                                    />
+
+                                    <span
+                                        className="input-group-text bg-white border-0"
+                                        onClick={() =>
+                                            setShowPassword(!showPassword)
+                                        }
+                                        style={{ cursor: "pointer" }}
+                                    >
+                                        <i
+                                            className={`bi ${
+                                                showPassword
+                                                    ? "bi-eye-slash"
+                                                    : "bi-eye"
+                                            }`}
+                                        ></i>
+                                    </span>
+                                </div>
                             {formik.touched.password &&
                                 formik.errors.password && (
                                     <small className="text-danger mb-3">
