@@ -3,10 +3,10 @@ import CheckoutNav from '../components/CheckoutNav';
 
 const CheckoutPage = () => {
     return (
-        <div style={{ background: 'rgb(249,250,251)', height: '100vh' }} >
+        <div className='checkout-page' style={{ background: 'rgb(249,250,251)', height: '100vh' }} >
             <CheckoutNav />
-            <div style={{ margin: '40px auto', width: '60%' }} className='d-flex align-items-start gap-4'>
-                <div style={{ width: '60%' }} className='d-flex flex-column gap-4'>
+            <div className='d-flex align-items-start gap-4 checkout-layout' style={{ margin: '40px auto', width: '60%' }}>
+                <div className='d-flex flex-column gap-4 checkout-left' style={{ width: '60%' }}>
                     <div className='d-flex align-items-center gap-3 shadow-sm py-4 px-4 rounded-3 bg-white'>
                         <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=100&h=80&fit=crop" alt="img" />
                         <div>
@@ -44,7 +44,7 @@ const CheckoutPage = () => {
                         </div>
                     </div>
                 </div>
-                <div style={{width: '40%'}} className='d-flex flex-column gap-1 shadow-sm py-4 px-3 rounded-3 bg-white'>
+                <div className='d-flex flex-column gap-1 shadow-sm py-4 px-3 rounded-3 bg-white checkout-right' style={{width: '40%'}}>
                     <h5>Order Summary</h5>
                     <div className="d-flex align-items-center justify-content-between">
                         <p className="m-0">General Admission x 2</p>

@@ -2,8 +2,8 @@ import React from 'react';
 
 const RecentBookings = () => {
     return (
-        <div className='table-responsive border rounded-3 overflow-hidden mt-4'>
-            <table className='table mb-0'>
+        <div className='table-responsive border rounded-3 mt-4 recent-bookings-wrap'>
+            <table className='table mb-0 recent-bookings-table'>
                 <thead>
                     <tr className='table-secondary thead'>
                         <th>EVENT</th>

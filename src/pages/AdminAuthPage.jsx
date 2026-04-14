@@ -4,10 +4,10 @@ import LeftPanel from '../components/LeftPanel';
 
 const AdminAuthPage = () => {
     return (
-        <div className='d-flex align-items-stretch'>
+        <div className='d-flex align-items-stretch admin-auth-page'>
             <AdminAuthLeftPanel />
-            <div style={{ backgroundColor: 'rgb(249,250,251)', padding: '2em' }} className='w-50'>
-                <div style={{ width: '450px', margin: '80px auto' }} className='bg-white rounded-4 py-4 px-4 shadow-sm'>
+            <div className='w-50 admin-auth-content' style={{ backgroundColor: 'rgb(249,250,251)', padding: '2em' }}>
+                <div className='bg-white rounded-4 py-4 px-4 shadow-sm admin-auth-card' style={{ width: '450px', margin: '80px auto' }}>
                     <div className='mb-4'>
                         <h5 className='m-0 mb-1 fw-semibold'>Admin Portal</h5>
                         <p style={{ fontSize: '.9em' }} className="m-0 text-secondary">Restricted Access</p>

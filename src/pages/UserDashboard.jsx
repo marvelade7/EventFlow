@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Sidebar from '../components/Sidebar';
 import DashNavbar from '../components/DashNavbar';
 import Greetings from '../components/Greetings';
@@ -9,6 +9,8 @@ import BrowseEventsHead from '../components/BrowseEventsHead';
 import RecentBookings from '../components/RecentBookings';
 
 const UserDashboard = () => {
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+
     const browseEvents = {
         // backgroundColor: 'white',
         padding: '3em 2em',
@@ -18,12 +20,19 @@ const UserDashboard = () => {
     };
 
     return (
-        <div className=''>
-            <Sidebar />
-            <div style={{ marginLeft: '300px', background: 'rgb(249,250,251)' }}>
-                <DashNavbar />
+        <div className='dashboard-page'>
+            <Sidebar mobileOpen={sidebarOpen} />
+            <div
+                className={`sidebar-overlay ${sidebarOpen ? 'show' : ''}`}
+                onClick={() => setSidebarOpen(false)}
+            ></div>
+            <div className='dashboard-main' style={{ marginLeft: '300px', background: 'rgb(249,250,251)' }}>
+                <DashNavbar
+                    onToggleSidebar={() => setSidebarOpen((prev) => !prev)}
+                    isSidebarOpen={sidebarOpen}
+                />
                 <Greetings />
-                <div className='d-flex align-items-center justify-items-between gap-3 pt-3 pb-5 mx-4'>
+                <div className='d-flex align-items-center justify-items-between gap-3 pt-3 pb-5 mx-4 dashboard-stats'>
                     <DashStats icon='bi bi-archive' icon2='bi bi-arrow-up' iconStyle={{ fontSize: '1.4em', background: 'rgba(0,0,256,.12)', color: 'rgb(89,68,231)', padding: '5px 10px', borderRadius: '7px' }} status='3' num='5' title='Upcoming Events' statusStyle={{ color: 'green', background: 'rgb(209,250,229)', padding: '1px 10px', borderRadius: '20px', fontWeight: '600', fontSize: '.8em' }} />
                     <DashStats icon='bi bi-archive text-warning' iconStyle={{ fontSize: '1.4em', background: 'rgb(255,251,235)', padding: '5px 10px', borderRadius: '7px' }} status='Active' num='8' title='Active Tickets' statusStyle={{ color: 'green', background: 'rgb(209,250,229)', padding: '2px 10px', borderRadius: '20px', fontWeight: '600', fontSize: '.8em' }} />
                     <DashStats icon='bi bi-people' iconStyle={{ fontSize: '1.4em', background: 'rgba(27, 180, 204, 0.16)', color: 'rgb(27,181,204)', padding: '5px 10px', borderRadius: '7px' }} status='All time' num='23' title='Events Attended' statusStyle={{ color: 'black', background: 'rgb(243,244,246)', padding: '2px 10px', borderRadius: '20px', fontWeight: '600', fontSize: '.8em' }} />

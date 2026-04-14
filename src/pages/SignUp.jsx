@@ -1,65 +1,386 @@
-import React from 'react';
-import LeftPanel from '../components/LeftPanel';
-import '../components/Auth.css';
-import { Link } from 'react-router-dom';
-import googleIcon from '../assets/images/google-icon.png';
+import React, { use, useState } from "react";
+import LeftPanel from "../components/LeftPanel";
+import "../components/Auth.css";
+import { Link, useNavigate } from "react-router-dom";
+import googleIcon from "../assets/images/google-icon.png";
+import { Formik, useFormik } from "formik";
+import * as yup from "yup";
 
 const SignUp = () => {
+    const navigate = useNavigate();
+    const formik = useFormik({
+        initialValues: {
+            lastName: "",
+            firstName: "",
+            email: "",
+            password: "",
+            confirmPassword: "",
+            terms: false,
+        },
+        onSubmit: (values) => {
+            console.log(values);
+            navigate("/signin");
+        },
+        validationSchema: yup.object({
+            firstName: yup
+                .string()
+                .min(2, "First name must be at least 2 characters")
+                .required("First name is required"),
+            lastName: yup
+                .string()
+                .min(2, "Last name must be at least 2 characters")
+                .required("Last name is required"),
+            email: yup
+                .string()
+                .email("Invalid email address")
+                .required("Email is required"),
+            password: yup
+                .string()
+                .min(6, "Password must be at least 8 characters")
+                .matches(/[a-z]/, "must contain at least one lowercase letter")
+                .matches(/[A-Z]/, "must contain at least one uppercase letter")
+                .matches(/[0-9]/, "must contain at least a number")
+                .matches(
+                    /[!@#$%_-]/,
+                    "must contain at least a special character (! @ # $ % _ -)",
+                )
+                .required("Password is required"),
+            confirmPassword: yup
+                .string()
+                .oneOf([yup.ref("password"), null], "Passwords must match")
+                .required("Confirm Password is required"),
+            terms: yup
+                .boolean()
+                .oneOf([true], "You must accept the terms and conditions"),
+        }),
+    });
+
+    const [showPasswordRules, setShowPasswordRules] = useState(false);
+    const password = formik.values.password;
+
+    const passwordRules = {
+        lowercase: /[a-z]/.test(password),
+        uppercase: /[A-Z]/.test(password),
+        number: /[0-9]/.test(password),
+        special: /[@#$%!]/.test(password),
+        length: password.length >= 6,
+    };
+
+    // const validate = (values) => {
     return (
         <div>
-            <div className='d-flex align-items-stretch'>
-                <LeftPanel head='EventFlow Join the community of event lovers'
-                    p='Discover, book, and experience events like never before.'
-                    texthead='Why Choose EventFlow for your event ticketing?'
-                    text1='Simple, easy to use platform'
-                    text2='Lowest ticketing fees'
-                    text3='Dedicated customer support team'
-                    text4='Powerful features'
-
+            <div className="d-flex align-items-stretch auth-layout auth-page">
+                <LeftPanel
+                    head="EventFlow Join the community of event lovers"
+                    p="Discover, book, and experience events like never before."
+                    texthead="Why Choose EventFlow for your event ticketing?"
+                    text1="Simple, easy to use platform"
+                    text2="Lowest ticketing fees"
+                    text3="Dedicated customer support team"
+                    text4="Powerful features"
                 />
-                <div style={{ backgroundColor: 'rgb(249,250,251)', padding: '2em' }} className='w-50'>
-                    <div style={{ width: '450px' }} className='bg-white mx-auto py-5 px-4 shadow-sm rounded-3'>
-                        <h4 className='fw-semibold'>Create Your Account</h4>
-                        <p className='text-secondary'>Join thousands of event lovers</p>
-                        <form action='register' method='post'>
-                            <div>
-                                <label htmlFor="name">Full Name</label>
-                                <input className='form-control shadow-none border-2' type="text" placeholder='Alex Johnson' name='name' id='name' />
+                <div
+                    style={{
+                        backgroundColor: "rgb(249,250,251)",
+                        padding: "2em",
+                    }}
+                    className="w-50 auth-content"
+                >
+                    <div
+                        style={{ width: "450px" }}
+                        className="bg-white mx-auto py-5 px-4 shadow-sm rounded-3 auth-form-card"
+                    >
+                        <h4 className="fw-semibold">Create Your Account</h4>
+                        <p className="text-secondary">
+                            Join thousands of event lovers
+                        </p>
+                        <form
+                            action="register"
+                            method="post"
+                            onSubmit={formik.handleSubmit}
+                        >
+                            <div className="form-group mb-3">
+                                <label htmlFor="firstName">First Name</label>
+                                <input
+                                    className={`form-control shadow-none border-2 m-0 ${
+                                        formik.touched.firstName
+                                            ? formik.errors.firstName
+                                                ? "is-invalid"
+                                                : "is-valid"
+                                            : ""
+                                    }`}
+                                    type="text"
+                                    placeholder="Alex"
+                                    name="firstName"
+                                    id="firstName"
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    value={formik.values.firstName}
+                                />
+                                {formik.touched.firstName &&
+                                    formik.errors.firstName && (
+                                        <small className="text-danger mb-3">
+                                            {formik.errors.firstName}
+                                        </small>
+                                    )}
                             </div>
-                            <div>
+
+                            <div className="form-group mb-3">
+                                <label htmlFor="lastName">Last Name</label>
+                                <input
+                                    className={`form-control shadow-none border-2 m-0 ${
+                                        formik.touched.lastName
+                                            ? formik.errors.lastName
+                                                ? "is-invalid"
+                                                : "is-valid"
+                                            : ""
+                                    }`}
+                                    type="text"
+                                    placeholder="Johnson"
+                                    name="lastName"
+                                    id="lastName"
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    value={formik.values.lastName}
+                                />
+                                {formik.touched.lastName &&
+                                    formik.errors.lastName && (
+                                        <small className="text-danger mb-3">
+                                            {formik.errors.lastName}
+                                        </small>
+                                    )}
+                            </div>
+
+                            <div className="form-group mb-3">
                                 <label htmlFor="email">Email Address</label>
-                                <input className='form-control shadow-none border-2' type="email" placeholder='alex@example.com' name='email' id='email' />
+                                <input
+                                    className={`form-control shadow-none border-2 m-0 ${
+                                        formik.touched.email
+                                            ? formik.errors.email
+                                                ? "is-invalid"
+                                                : "is-valid"
+                                            : ""
+                                    }`}
+                                    type="email"
+                                    placeholder="alex@example.com"
+                                    name="email"
+                                    id="email"
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    value={formik.values.email}
+                                />
+                                {formik.touched.email &&
+                                    formik.errors.email && (
+                                        <small className="text-danger mb-3">
+                                            {formik.errors.email}
+                                        </small>
+                                    )}
                             </div>
-                            <div>
+
+                            <div className="form-group mb-3">
                                 <label htmlFor="password">Password</label>
-                                <input className='form-control shadow-none border-2' type="password" placeholder='Create a strong password' name='password' id='password' />
-                            </div>
-                            <div>
-                                <label htmlFor="confimPassword">Confirm Password</label>
-                                <input className='form-control shadow-none border-2' type="password" placeholder='Confirm password' name='confirmPassword' id='confirmPassword' />
+
+                                <input
+                                    className={`form-control shadow-none border-2 m-0 ${
+                                        formik.touched.password
+                                            ? formik.errors.password
+                                                ? "is-invalid"
+                                                : "is-valid"
+                                            : ""
+                                    }`}
+                                    type="password"
+                                    placeholder="Create a strong password"
+                                    name="password"
+                                    id="password"
+                                    onChange={formik.handleChange}
+                                    onBlur={(e) => {
+                                        formik.handleBlur(e);
+                                        setShowPasswordRules(false);
+                                    }}
+                                    onFocus={() => setShowPasswordRules(true)}
+                                    value={formik.values.password}
+                                />
+
+                                {showPasswordRules && (
+                                    <div className="mt-2 small">
+                                        <p
+                                            className={
+                                                passwordRules.lowercase
+                                                    ? "text-success"
+                                                    : "text-muted"
+                                            }
+                                        >
+                                            {passwordRules.lowercase ? (
+                                                <i className="bi bi-check-circle text-success"></i>
+                                            ) : (
+                                                <i class="bi bi-x-circle"></i>
+                                            )}{" "}
+                                            At least one lowercase letter
+                                        </p>
+
+                                        <p
+                                            className={
+                                                passwordRules.uppercase
+                                                    ? "text-success"
+                                                    : "text-muted"
+                                            }
+                                        >
+                                            {passwordRules.uppercase ? (
+                                                <i className="bi bi-check-circle text-success"></i>
+                                            ) : (
+                                                <i class="bi bi-x-circle"></i>
+                                            )}{" "}
+                                            At least one uppercase letter
+                                        </p>
+
+                                        <p
+                                            className={
+                                                passwordRules.number
+                                                    ? "text-success"
+                                                    : "text-muted"
+                                            }
+                                        >
+                                            {passwordRules.number ? (
+                                                <i className="bi bi-check-circle text-success"></i>
+                                            ) : (
+                                                <i class="bi bi-x-circle"></i>
+                                            )}{" "}
+                                            At least one number
+                                        </p>
+
+                                        <p
+                                            className={
+                                                passwordRules.special
+                                                    ? "text-success"
+                                                    : "text-muted"
+                                            }
+                                        >
+                                            {passwordRules.special ? (
+                                                <i className="bi bi-check-circle text-success"></i>
+                                            ) : (
+                                                <i class="bi bi-x-circle"></i>
+                                            )}{" "}
+                                            At least one special character (@ #
+                                            $ % !)
+                                        </p>
+
+                                        <p
+                                            className={
+                                                passwordRules.length
+                                                    ? "text-success"
+                                                    : "text-muted"
+                                            }
+                                        >
+                                            {passwordRules.length ? (
+                                                <i className="bi bi-check-circle text-success"></i>
+                                            ) : (
+                                                <i class="bi bi-x-circle"></i>
+                                            )}{" "}
+                                            Minimum 6 characters
+                                        </p>
+                                    </div>
+                                )}
+
+                                {formik.touched.password &&
+                                    formik.errors.password && (
+                                        <small className="text-danger mb-3">
+                                            {formik.errors.password}
+                                        </small>
+                                    )}
                             </div>
 
-                            <div className='d-flex align-items-center justify-content-start gap-2 my-4'>
-                                <input type="checkbox" name="terms" id='terms' />
-                                <label htmlFor='terms' className="m-0">I agree to the <span className='text-primary'>Terms of Service</span> and <span className='text-primary'>Privacy Policy</span></label>
+                            <div className="form-group mb-3">
+                                <label htmlFor="confirmPassword">
+                                    Confirm Password
+                                </label>
+                                <input
+                                    className={`form-control shadow-none border-2 m-0 ${
+                                        formik.touched.confirmPassword
+                                            ? formik.errors.confirmPassword
+                                                ? "is-invalid"
+                                                : "is-valid"
+                                            : ""
+                                    }`}
+                                    type="password"
+                                    placeholder="Confirm password"
+                                    name="confirmPassword"
+                                    id="confirmPassword"
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    value={formik.values.confirmPassword}
+                                />
+                                {formik.touched.confirmPassword &&
+                                    formik.errors.confirmPassword && (
+                                        <small className="text-danger mb-3">
+                                            {formik.errors.confirmPassword}
+                                        </small>
+                                    )}
                             </div>
 
-                            <Link to='/signin'>
-                                <button style={{ backgroundColor: 'rgb(226,131,8)' }} className='btn w-100 py-2 text-white fw-semibold mb-3'>Create Account</button>
-                            </Link>
-                            <div className='d-flex align-items-center justify-content-between'>
-                                <hr className='w-25' />
-                                <p style={{ fontSize: '.9em' }} className="m-0">or continue with</p>
-                                <hr className='w-25' />
+                            <div className="d-flex align-items-center justify-content-start gap-2 mt-4">
+                                <input
+                                    type="checkbox"
+                                    name="terms"
+                                    id="terms"
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    value={formik.values.terms}
+                                    className={`form-check-input m-0 ${
+                                        formik.touched.terms
+                                            ? formik.errors.terms
+                                                ? "is-invalid"
+                                                : "is-valid"
+                                            : ""
+                                    }`}
+                                />
+                                <label htmlFor="terms" className="m-0">
+                                    I agree to the{" "}
+                                    <span className="text-primary">
+                                        Terms of Service
+                                    </span>{" "}
+                                    and{" "}
+                                    <span className="text-primary">
+                                        Privacy Policy
+                                    </span>
+                                </label>
+                            </div>
+                            {formik.touched.terms && formik.errors.terms && (
+                                <small className="text-danger mb-3">
+                                    {formik.errors.terms}
+                                </small>
+                            )}
+
+                            <button
+                                type="submit"
+                                style={{
+                                    backgroundColor: "rgb(226,131,8)",
+                                }}
+                                className="btn w-100 py-2 text-white fw-semibold my-3"
+                            >
+                                Create Account
+                            </button>
+                            <div className="d-flex align-items-center justify-content-between">
+                                <hr className="w-25" />
+                                <p style={{ fontSize: ".9em" }} className="m-0">
+                                    or continue with
+                                </p>
+                                <hr className="w-25" />
                             </div>
 
-                            <btn className='btn d-flex align-items-center justify-content-center gap-3 rounded-3 border p-3 my-3  '>
+                            <div className="btn d-flex align-items-center justify-content-center gap-3 rounded-3 border p-3 my-3  ">
                                 {/* <i className='bi bi-google'></i> */}
                                 <img src={googleIcon} width="30" />
                                 <p className="m-0">Continue with Google</p>
-                            </btn>
+                            </div>
 
-                            <p className="m-0 text-center">Already have an account? <Link to='/signin'><span className='text-primary fw-semibold'>Sign In</span></Link></p>
+                            <p className="m-0 text-center">
+                                Already have an account?{" "}
+                                <Link to="/signin">
+                                    <span className="text-primary fw-semibold">
+                                        Sign In
+                                    </span>
+                                </Link>
+                            </p>
                         </form>
                     </div>
                 </div>

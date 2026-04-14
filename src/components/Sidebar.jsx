@@ -3,9 +3,9 @@ import Logo from './Logo';
 import './sidebar.css';
 import { Link } from 'react-router-dom';
 
-const Sidebar = () => {
+const Sidebar = ({ mobileOpen = false }) => {
     return (
-        <div className='sidebar bg-white'>
+        <div className={`sidebar bg-white ${mobileOpen ? 'sidebar-mobile-open' : ''}`}>
             <div>
                 <Logo size={40} fontSize='1.25em' />
                 <ul className='links'>
