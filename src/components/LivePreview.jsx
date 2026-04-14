@@ -57,7 +57,7 @@ const LivePreview = () => {
                         <li className="m-0">Event Banner</li>
                     </ul>
                 </div>
-            <div className="d-flex align-items-center gap-3 mt-4 create-event-bottom-actions">
+            <div className="d-flex flex-wrap align-items-center gap-3 mt-4 create-event-bottom-actions">
                 <button className="btn btn-outline-light w-100 text-dark border rounded-3 py-2 px-3">
                     Save Draft
                 </button>

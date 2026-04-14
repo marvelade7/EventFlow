@@ -8,6 +8,18 @@
     }
 }
 
+@media (min-width: 1025px) and (max-width: 1400px) {
+    .dashboard-page .sidebar,
+    .create-event-page .sidebar {
+        width: 240px;
+    }
+
+    .dashboard-main,
+    .create-event-main {
+        margin-left: 240px !important;
+    }
+}
+
 @media (max-width: 1024px) {
     .create-event-page .sidebar {
         display: flex !important;
@@ -171,6 +183,19 @@
         width: 100% !important;
         max-width: 560px;
         margin: 2rem auto !important;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+    .create-event-page .create-event-layout {
+        align-items: center;
+    }
+
+    .create-event-page .create-event-form-column,
+    .create-event-page .create-event-preview-column {
+        width: 80% !important;
+        margin-left: auto;
+        margin-right: auto;
     }
 }
 

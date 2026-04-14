@@ -33,13 +33,13 @@ const Tickets = () => {
                 <div className='form-group w-100'>
                     <label htmlFor="availableTickets">Total Tickets Available <span className='text-secondary'>(min - 10)</span></label>
                     <div className='d-flex align-items-center justify-content-between px-0 py-0 gap-2 form-control shadow-none ticket-quantity-control'>
-                        <button style={{fontSize: '1.3em'}} onClick={() => setTickets(prev => (prev > 10 ? prev - 5 : 10))} className='border-0 py-1 px-3 qty-btn' type='button'>-</button>
+                        <button style={{fontSize: '1.3em'}} onClick={() => setTickets(prev => (prev > 10 ? prev - 5 : 10))} className='border-0 py-2 px-3 qty-btn' type='button'>-</button>
                         <input onChange={(e) => {
                             const value = Number(e.target.value);
                             setTickets(value < 10 ? 10 : value);
                         }}
                             style={{ outline: 'none' }} type='number' value={tickets} className='border-0 text-center qty-input' />
-                        <button style={{fontSize: '1.3em'}} onClick={() => setTickets(prev => prev + 5)} className='border-0 py-1 px-3 qty-btn' type='button'>+</button>
+                        <button style={{fontSize: '1.3em'}} onClick={() => setTickets(prev => prev + 5)} className='border-0 py-2 px-3 qty-btn' type='button'>+</button>
                     </div>
                 </div>
             </div>
