@@ -23,7 +23,7 @@ const App = () => {
         <Route path='/create-event' element={<CreateNewEventPage />} />
         <Route path='/admin-auth' element={<AdminAuthPage />} />
         <Route path='/checkout' element={<CheckoutPage />} />
-        <Route path='/error' element={<Error404/>} />
+        <Route path='*' element={<Error404/>} />
       </Routes>
     </>
   )
