@@ -1,9 +1,9 @@
-import React, { use, useState } from "react";
+import React, { useState } from "react";
 import LeftPanel from "../components/LeftPanel";
 import "../components/Auth.css";
 import { Link, useNavigate } from "react-router-dom";
 import googleIcon from "../assets/images/google-icon.png";
-import { Formik, useFormik } from "formik";
+import { useFormik } from "formik";
 import * as yup from "yup";
 
 const SignUp = () => {
@@ -256,7 +256,7 @@ const SignUp = () => {
                                             {passwordRules.lowercase ? (
                                                 <i className="bi bi-check-circle text-success tick"></i>
                                             ) : (
-                                                <i class="bi bi-x-circle"></i>
+                                                <i className="bi bi-x-circle"></i>
                                             )}{" "}
                                             At least one lowercase letter
                                         </p>
@@ -271,7 +271,7 @@ const SignUp = () => {
                                             {passwordRules.uppercase ? (
                                                 <i className="bi bi-check-circle text-success tick"></i>
                                             ) : (
-                                                <i class="bi bi-x-circle"></i>
+                                                <i className="bi bi-x-circle"></i>
                                             )}{" "}
                                             At least one uppercase letter
                                         </p>
@@ -286,7 +286,7 @@ const SignUp = () => {
                                             {passwordRules.number ? (
                                                 <i className="bi bi-check-circle text-success tick"></i>
                                             ) : (
-                                                <i class="bi bi-x-circle"></i>
+                                                <i className="bi bi-x-circle"></i>
                                             )}{" "}
                                             At least one number
                                         </p>
@@ -301,7 +301,7 @@ const SignUp = () => {
                                             {passwordRules.special ? (
                                                 <i className="bi bi-check-circle text-success tick"></i>
                                             ) : (
-                                                <i class="bi bi-x-circle"></i>
+                                                <i className="bi bi-x-circle"></i>
                                             )}{" "}
                                             At least one special character (@ #
                                             $ % !)
@@ -317,7 +317,7 @@ const SignUp = () => {
                                             {passwordRules.length ? (
                                                 <i className="bi bi-check-circle text-success tick"></i>
                                             ) : (
-                                                <i class="bi bi-x-circle"></i>
+                                                <i className="bi bi-x-circle"></i>
                                             )}{" "}
                                             Minimum 6 characters
                                         </p>

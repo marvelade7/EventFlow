@@ -101,17 +101,11 @@ const SignIn = () => {
                                         type={
                                             showPassword ? "text" : "password"
                                         }
-                                        placeholder="Create a strong password"
+                                        placeholder="Enter your password"
                                         name="password"
                                         id="password"
                                         onChange={formik.handleChange}
-                                        onBlur={(e) => {
-                                            formik.handleBlur(e);
-                                            setShowPasswordRules(false);
-                                        }}
-                                        onFocus={() =>
-                                            setShowPasswordRules(true)
-                                        }
+                                        onBlur={formik.handleBlur}
                                         value={formik.values.password}
                                     />
 
@@ -153,10 +147,13 @@ const SignIn = () => {
                             <hr className="w-50" />
                         </div>
 
-                        <btn className="btn d-flex align-items-center justify-content-center gap-3 rounded-3 border p-3 my-3  ">
+                        <button
+                            type="button"
+                            className="btn d-flex align-items-center justify-content-center gap-3 rounded-3 border p-3 my-3 w-100"
+                        >
                             <img src={googleIcon} width="30" />
                             <p className="m-0">Continue with Google</p>
-                        </btn>
+                        </button>
 
                         <p className="m-0 text-center">
                             Don't have an account?{" "}

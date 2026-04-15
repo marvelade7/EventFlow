@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local notes and Codex metadata
+AdminDashboard_Explanation.txt
+.codex

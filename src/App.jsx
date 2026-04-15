@@ -11,6 +11,8 @@ import CreateNewEventPage from './pages/CreateNewEventPage';
 import Error404 from './pages/Error404';
 import AdminAuthPage from './pages/AdminAuthPage';
 import CheckoutPage from './pages/CheckoutPage';
+import Profile from './pages/Profile';
+import AdminDashboard from './pages/AdminDashboard';
 
 const App = () => {
   return (
@@ -22,7 +24,9 @@ const App = () => {
         <Route path='/dashboard' element={<UserDashboard/>} />
         <Route path='/create-event' element={<CreateNewEventPage />} />
         <Route path='/admin-auth' element={<AdminAuthPage />} />
+        <Route path='/admin-dashboard' element={<AdminDashboard />} />
         <Route path='/checkout' element={<CheckoutPage />} />
+        <Route path='/my-event' element={<Profile />} />
         <Route path='*' element={<Error404/>} />
       </Routes>
     </>

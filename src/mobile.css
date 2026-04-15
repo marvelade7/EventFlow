@@ -3,19 +3,22 @@
         display: none !important;
     }
 
-    .create-event-menu-btn {
+    .create-event-menu-btn,
+    .admin-dashboard-page .dashboard-menu-btn {
         display: none !important;
     }
 }
 
 @media (min-width: 1025px) and (max-width: 1400px) {
     .dashboard-page .sidebar,
-    .create-event-page .sidebar {
+    .create-event-page .sidebar,
+    .admin-dashboard-page .sidebar {
         width: 240px;
     }
 
     .dashboard-main,
-    .create-event-main {
+    .create-event-main,
+    .admin-dashboard-main {
         margin-left: 240px !important;
     }
 }
@@ -43,6 +46,17 @@
         transform: translateX(0);
     }
 
+    .admin-dashboard-page .sidebar {
+        display: flex !important;
+        transform: translateX(-105%);
+        transition: transform 0.25s ease;
+        z-index: 1200;
+    }
+
+    .admin-dashboard-page .sidebar.sidebar-mobile-open {
+        transform: translateX(0);
+    }
+
     .sidebar-overlay {
         position: fixed;
         inset: 0;
@@ -59,7 +73,8 @@
     }
 
     .dashboard-main,
-    .create-event-main {
+    .create-event-main,
+    .admin-dashboard-main {
         margin-left: 0 !important;
     }
 
@@ -85,7 +100,8 @@
     }
 
     .dash-navbar,
-    .create-event-nav {
+    .create-event-nav,
+    .admin-topbar {
         padding: 16px !important;
         gap: 12px;
         flex-wrap: wrap;
@@ -113,17 +129,34 @@
         flex-wrap: wrap;
     }
 
-    .dash-navbar .input-group {
+    .dash-navbar .input-group,
+    .admin-topbar .input-group {
         flex: 1 1 320px;
         display: flex !important;
         align-items: center;
         flex-wrap: nowrap !important;
     }
 
-    .dash-navbar .input-group input {
+    .dash-navbar .input-group input,
+    .admin-topbar .input-group input {
         width: auto;
         min-width: 0;
         flex: 1 1 auto;
+    }
+
+    .admin-dashboard-content {
+        padding: 16px !important;
+    }
+
+    .admin-stats-grid,
+    .admin-two-column,
+    .admin-permissions-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .admin-hero-card {
+        flex-direction: column;
+        align-items: flex-start;
     }
 
     .create-event-nav .create-event-actions {
@@ -294,7 +327,8 @@
     }
 
     .dash-navbar,
-    .create-event-nav {
+    .create-event-nav,
+    .admin-topbar {
         padding: 14px !important;
     }
 
@@ -322,6 +356,23 @@
 
     .create-event-form-column .d-flex.gap-3 > .w-100 {
         min-width: 100%;
+    }
+
+    .admin-search,
+    .admin-create-btn,
+    .admin-alert-pill {
+        width: 100%;
+    }
+
+    .admin-hero-actions,
+    .admin-dashboard-content .d-flex.gap-2,
+    .admin-dashboard-content .d-flex.gap-3 {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .admin-table {
+        min-width: 760px;
     }
 
     .ticket-quantity-control .qty-btn {
@@ -441,7 +492,8 @@
     }
 
     .dash-navbar,
-    .create-event-nav {
+    .create-event-nav,
+    .admin-topbar {
         padding: 12px !important;
     }
 
@@ -457,12 +509,18 @@
         width: 280px;
     }
 
+    .admin-dashboard-page .sidebar {
+        width: 280px;
+    }
+
     .dash-navbar h5,
-    .create-event-nav h5 {
+    .create-event-nav h5,
+    .admin-topbar h5 {
         font-size: 1rem;
     }
 
-    .dash-navbar .input-group {
+    .dash-navbar .input-group,
+    .admin-topbar .input-group {
         flex: 1 1 100%;
     }
 

@@ -1,8 +1,10 @@
 import React from 'react';
 import AdminAuthLeftPanel from '../components/AdminAuthLeftPanel';
-import LeftPanel from '../components/LeftPanel';
+import { useNavigate } from 'react-router-dom';
 
 const AdminAuthPage = () => {
+    const navigate = useNavigate();
+
     return (
         <div className='d-flex align-items-stretch admin-auth-page'>
             <AdminAuthLeftPanel />
@@ -21,7 +23,14 @@ const AdminAuthPage = () => {
                             <label htmlFor="adminPassword">Password</label>
                             <input type="password" placeholder='Admin Password' id='adminPassword' name='adminPassword' className='form-control shadow-none admin-input' />
                         </div>
-                        <button style={{ background: 'rgb(49,46,129)' }} className='btn py-2 px-3 rounded-3 text-white w-100 mt-3 fw-semibold'>Sign In To Dashboard</button>
+                        <button
+                            type='button'
+                            onClick={() => navigate('/admin-dashboard')}
+                            style={{ background: 'rgb(49,46,129)' }}
+                            className='btn py-2 px-3 rounded-3 text-white w-100 mt-3 fw-semibold'
+                        >
+                            Sign In To Dashboard
+                        </button>
                         <div style={{fontSize: '.9em'}} className="d-flex align-items-center gap-2 alert alert-secondary p-3 w-100 border rounded-3 mt-4 m-0">
                             <i className='bi bi-exclamation-triangle'></i>
                             <p className='m-0'>This portal is for authorized administrators only. All access is logged and monitored.</p>

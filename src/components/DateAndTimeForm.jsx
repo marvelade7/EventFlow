@@ -30,7 +30,7 @@ const DateAndTimeForm = () => {
             <div className='form-group'>
                 <label htmlFor="timeZone">Time Zone</label>
                 <select name="timeZone" id="timeZone" className='form-control shadow-none'>
-                    <option value="West African Time">West AFrican Time (WAT) -- UTC-5</option>
+                    <option value="West African Time">West African Time (WAT) -- UTC+1</option>
                     <option value="Eastern Time">Eastern Time (ET) -- UTC-5</option>
                     <option value="Pacific Time">Pacific Time (PT) -- UTC-8</option>
                     <option value="Central Time">Central Time (CT) -- UTC-6</option>

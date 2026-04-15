@@ -10,8 +10,8 @@ const CheckoutPage = () => {
                     <div className='d-flex align-items-center gap-3 shadow-sm py-4 px-4 rounded-3 bg-white'>
                         <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=100&h=80&fit=crop" alt="img" />
                         <div>
-                            <h5 className='m-0'>Summer Beats Festival 2025</h5>
-                            <p className="m-0">Aug 15, 2025 · 2:00 PM</p>
+                            <h5 className='m-0'>Summer Beats Festival 2026</h5>
+                            <p className="m-0">Aug 15, 2026 · 2:00 PM</p>
                             <p className="m-0">Madison Square Garden, NYC</p>
                         </div>
                     </div>
