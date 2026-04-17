@@ -58,7 +58,7 @@ const Navbar = ({scrollToBrowse, scrollToContact, scrollToHero, scrollToWorks}) 
                         </ul>
                         <div className="d-flex gap-3" role="search">
                             <Link to='signin'><button style={currentStyle} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} className='btn px-3'>Sign In</button></Link>
-                            <Link to='signup'><button className="btn btn-warning px-3 " type="submit">Get Started</button></Link>
+                            <Link to='signup'><button className="btn btn-warning px-3 fw-semibold " type="submit">Get Started</button></Link>
                         </div>
                     </div>
                 </div>

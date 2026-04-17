@@ -13,6 +13,7 @@ import AdminAuthPage from './pages/AdminAuthPage';
 import CheckoutPage from './pages/CheckoutPage';
 import Profile from './pages/Profile';
 import AdminDashboard from './pages/AdminDashboard';
+import ForgotPassword from './pages/ForgotPassword';
 
 const App = () => {
   return (
@@ -21,6 +22,7 @@ const App = () => {
         <Route path='/' element={<Home/>} />
         <Route path='/signup' element={<SignUp/>} />
         <Route path='/signin' element={<SignIn/>} />
+        <Route path='/forgot-password' element={<ForgotPassword/>} />
         <Route path='/dashboard' element={<UserDashboard/>} />
         <Route path='/create-event' element={<CreateNewEventPage />} />
         <Route path='/admin-auth' element={<AdminAuthPage />} />

@@ -90,7 +90,7 @@ const SignIn = () => {
                                     style={{ fontSize: ".9em" }}
                                     className="m-0 text-primary fw-semibold text-decoration-underline"
                                 >
-                                    Forgot Password?
+                                    <Link to="/forgot-password">Forgot Password?</Link>
                                 </p>
                             </div>
                             <div className="input-group border rounded overflow-hidden">
