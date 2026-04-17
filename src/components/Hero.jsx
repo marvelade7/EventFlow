@@ -33,20 +33,20 @@ const Hero = ({ onBrowseEvents, onCreateEvent }) => {
                     </div>
 
                     <div className="carousel-inner">
-                        <div className="carousel-item ">
-                            <img src={carousel1} className="d-block w-100" data-bs-interval="3000" alt="..." />
-                        </div>
                         <div className="carousel-item active"  data-bs-interval="3000">
-                            <img src={carousel2} className="d-block w-100" alt="..." />
+                            <img src={carousel2} className="d-block w-100" alt="Concert lights and audience" loading="eager" fetchPriority="high" decoding="async" />
                         </div>
                         <div className="carousel-item ">
-                            <img src={carousel3} className="d-block w-100" data-bs-interval="3000" alt="..." />
+                            <img src={carousel3} className="d-block w-100" data-bs-interval="3000" alt="Conference stage with audience" loading="lazy" decoding="async" />
+                        </div>
+                        <div className="carousel-item" data-bs-interval="3000">
+                            <img src={carousel1} className="d-block w-100" alt="Event crowd at a music festival" loading="lazy" decoding="async" />
                         </div>
                         <div className="carousel-item ">
-                            <img src={carousel4} className="d-block w-100" data-bs-interval="3000" alt="..." />
+                            <img src={carousel4} className="d-block w-100" data-bs-interval="3000" alt="Outdoor event with evening lights" loading="lazy" decoding="async" />
                         </div>
                         <div className="carousel-item ">
-                            <img src={carousel5} className="d-block w-100" data-bs-interval="3000" alt="..." />
+                            <img src={carousel5} className="d-block w-100" data-bs-interval="3000" alt="Live performance with crowd" loading="lazy" decoding="async" />
                         </div>
                     </div>
 
