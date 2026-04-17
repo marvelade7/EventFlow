@@ -5,21 +5,39 @@ import { Link, useNavigate } from "react-router-dom";
 import googleIcon from "../assets/images/google-icon.png";
 import { useFormik } from "formik";
 import * as yup from "yup";
+import axios from "axios";
 
 const SignUp = () => {
+    const [errorMsg, setErrorMsg] = useState("");
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const formik = useFormik({
         initialValues: {
-            lastName: "",
             firstName: "",
+            lastName: "",
             email: "",
             password: "",
             confirmPassword: "",
             terms: false,
         },
         onSubmit: (values) => {
-            console.log(values);
-            navigate("/signin");
+            setLoading(true);
+            // console.log(values);
+            axios
+                .post("http://localhost:5000/api/register", values)
+                .then((res) => {
+                    setLoading(false);
+                    console.log(res.data.user);
+                    console.log(res.data.message);
+                    setErrorMsg("");
+                    navigate("/signin");
+                })
+                .catch((err) => {
+                    setLoading(false);
+                    setErrorMsg(
+                        err.response?.data?.message || "Something went wrong",
+                    );
+                });
         },
         validateOnMount: true, // 👈 important
         validateOnChange: true,
@@ -386,14 +404,32 @@ const SignUp = () => {
                                 </small>
                             )}
 
+                            {errorMsg && (
+                                <div className="fw-semibold text-danger text-center mt-3">
+                                    {errorMsg}
+                                </div>
+                            )}
+
                             <button
                                 type="submit"
+                                disabled={loading}
                                 style={{
                                     backgroundColor: "rgb(226,131,8)",
                                 }}
                                 className="btn w-100 py-2 text-white fw-semibold my-3"
                             >
-                                Create Account
+                                {loading ? (
+                                    <>
+                                        <span
+                                            className="spinner-border spinner-border-sm me-2"
+                                            role="status"
+                                            aria-hidden="true"
+                                        ></span>
+                                        Processing...
+                                    </>
+                                ) : (
+                                    "Create Account"
+                                )}
                             </button>
                             <div className="d-flex align-items-center justify-content-between">
                                 <hr className="w-25" />
