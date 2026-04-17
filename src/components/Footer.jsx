@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const Footer = () => {
+const Footer = ({ onSubscribe }) => {
     const footerDiv = {
         display: 'flex',
         flexDirection: 'column',
@@ -40,7 +40,7 @@ const Footer = () => {
                     <h6 className='text-white m-0'>Newsletter</h6>
                     <div className='footer-btns d-flex gap-3'>
                         <input className='form-control shadow-none border-3 m-0' type="email" placeholder='your@example.com' name='email' />
-                        <button className='btn btn-primary'>Subscribe</button>
+                        <button onClick={onSubscribe} className='btn btn-primary'>Subscribe</button>
                     </div>
                 </div>
             </div>

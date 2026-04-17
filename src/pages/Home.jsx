@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Hero from "../components/Hero";
 import BrowseEvent from "../components/BrowseEvent";
@@ -11,6 +12,8 @@ import aos from "aos";
 import "aos/dist/aos.css";
 
 const Home = () => {
+    const navigate = useNavigate();
+
     useEffect(() => {
         aos.init({ 
             duration: 1500,
@@ -58,7 +61,10 @@ const Home = () => {
                 }}
             />
             <section style={section} ref={heroRef}>
-                <Hero />
+                <Hero
+                    onBrowseEvents={() => scrollToSection(browseRef)}
+                    onCreateEvent={() => navigate("/signup")}
+                />
             </section>
 
             <section
@@ -70,7 +76,7 @@ const Home = () => {
                 <BrowseEventsHead
                     title="What's Happening Near You"
                     view="View all"
-                    
+                    onViewAll={() => navigate("/signup")}
                 />
                 <BrowseEventsFilter
                     filterEvent={{ backgroundColor: "rgb(234, 238, 246)" }}
@@ -84,6 +90,8 @@ const Home = () => {
                         event="Music"
                         eventIcon="bi bi-music-note-beamed"
                         anim='fade-up'
+                        cardTo="/signup"
+                        showActionButton={false}
                     />
 
                     <BrowseEvent
@@ -94,6 +102,8 @@ const Home = () => {
                         event="Tech"
                         eventIcon="bi bi-laptop"
                         anim='fade-up'
+                        cardTo="/signup"
+                        showActionButton={false}
                     />
 
                     <BrowseEvent
@@ -104,6 +114,8 @@ const Home = () => {
                         event="Food"
                         eventIcon="bi bi-laptop"
                         anim='fade-up'
+                        cardTo="/signup"
+                        showActionButton={false}
                     />
                 </div>
             </section>
@@ -113,11 +125,11 @@ const Home = () => {
             </section>
 
             <section data-aos="fade-up" style={section}>
-                <HostEvent />
+                <HostEvent onStartFree={() => navigate("/signup")} />
             </section>
 
             <section data-aos="fade-up" style={section} ref={contactRef}>
-                <Footer />
+                <Footer onSubscribe={() => navigate("/signup")} />
             </section>
         </>
     );
