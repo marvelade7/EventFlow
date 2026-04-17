@@ -19,6 +19,7 @@ const SignUp = () => {
 
     const [errorMsg, setErrorMsg] = useState("");
     const [loading, setLoading] = useState(false);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
     const navigate = useNavigate();
     const formik = useFormik({
         initialValues: {
@@ -39,7 +40,7 @@ const SignUp = () => {
                     console.log(res.data.user);
                     console.log(res.data.message);
                     setErrorMsg("");
-                    navigate("/signin");
+                    setShowSuccessModal(true);
                 })
                 .catch((err) => {
                     setLoading(false);
@@ -97,6 +98,11 @@ const SignUp = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [showPasswordRules, setShowPasswordRules] = useState(false);
     const password = formik.values.password;
+
+    const handleContinueToSignIn = () => {
+        setShowSuccessModal(false);
+        navigate("/signin");
+    };
 
     const passwordRules = {
         lowercase: /[a-z]/.test(password),
@@ -468,6 +474,47 @@ const SignUp = () => {
                     </div>
                 </div>
             </div>
+
+            {showSuccessModal && (
+                <>
+                    <div
+                        className="modal fade show d-block"
+                        tabIndex="-1"
+                        role="dialog"
+                        aria-modal="true"
+                    >
+                        <div className="modal-dialog modal-dialog-centered" role="document">
+                            <div className="modal-content border-0 shadow rounded-4">
+                                <div className="modal-body p-4 text-center">
+                                    <div
+                                        className="mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle"
+                                        style={{
+                                            width: "56px",
+                                            height: "56px",
+                                            backgroundColor: "rgba(25,135,84,.12)",
+                                        }}
+                                    >
+                                        <i className="bi bi-check2-circle text-success fs-3"></i>
+                                    </div>
+                                    <h5 className="fw-semibold mb-2">Account Created Successfully</h5>
+                                    <p className="text-secondary mb-4">
+                                        Your EventFlow account is ready. Continue to sign in.
+                                    </p>
+                                    <button
+                                        type="button"
+                                        className="btn text-white fw-semibold px-4"
+                                        style={{ backgroundColor: "rgb(226,131,8)" }}
+                                        onClick={handleContinueToSignIn}
+                                    >
+                                        Continue to Sign In
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="modal-backdrop fade show"></div>
+                </>
+            )}
         </div>
     );
 };
