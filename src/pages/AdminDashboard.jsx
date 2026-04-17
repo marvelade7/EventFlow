@@ -1,7 +1,9 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import AdminSidebar from "../components/AdminSidebar";
 import AdminTopbar from "../components/AdminTopbar";
+import AOS from "aos";
+import "aos/dist/aos.css";
 
 const initialEvents = [
     {
@@ -101,6 +103,15 @@ const AdminDashboard = () => {
         "Suspended one organizer account for policy review.",
         "Removed 1 reported promotional post from the feed.",
     ]);
+
+    useEffect(() => {
+        AOS.init({
+            duration: 1500,
+            once: true,
+            easing: "ease-out-cubic",
+            offset: 30,
+        });
+    }, []);
 
     const addActivity = (message) => {
         setActivityLog((prev) => [message, ...prev].slice(0, 6));
@@ -241,7 +252,7 @@ const AdminDashboard = () => {
 
     const renderOverview = () => (
         <div className="d-flex flex-column gap-4">
-            <section className="admin-hero-card">
+            <section className="admin-hero-card" data-aos="fade-up">
                 <div>
                     <p className="admin-hero-kicker">Command Center</p>
                     <h2 className="fw-semibold m-0">EventFlow platform oversight</h2>
@@ -266,9 +277,14 @@ const AdminDashboard = () => {
                 </div>
             </section>
 
-            <section className="admin-stats-grid">
+            <section className="admin-stats-grid" data-aos="fade-up" data-aos-delay="70">
                 {stats.map((stat) => (
-                    <div key={stat.title} className={`admin-stat-card ${stat.accent}`}>
+                    <div
+                        key={stat.title}
+                        className={`admin-stat-card ${stat.accent}`}
+                        data-aos="fade-up"
+                        data-aos-delay="120"
+                    >
                         <div className="d-flex align-items-start justify-content-between gap-3">
                             <div>
                                 <p className="admin-stat-label">{stat.title}</p>
@@ -281,8 +297,8 @@ const AdminDashboard = () => {
                 ))}
             </section>
 
-            <section className="admin-two-column">
-                <div className="admin-card">
+            <section className="admin-two-column" data-aos="fade-up" data-aos-delay="120">
+                <div className="admin-card" data-aos="fade-right" data-aos-delay="160">
                     <div className="d-flex align-items-center justify-content-between gap-3 mb-3">
                         <div>
                             <p className="admin-section-kicker">Recent Activity</p>
@@ -302,7 +318,7 @@ const AdminDashboard = () => {
                     </div>
                 </div>
 
-                <div className="admin-card">
+                <div className="admin-card" data-aos="fade-left" data-aos-delay="180">
                     <div className="d-flex align-items-center justify-content-between gap-3 mb-3">
                         <div>
                             <p className="admin-section-kicker">Access Level</p>
@@ -334,7 +350,7 @@ const AdminDashboard = () => {
     );
 
     const renderEvents = () => (
-        <section className="admin-card">
+        <section className="admin-card" data-aos="fade-up">
             <div className="d-flex align-items-center justify-content-between gap-3 mb-4 flex-wrap">
                 <div>
                     <p className="admin-section-kicker">Event Management</p>
@@ -361,8 +377,8 @@ const AdminDashboard = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredEvents.map((event) => (
-                            <tr key={event.id}>
+                        {filteredEvents.map((event, index) => (
+                            <tr key={event.id} data-aos="fade-up" data-aos-delay={Math.min(index * 60, 220)}>
                                 <td className="fw-semibold">{event.title}</td>
                                 <td>{event.organizer}</td>
                                 <td>{event.date}</td>
@@ -403,7 +419,7 @@ const AdminDashboard = () => {
     );
 
     const renderUsers = () => (
-        <section className="admin-card">
+        <section className="admin-card" data-aos="fade-up">
             <div className="mb-4">
                 <p className="admin-section-kicker">User Management</p>
                 <h4 className="m-0">Manage attendee and organizer access</h4>
@@ -422,8 +438,8 @@ const AdminDashboard = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredUsers.map((user) => (
-                            <tr key={user.id}>
+                        {filteredUsers.map((user, index) => (
+                            <tr key={user.id} data-aos="fade-up" data-aos-delay={Math.min(index * 60, 220)}>
                                 <td className="fw-semibold">{user.name}</td>
                                 <td>{user.email}</td>
                                 <td>{user.role}</td>
@@ -464,7 +480,7 @@ const AdminDashboard = () => {
     );
 
     const renderPosts = () => (
-        <section className="admin-card">
+        <section className="admin-card" data-aos="fade-up">
             <div className="mb-4">
                 <p className="admin-section-kicker">Content Moderation</p>
                 <h4 className="m-0">Approve, review, or delete community posts</h4>
@@ -483,8 +499,8 @@ const AdminDashboard = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredPosts.map((post) => (
-                            <tr key={post.id}>
+                        {filteredPosts.map((post, index) => (
+                            <tr key={post.id} data-aos="fade-up" data-aos-delay={Math.min(index * 60, 220)}>
                                 <td className="fw-semibold">{post.title}</td>
                                 <td>{post.author}</td>
                                 <td>{post.category}</td>
@@ -534,8 +550,8 @@ const AdminDashboard = () => {
     );
 
     const renderControls = () => (
-        <div className="admin-two-column">
-            <section className="admin-card">
+        <div className="admin-two-column" data-aos="fade-up">
+            <section className="admin-card" data-aos="fade-right" data-aos-delay="90">
                 <div className="mb-4">
                     <p className="admin-section-kicker">Platform Controls</p>
                     <h4 className="m-0">Push updates and act fast</h4>
@@ -573,7 +589,7 @@ const AdminDashboard = () => {
                 </div>
             </section>
 
-            <section className="admin-card">
+            <section className="admin-card" data-aos="fade-left" data-aos-delay="120">
                 <div className="mb-4">
                     <p className="admin-section-kicker">High Priority</p>
                     <h4 className="m-0">Suggested admin actions</h4>

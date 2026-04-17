@@ -1,11 +1,21 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import LeftPanel from "../components/LeftPanel";
 import { Link } from "react-router-dom";
 import googleIcon from "../assets/images/google-icon.png";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import aos from "aos";
+import "aos/dist/aos.css";
 
 const SignIn = () => {
+    useEffect(() => {
+        aos.init({
+            duration: 1500,
+            once: true,
+        });
+    }, []);
+
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
@@ -46,6 +56,7 @@ const SignIn = () => {
                 // p='Your next great experience is waiting for you.'
             />
             <div
+                data-aos="fade-left"
                 style={{
                     backgroundColor: "rgb(249,250,251)",
                     padding: "4.6em 2em",
@@ -60,7 +71,7 @@ const SignIn = () => {
                     <p className="text-secondary">
                         Sign in to your EventFlow account
                     </p>
-                    <form action="" method="post">
+                    <form action="" method="post" data-aos="fade-up">
                         <div className="mb-3">
                             <label htmlFor="email">Email Address</label>
                             <input

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import LeftPanel from "../components/LeftPanel";
 import "../components/Auth.css";
 import { Link, useNavigate } from "react-router-dom";
@@ -6,8 +6,17 @@ import googleIcon from "../assets/images/google-icon.png";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import axios from "axios";
+import aos from "aos";
+import "aos/dist/aos.css";
 
 const SignUp = () => {
+    useEffect(() => {
+        aos.init({ 
+            duration: 1500,
+            once: true, 
+        });
+    }, []);
+
     const [errorMsg, setErrorMsg] = useState("");
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
@@ -111,6 +120,7 @@ const SignUp = () => {
                     text4="Powerful features"
                 />
                 <div
+                    data-aos="fade-left"
                     style={{
                         backgroundColor: "rgb(249,250,251)",
                         padding: "2em",
@@ -126,6 +136,7 @@ const SignUp = () => {
                             Join thousands of event lovers
                         </p>
                         <form
+                            data-aos = 'fade-up'
                             action="register"
                             method="post"
                             onSubmit={formik.handleSubmit}

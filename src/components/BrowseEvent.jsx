@@ -1,13 +1,11 @@
 import React from 'react';
-import BrowseEventsHead from './BrowseEventsHead';
-import BrowseEventsFilter from './BrowseEventsFilter';
 
-const BrowseEvent = ({ img, title, date, venue, event, eventIcon, price, button, btnStyle }) => {
+const BrowseEvent = ({ img, title, date, venue, event, eventIcon, price, button, btnStyle, anim = 'fade-up', delay = 0 }) => {
 
     return (
         <>
             <div className="col">
-                <div className="browse-card card border-0 shadow-sm">
+                <div data-aos={anim} data-aos-delay={delay} className="browse-card card border-0 shadow-sm">
                     <img src={img} className="card-img-top" alt="..." />
                     <div className="card-body">
                         <p className={'card-text border gap-2 m-0 rounded-5 w-auto d-inline-flex px-2'}><i className={eventIcon}></i> {event}</p>
