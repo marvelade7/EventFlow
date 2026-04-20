@@ -1,6 +1,6 @@
 import React from 'react';
 
-const CreateEventNav = ({ onToggleSidebar, isSidebarOpen }) => {
+const CreateEventNav = ({ onToggleSidebar, isSidebarOpen, onSaveDraft, isSubmitting }) => {
     const nav = {
         display: 'flex',
         justifyContent: 'space-between',
@@ -23,8 +23,10 @@ const CreateEventNav = ({ onToggleSidebar, isSidebarOpen }) => {
                 <h5 className='m-0'>Create New Event</h5>
             </div>
             <div className='d-flex align-items-center gap-3 create-event-actions'>
-                <button className='btn btn-outline-light text-dark border rounded-3 py-2 px-3'>Save Draft</button>
-                <button style={{backgroundColor: 'rgb(17,213,243)'}} className='btn rounded-3 text-white py-2 fw-semibold px-3'>Publish Event</button>
+                <button type='button' onClick={onSaveDraft} className='btn btn-outline-light text-dark border rounded-3 py-2 px-3'>Save Draft</button>
+                <button type='submit' disabled={isSubmitting} style={{backgroundColor: 'rgb(17,213,243)'}} className='btn rounded-3 text-white py-2 fw-semibold px-3'>
+                    {isSubmitting ? 'Publishing...' : 'Publish Event'}
+                </button>
             </div>
         </div>
     );

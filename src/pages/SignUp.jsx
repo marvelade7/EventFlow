@@ -35,7 +35,7 @@ const SignUp = () => {
             setLoading(true);
             // console.log(values);
             axios
-                .post("https://eventflow-backend-fwv4.onrender.com/api/register", values)
+                .post("https://eventflow-backend-fwv4.onrender.com/api/users/register", values)
                 .then((res) => {
                     setLoading(false);
                     console.log(res.data.user);

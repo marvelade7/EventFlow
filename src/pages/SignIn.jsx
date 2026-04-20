@@ -28,7 +28,7 @@ const SignIn = () => {
         const credentials = { email, password };
         setLoading(true)
         axios
-            .post("https://eventflow-backend-fwv4.onrender.com/api/login", credentials)
+            .post("https://eventflow-backend-fwv4.onrender.com/api/users/login", credentials)
             .then((response) => {
                 setLoading(false)
                 setErrorMsg("");

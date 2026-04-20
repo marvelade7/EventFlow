@@ -1,10 +1,30 @@
-import React from "react";
+import React, { useEffect, useMemo } from "react";
 
-const LivePreview = () => {
+const LivePreview = ({ values, isSubmitting, onSaveDraft }) => {
     const preview = {
         position: "sticky",
         top: "10px",
     };
+
+    const imageUrl = useMemo(
+        () => (values.eventBanner ? URL.createObjectURL(values.eventBanner) : ""),
+        [values.eventBanner]
+    );
+
+    useEffect(() => {
+        return () => {
+            if (imageUrl) {
+                URL.revokeObjectURL(imageUrl);
+            }
+        };
+    }, [imageUrl]);
+
+    const previewDate = values.startDate ? new Date(values.startDate).toLocaleDateString() : "Date TBD";
+    const previewVenue = values.venueName || "Venue TBD";
+    const previewName = values.eventName || "Your Event Name";
+    const previewCategory = values.category || "Category";
+    const previewPrice = values.isFree ? "$0.00" : `$${Number(values.ticketPrice || 0).toFixed(2)}`;
+
     return (
         <div style={preview}>
             <div className="bg-white rounded-4 p-3 shadow-sm mb-4">
@@ -17,24 +37,29 @@ const LivePreview = () => {
                 <div>
                     <img
                         className="preview-img"
-                        src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=300&h=140&fit=crop"
+                        src={
+                            imageUrl ||
+                            "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=300&h=140&fit=crop"
+                        }
+                        alt="Event preview"
                     />
                     <p className="mt-3 px-3 border d-inline-flex rounded-4">
-                        Music
+                        {previewCategory}
                     </p>
-                    <h6 style={{ fontSize: "1.1em" }}>Your Event Name</h6>
-                    <p className="m-0">Date TBD</p>
-                    <p className="m-0">Venue TBD</p>
+                    <h6 style={{ fontSize: "1.1em" }}>{previewName}</h6>
+                    <p className="m-0">{previewDate}</p>
+                    <p className="m-0">{previewVenue}</p>
                 </div>
                 <div className="d-flex align-items-center justify-content-between mt-2">
                     <p
                         style={{ color: "rgb(17,213,243)" }}
                         className="fw-semibold m-0"
                     >
-                        $0.00
+                        {previewPrice}
                     </p>
                     <button
                         style={{ backgroundColor: "rgb(17,213,243)" }}
+                        type="button"
                         className="btn py-1 text-white fw-semibold"
                     >
                         Book Now
@@ -58,14 +83,16 @@ const LivePreview = () => {
                     </ul>
                 </div>
             <div className="d-flex flex-wrap align-items-center gap-3 mt-4 create-event-bottom-actions">
-                <button className="btn btn-outline-light w-100 text-dark border rounded-3 py-2 px-3">
+                <button type="button" onClick={onSaveDraft} className="btn btn-outline-light w-100 text-dark border rounded-3 py-2 px-3">
                     Save Draft
                 </button>
                 <button
+                    type="submit"
+                    disabled={isSubmitting}
                     style={{ backgroundColor: "rgb(17,213,243)" }}
                     className="btn rounded-3 text-white w-100 py-2 fw-semibold px-3"
                 >
-                    Publish Event
+                    {isSubmitting ? "Publishing..." : "Publish Event"}
                 </button>
             </div>
             </div>
