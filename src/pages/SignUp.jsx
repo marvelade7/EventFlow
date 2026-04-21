@@ -13,7 +13,7 @@ const SignUp = () => {
     useEffect(() => {
         window.scrollTo({ top: 0, left: 0, behavior: "auto" });
         aos.init({ 
-            duration: 1500,
+            duration: 1000,
             once: true, 
         });
     }, []);
@@ -31,7 +31,7 @@ const SignUp = () => {
             confirmPassword: "",
             terms: false,
         },
-        onSubmit: (values) => {
+        onSubmit: (values, {resetForm}) => {
             setLoading(true);
             // console.log(values);
             axios
@@ -41,6 +41,7 @@ const SignUp = () => {
                     console.log(res.data.user);
                     console.log(res.data.message);
                     setErrorMsg("");
+                    resetForm()
                     setShowSuccessModal(true);
                 })
                 .catch((err) => {

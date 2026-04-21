@@ -10,34 +10,38 @@ import "aos/dist/aos.css";
 const SignIn = () => {
     useEffect(() => {
         aos.init({
-            duration: 1500,
+            duration: 1000,
             once: true,
         });
     }, []);
-
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
     const [errorMsg, setErrorMsg] = useState("");
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false);
+    const [formData, setFormData] = useState({ name: "", email: "" });
 
     const signin = (e) => {
         e.preventDefault();
         const credentials = { email, password };
-        setLoading(true)
+        setLoading(true);
         axios
-            .post("https://eventflow-backend-fwv4.onrender.com/api/users/login", credentials)
+            .post(
+                "https://eventflow-backend-fwv4.onrender.com/api/users/login",
+                credentials,
+            )
             .then((response) => {
-                setLoading(false)
+                setLoading(false);
                 setErrorMsg("");
                 // alert("Login successful");
+                setFormData({ name: "", email: "" });
                 console.log(response.data.user.firstName);
                 navigate("/dashboard");
             })
             .catch((error) => {
-                setLoading(false)
+                setLoading(false);
                 setErrorMsg(
                     error.response?.data?.message || "Something went wrong",
                 );
@@ -90,7 +94,9 @@ const SignIn = () => {
                                     style={{ fontSize: ".9em" }}
                                     className="m-0 text-primary fw-semibold text-decoration-underline"
                                 >
-                                    <Link to="/forgot-password">Forgot Password?</Link>
+                                    <Link to="/forgot-password">
+                                        Forgot Password?
+                                    </Link>
                                 </p>
                             </div>
                             <div className="input-group border rounded overflow-hidden">
@@ -136,17 +142,17 @@ const SignIn = () => {
                             className="btn w-100 py-2 text-white fw-semibold my-3"
                         >
                             {loading ? (
-                                    <>
-                                        <span
-                                            className="spinner-border spinner-border-sm me-2"
-                                            role="status"
-                                            aria-hidden="true"
-                                        ></span>
-                                        Processing...
-                                    </>
-                                ) : (
-                                    "Sign In"
-                                )}
+                                <>
+                                    <span
+                                        className="spinner-border spinner-border-sm me-2"
+                                        role="status"
+                                        aria-hidden="true"
+                                    ></span>
+                                    Processing...
+                                </>
+                            ) : (
+                                "Sign In"
+                            )}
                         </button>
                         <div className="d-flex align-items-center justify-content-between gap-3">
                             <hr className="w-50" />

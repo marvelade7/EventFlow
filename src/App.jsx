@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { Route, Routes, useLocation } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import Home from './pages/Home';
 import '/node_modules/bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
@@ -33,6 +33,7 @@ const App = () => {
         <Route path='/' element={<Home/>} />
         <Route path='/signup' element={<SignUp/>} />
         <Route path='/signin' element={<SignIn/>} />
+        <Route path='/login' element={<Navigate to='/signin' replace />} />
         <Route path='/forgot-password' element={<ForgotPassword/>} />
         <Route path='/dashboard' element={<UserDashboard/>} />
         <Route path='/create-event' element={<CreateNewEventPage />} />

@@ -106,7 +106,7 @@ const AdminDashboard = () => {
 
     useEffect(() => {
         AOS.init({
-            duration: 1500,
+            duration: 1000,
             once: true,
             easing: "ease-out-cubic",
             offset: 30,
