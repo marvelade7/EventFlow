@@ -33,12 +33,12 @@ const SignIn = () => {
                 credentials,
             )
             .then((response) => {
+                navigate("/dashboard");
                 setLoading(false);
                 setErrorMsg("");
                 // alert("Login successful");
                 setFormData({ name: "", email: "" });
                 console.log(response.data.user.firstName);
-                navigate("/dashboard");
             })
             .catch((error) => {
                 setLoading(false);
