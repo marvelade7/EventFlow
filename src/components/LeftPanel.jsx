@@ -32,7 +32,7 @@ const LeftPanel = ({ head, p, texthead, text1, text2, text3, text4, style, pStyl
             <div data-aos="fade-right" style={leftPanel}>
                 <Link to='/' style={{textDecoration: 'none', color: 'white'}}>
                     <div className='d-flex align-items-center gap-1 top-0'>
-                        <img src="eventLogo.png" width="40" />
+                        <img src="/eventLogo.png" width="40" />
                         <h5 className='m-0'>EventFlow</h5>
                     </div>
                 </Link>

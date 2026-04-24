@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import aos from "aos";
 import "aos/dist/aos.css";
+import { seedUserProfileFromAuthUser } from "../utils/userProfile";
 
 const SignIn = () => {
     useEffect(() => {
@@ -34,6 +35,7 @@ const SignIn = () => {
             )
             .then((response) => {
                 navigate("/dashboard");
+                seedUserProfileFromAuthUser(response.data.user);
                 setLoading(false);
                 setErrorMsg("");
                 // alert("Login successful");
@@ -41,10 +43,10 @@ const SignIn = () => {
                 console.log(response.data.user.firstName);
             })
             .catch((error) => {
-                setLoading(false);
                 setErrorMsg(
                     error.response?.data?.message || "Something went wrong",
                 );
+                setLoading(false);
                 console.error("Error logging in:", error);
                 // alert("Login failed");
             });

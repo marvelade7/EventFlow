@@ -146,8 +146,10 @@ const CreateNewEventPage = () => {
                             isSidebarOpen={sidebarOpen}
                             onSaveDraft={handleSaveDraft}
                             isSubmitting={formik.isSubmitting}
+                            title='Create New Event'
                         />
                     </div>
+
                     <div className='d-flex gap-3 px-4 pb-4 mt-2 create-event-layout'>
                         <div className='create-event-form-column' style={{width: '70%'}}>
                             <div className='my-4' data-aos='fade-up' data-aos-delay='60'>
@@ -166,6 +168,7 @@ const CreateNewEventPage = () => {
                                 <EventMedia formik={formik} />
                             </div>
                         </div>
+                        
                         <div className='py-4 create-event-preview-column' style={{width: '30%'}} data-aos='fade-left' data-aos-delay='180'>
                             <LivePreview
                                 values={formik.values}

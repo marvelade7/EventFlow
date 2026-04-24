@@ -1,6 +1,14 @@
 import React from 'react';
 
-const CreateEventNav = ({ onToggleSidebar, isSidebarOpen, onSaveDraft, isSubmitting }) => {
+const CreateEventNav = ({
+    onToggleSidebar,
+    isSidebarOpen,
+    onSaveDraft,
+    isSubmitting,
+    title,
+    actionLabel,
+    onActionClick,
+}) => {
     const nav = {
         display: 'flex',
         justifyContent: 'space-between',
@@ -20,13 +28,28 @@ const CreateEventNav = ({ onToggleSidebar, isSidebarOpen, onSaveDraft, isSubmitt
                 >
                     <i className={`bi ${isSidebarOpen ? 'bi-x-lg' : 'bi-list'}`}></i>
                 </button>
-                <h5 className='m-0'>Create New Event</h5>
+
+                {/* <h5 className='m-0'>Creta</h5> */}
+                <h5 className='m-0'>{title}</h5>
             </div>
             <div className='d-flex align-items-center gap-3 create-event-actions'>
-                <button type='button' onClick={onSaveDraft} className='btn btn-outline-light text-dark border rounded-3 py-2 px-3'>Save Draft</button>
-                <button type='submit' disabled={isSubmitting} style={{backgroundColor: 'rgb(17,213,243)'}} className='btn rounded-3 text-white py-2 fw-semibold px-3'>
-                    {isSubmitting ? 'Publishing...' : 'Publish Event'}
-                </button>
+                {actionLabel ? (
+                    <button
+                        type='button'
+                        onClick={onActionClick}
+                        style={{ backgroundColor: 'rgb(17,213,243)' }}
+                        className='btn rounded-3 text-white py-2 fw-semibold px-3'
+                    >
+                        {actionLabel}
+                    </button>
+                ) : (
+                    <>
+                        <button type='button' onClick={onSaveDraft} className='btn btn-outline-light text-dark border rounded-3 py-2 px-3'>Save Draft</button>
+                        <button type='submit' disabled={isSubmitting} style={{backgroundColor: 'rgb(17,213,243)'}} className='btn rounded-3 text-white py-2 fw-semibold px-3'>
+                            {isSubmitting ? 'Publishing...' : 'Publish Event'}
+                        </button>
+                    </>
+                )}
             </div>
         </div>
     );

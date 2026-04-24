@@ -11,6 +11,7 @@
     flex-direction: column;
     justify-content: space-between;
 }
+
 .links {
     list-style: none;
     display: flex;
@@ -35,6 +36,16 @@
 .links li:hover {
     background-color: rgba(128, 128, 128, 0.245);
 }
+
+.sidebar-link.active li {
+    background-color: rgba(27, 181, 204, 0.18);
+    color: rgb(17, 110, 124);
+}
+
+.sidebar-link.active li i {
+    color: rgb(17, 110, 124);
+}
+
 .profile {
     padding: 20px 0 0;
     display: flex;

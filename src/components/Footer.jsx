@@ -14,7 +14,7 @@ const Footer = ({ onSubscribe }) => {
                 <div style={footerDiv}>
                     <Link to='/' className='text-decoration-none'>
                         <div className='text-white d-flex align-items-center gap-2'>
-                            <img src="eventLogo.png" width="40" />
+                            <img src="/eventLogo.png" width="40" />
                             <h5 className='m-0'>Event<span>Flow</span></h5>
                         </div>
                     </Link>
