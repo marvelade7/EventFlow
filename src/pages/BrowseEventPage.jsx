@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Sidebar from "../components/Sidebar";
 import CreateEventNav from "../components/CreateEventNav";
 
-const MyEvent = () => {
+const BrowseEventPage = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     return (
@@ -19,7 +19,7 @@ const MyEvent = () => {
                 <CreateEventNav
                     onToggleSidebar={() => setSidebarOpen((prev) => !prev)}
                     isSidebarOpen={sidebarOpen}
-                    title="My Events"
+                    title="Browse Events"
                     actionLabel=""
                 />
             </div>
@@ -27,4 +27,4 @@ const MyEvent = () => {
     );
 };
 
-export default MyEvent;
+export default BrowseEventPage;

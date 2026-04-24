@@ -15,6 +15,8 @@ import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/AdminDashboard";
 import ForgotPassword from "./pages/ForgotPassword";
 import MyEvent from "./pages/MyEvent";
+import MyTicketPage from "./pages/MyTicketPage";
+import BrowseEventPage from "./pages/BrowseEventPage";
 
 const ScrollToTop = () => {
     const { pathname } = useLocation();
@@ -42,6 +44,8 @@ const App = () => {
                     <Route path="my-event" element={<MyEvent/>} />
                     <Route path="create-event" element={<CreateNewEventPage />} />
                     <Route path="checkout" element={<CheckoutPage />} />
+                    <Route path="tickets" element={<MyTicketPage/>} />
+                    <Route path="browse-event" element={<BrowseEventPage/>} />
                 </Route>
 
                 <Route path="/admin-auth" element={<AdminAuthPage />} />
