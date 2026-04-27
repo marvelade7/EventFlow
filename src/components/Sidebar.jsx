@@ -4,7 +4,7 @@ import './sidebar.css';
 import { NavLink } from 'react-router-dom';
 import Avatar from './Avatar';
 
-const Sidebar = ({ mobileOpen = false, firstName, lastName }) => {
+const Sidebar = ({ mobileOpen = false, firstName, lastName, avatar }) => {
     return (
         <div className={`sidebar bg-white ${mobileOpen ? 'sidebar-mobile-open' : ''}`}>
             <div>
@@ -23,9 +23,14 @@ const Sidebar = ({ mobileOpen = false, firstName, lastName }) => {
             </div>
 
             <div className="profile">
-                {/* <img src="https://randomuser.me/api/portraits/men/32.jpg" width="40" height="40" className='rounded-5 ' /> */}
-                <Avatar firstName={firstName} lastName={lastName}/>
-                <p className="m-0 fw-semibold w-100">{firstName} {lastName}</p>
+                <Avatar
+                    firstName={firstName}
+                    lastName={lastName}
+                    avatarUrl={avatar}
+                />
+                <p className="m-0 fw-semibold w-100">
+                    {(firstName || "") + " " + (lastName || "")}
+                </p>
             </div>
         </div>
     );

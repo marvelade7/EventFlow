@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import aos from "aos";
 import "aos/dist/aos.css";
-import { seedUserProfileFromAuthUser } from "../utils/userProfile";
 
 const SignIn = () => {
     useEffect(() => {
@@ -22,30 +21,42 @@ const SignIn = () => {
     const navigate = useNavigate();
     const [errorMsg, setErrorMsg] = useState("");
     const [loading, setLoading] = useState(false);
-    const [formData, setFormData] = useState({ name: "", email: "" });
+
+    useEffect(() => {
+        const existingToken = localStorage.getItem("token");
+        if (existingToken) {
+            navigate("/dashboard", { replace: true });
+        }
+    }, [navigate]);
 
     const signin = (e) => {
         e.preventDefault();
+        if (loading) return;
+
         const credentials = { email, password };
         setLoading(true);
+        setErrorMsg("");
+
         axios
-            // .post(
-            //     "https://eventflow-backend-fwv4.onrender.com/api/users/login",
-            //     credentials,
-            // )
-            .post("http://localhost:5000/api/users/login", credentials)
+            .post(
+                "https://eventflow-backend-fwv4.onrender.com/api/users/login",
+                credentials,
+            )
             .then((response) => {
-                if (response.data.token) {
-                    alert("Welcome back! You have successfully logged in.");
-                    localStorage.setItem("token", response.data.token);
-                    navigate("/dashboard");
-                    setErrorMsg("");
+                const token =
+                    response.data?.token ||
+                    response.data?.accessToken ||
+                    response.data?.data?.token;
+
+                if (token) {
+                    // alert("Welcome back! You have successfully logged in.");
+                    localStorage.setItem("token", token);
+                    navigate("/dashboard", { replace: true });
                 } else {
                     setErrorMsg("Login failed. Please check your credentials.");
                 }
                 setLoading(false);
             })
-            // seedUserProfileFromAuthUser(response.data.user);
             .catch((error) => {
                 setErrorMsg(
                     error.response?.data?.message || "Something went wrong",
@@ -61,7 +72,6 @@ const SignIn = () => {
                 head="Welcome Back"
                 pStyle="fs-5"
                 p="Access your exclusive dashboard, mange your premium tickets and explore the next wave of editorial experiences"
-                // p='Your next great experience is waiting for you.'
             />
             <div
                 data-aos="fade-left"
@@ -79,7 +89,7 @@ const SignIn = () => {
                     <p className="text-secondary">
                         Sign in to your EventFlow account
                     </p>
-                    <form action="" method="post" data-aos="fade-up">
+                    <form onSubmit={signin} data-aos="fade-up">
                         <div className="mb-3">
                             <label htmlFor="email">Email Address</label>
                             <input
@@ -139,9 +149,8 @@ const SignIn = () => {
                             </div>
                         )}
                         <button
-                            onClick={(e) => {
-                                signin(e);
-                            }}
+                            type="submit"
+                            disabled={loading}
                             style={{ backgroundColor: "rgb(226,131,8)" }}
                             className="btn w-100 py-2 text-white fw-semibold my-3"
                         >

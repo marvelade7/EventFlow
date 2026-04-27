@@ -22,6 +22,7 @@ const UserDashboard = () => {
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
+    const [avatar, setAvatar] = useState("");
 
     useEffect(() => {
         aos.init({
@@ -44,11 +45,11 @@ const UserDashboard = () => {
     useEffect(() => {
         let token = localStorage.getItem("token");
         if (!token) {
-            navigate("/login");
+            navigate("/signin", { replace: true });
             return;
         }
 
-        let url = "http://localhost:5000/api/users/dashboard";
+        let url = "https://eventflow-backend-fwv4.onrender.com/api/users/dashboard"
         axios
             .get(url, {
                 headers: {
@@ -61,11 +62,13 @@ const UserDashboard = () => {
                 setFirstName(res.data.user.firstName);
                 setLastName(res.data.user.lastName);
                 setEmail(res.data.user.email);
+                setAvatar(res.data.user.avatar || "");
             })
             .catch((err) => {
                 if (err.response && err.response.status === 401) {
                     localStorage.removeItem("token");
-                    navigate("/login");
+                    navigate("/signin", { replace: true });
+                    return;
                 }
                 console.error("Error:", err.response ? err.response.data : err);
             });
@@ -77,6 +80,7 @@ const UserDashboard = () => {
                 mobileOpen={sidebarOpen}
                 firstName={firstName}
                 lastName={lastName}
+                avatar={avatar}
             />
             <div
                 className={`sidebar-overlay ${sidebarOpen ? "show" : ""}`}
@@ -98,6 +102,7 @@ const UserDashboard = () => {
                         isSidebarOpen={sidebarOpen}
                         firstName={firstName}
                         lastName={lastName}
+                        avatar={avatar}
                     />
 
                     <div data-aos="fade-left">

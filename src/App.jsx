@@ -29,7 +29,7 @@ const ScrollToTop = () => {
 };
 
 const App = () => {
-    let token = localStorage.token
+    const token = localStorage.getItem("token");
     return (
         <>
             <ScrollToTop />
@@ -40,13 +40,13 @@ const App = () => {
                 <Route path="/login" element={<Navigate to="/signin" replace />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
 
-                <Route path="/dashboard" element={token ? <UserDashboard/> : <Navigate to='/signin' replace />}>
+                <Route path="/dashboard" element={token ? <UserDashboard /> : <Navigate to="/signin" replace />}>
                     <Route path="profile" element={<Profile />} />
-                    <Route path="my-event" element={<MyEvent/>} />
+                    <Route path="my-event" element={<MyEvent />} />
                     <Route path="create-event" element={<CreateNewEventPage />} />
                     <Route path="checkout" element={<CheckoutPage />} />
-                    <Route path="tickets" element={<MyTicketPage/>} />
-                    <Route path="browse-event" element={<BrowseEventPage/>} />
+                    <Route path="tickets" element={<MyTicketPage />} />
+                    <Route path="browse-event" element={<BrowseEventPage />} />
                 </Route>
 
                 <Route path="/admin-auth" element={<AdminAuthPage />} />
