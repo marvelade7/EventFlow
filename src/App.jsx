@@ -28,11 +28,14 @@ const ScrollToTop = () => {
     return null;
 };
 
+import { ProfileProvider } from "./context/ProfileContext";
+
 const App = () => {
     const token = localStorage.getItem("token");
     return (
         <>
             <ScrollToTop />
+            <ProfileProvider>
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/signup" element={<SignUp />} />
@@ -53,6 +56,7 @@ const App = () => {
                 <Route path="/admin-dashboard" element={<AdminDashboard />} />
                 <Route path="*" element={<Error404 />} />
             </Routes>
+            </ProfileProvider>
         </>
     );
 };

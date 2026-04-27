@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import Sidebar from "../components/Sidebar";
 import DashNavbar from "../components/DashNavbar";
 import Greetings from "../components/Greetings";
@@ -9,10 +9,12 @@ import BrowseEventsHead from "../components/BrowseEventsHead";
 import RecentBookings from "../components/RecentBookings";
 import aos from "aos";
 import "aos/dist/aos.css";
-import { useNavigate, useOutlet } from "react-router-dom";
+import { useNavigate, useOutlet, useLocation } from "react-router-dom";
 import axios from "axios";
+import { ProfileContext } from "../context/ProfileContext";
 
 const UserDashboard = () => {
+    const { user, setUser } = useContext(ProfileContext);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const outlet = useOutlet({
         sidebarOpen,
@@ -23,6 +25,9 @@ const UserDashboard = () => {
     const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
     const [avatar, setAvatar] = useState("");
+    const [isHydrated, setIsHydrated] = useState(false);
+    const [isRouteChanging, setIsRouteChanging] = useState(false);
+    const { pathname } = useLocation();
 
     useEffect(() => {
         aos.init({
@@ -49,7 +54,13 @@ const UserDashboard = () => {
             return;
         }
 
-        let url = "https://eventflow-backend-fwv4.onrender.com/api/users/dashboard"
+        setIsHydrated(false);
+        setFirstName("");
+        setLastName("");
+        setEmail("");
+        setAvatar("");
+
+        let url = "https://eventflow-backend-fwv4.onrender.com/api/users/dashboard";
         axios
             .get(url, {
                 headers: {
@@ -59,10 +70,13 @@ const UserDashboard = () => {
                 },
             })
             .then((res) => {
-                setFirstName(res.data.user.firstName);
-                setLastName(res.data.user.lastName);
-                setEmail(res.data.user.email);
-                setAvatar(res.data.user.avatar || "");
+                const user = res.data.user || {};
+                if (setUser) setUser(user);
+                setFirstName(user.firstName || "");
+                setLastName(user.lastName || "");
+                setEmail(user.email || "");
+                setAvatar(user.avatar || user.profilePic || "");
+                setIsHydrated(true);
             })
             .catch((err) => {
                 if (err.response && err.response.status === 401) {
@@ -71,8 +85,49 @@ const UserDashboard = () => {
                     return;
                 }
                 console.error("Error:", err.response ? err.response.data : err);
+                setIsHydrated(true);
             });
     }, [navigate]);
+
+    useEffect(() => {
+        if (!user || !isHydrated) return;
+        setFirstName(user.firstName || "");
+        setLastName(user.lastName || "");
+        setEmail(user.email || "");
+        setAvatar(user.avatar || user.profilePic || "");
+    }, [user, isHydrated]);
+
+    useEffect(() => {
+        if (!isHydrated) return;
+
+        setIsRouteChanging(true);
+        const timer = setTimeout(() => {
+            setIsRouteChanging(false);
+        }, 220);
+
+        return () => clearTimeout(timer);
+    }, [pathname, isHydrated]);
+
+    if (!isHydrated) {
+        return (
+            <div className="dashboard-page">
+                <div
+                    className="dashboard-main d-flex align-items-center justify-content-center"
+                    style={{
+                        marginLeft: "300px",
+                        background: "rgb(249,250,251)",
+                        minHeight: "100vh",
+                    }}
+                >
+                    <div
+                        className="spinner-border text-info"
+                        role="status"
+                        aria-label="Loading dashboard"
+                    ></div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="dashboard-page">
@@ -81,22 +136,42 @@ const UserDashboard = () => {
                 firstName={firstName}
                 lastName={lastName}
                 avatar={avatar}
+                onLinkClick={() => setSidebarOpen(false)}
             />
             <div
                 className={`sidebar-overlay ${sidebarOpen ? "show" : ""}`}
                 onClick={() => setSidebarOpen(false)}
             ></div>
 
-            {outlet ? (
-                outlet
-            ) : (
-                <div
-                    className="dashboard-main"
-                    style={{
-                        marginLeft: "300px",
-                        background: "rgb(249,250,251)",
-                    }}
-                >
+            <div className="position-relative w-100">
+                {isRouteChanging ? (
+                    <div
+                        className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+                        style={{ background: "rgba(249,250,251,0.78)", zIndex: 1200 }}
+                    >
+                        <div className="text-center">
+                            <div
+                                className="spinner-border text-info"
+                                role="status"
+                                aria-hidden="true"
+                            ></div>
+                            <p className="mt-2 mb-0 text-secondary fw-semibold">
+                                Loading...
+                            </p>
+                        </div>
+                    </div>
+                ) : null}
+
+                {outlet ? (
+                    outlet
+                ) : (
+                    <div
+                        className="dashboard-main"
+                        style={{
+                            marginLeft: "300px",
+                            background: "rgb(249,250,251)",
+                        }}
+                    >
                     <DashNavbar
                         onToggleSidebar={() => setSidebarOpen((prev) => !prev)}
                         isSidebarOpen={sidebarOpen}
@@ -268,8 +343,9 @@ const UserDashboard = () => {
                             <RecentBookings />
                         </div>
                     </div>
-                </div>
-            )}
+                    </div>
+                )}
+            </div>
         </div>
     );
 };

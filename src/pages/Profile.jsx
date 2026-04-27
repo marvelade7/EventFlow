@@ -5,6 +5,8 @@ import "aos/dist/aos.css";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import axios from "axios";
 import Avatar from "../components/Avatar";
+import { useContext } from "react";
+import { ProfileContext } from "../context/ProfileContext";
 
 const Profile = () => {
     const [isEditing, setIsEditing] = useState(false);
@@ -16,6 +18,7 @@ const Profile = () => {
     const fileInputRef = useRef(null);
     const { sidebarOpen, toggleSidebar } = useOutletContext();
     const navigate = useNavigate();
+    const { user, setUser } = useContext(ProfileContext);
 
     const [profileData, setProfileData] = useState({
         firstName: "",
@@ -55,6 +58,8 @@ const Profile = () => {
             })
             .then((res) => {
                 const user = res.data?.user || {};
+                console.debug("[Profile] dashboard fetch user:", res.data);
+                if (setUser) setUser(user);
                 setProfileData((prev) => ({
                     ...prev,
                     firstName: user.firstName || "",
@@ -62,7 +67,7 @@ const Profile = () => {
                     email: user.email || "",
                     bio: user.bio || "",
                     phoneNumber: user.phoneNumber || "",
-                    avatar: user.profilePic || "",
+                    avatar: user.profilePic || user.avatar || "",
                     location: user.location || "",
                 }));
             })
@@ -120,18 +125,17 @@ const Profile = () => {
             }
 
             const response = await axios.patch(
-                "http://localhost:5000/api/users/update-user",
-                // "https://eventflow-backend-fwv4.onrender.com/api/users/update-user",
+                "https://eventflow-backend-fwv4.onrender.com/api/users/update-user",
                 formData,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
-                        "Content-Type": "multipart/form-data",
                     },
                 },
             );
 
             const updatedUser = response.data.user;
+            console.debug("[Profile] update response user:", response.data);
 
             setProfileData((prev) => ({
                 ...prev,
@@ -140,10 +144,12 @@ const Profile = () => {
                 email: updatedUser.email || prev.email,
                 bio: updatedUser.bio || prev.bio,
                 phoneNumber: updatedUser.phoneNumber || prev.phoneNumber,
-                avatar: updatedUser.profilePic || prev.avatar, // 👈 from backend
+                avatar: updatedUser.profilePic || updatedUser.avatar || prev.avatar,
                 location: updatedUser.location || prev.location,
                 file: null, // reset after upload
             }));
+
+            if (setUser) setUser(updatedUser);
 
             setIsEditing(false);
             setRequestSuccess("Profile updated successfully.");

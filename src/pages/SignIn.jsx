@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import LeftPanel from "../components/LeftPanel";
 import { Link } from "react-router-dom";
 import googleIcon from "../assets/images/google-icon.png";
@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import aos from "aos";
 import "aos/dist/aos.css";
+import { ProfileContext } from "../context/ProfileContext";
 
 const SignIn = () => {
     useEffect(() => {
@@ -21,13 +22,7 @@ const SignIn = () => {
     const navigate = useNavigate();
     const [errorMsg, setErrorMsg] = useState("");
     const [loading, setLoading] = useState(false);
-
-    useEffect(() => {
-        const existingToken = localStorage.getItem("token");
-        if (existingToken) {
-            navigate("/dashboard", { replace: true });
-        }
-    }, [navigate]);
+    const { setUser } = useContext(ProfileContext);
 
     const signin = (e) => {
         e.preventDefault();
@@ -50,6 +45,7 @@ const SignIn = () => {
 
                 if (token) {
                     // alert("Welcome back! You have successfully logged in.");
+                    if (setUser) setUser(null);
                     localStorage.setItem("token", token);
                     navigate("/dashboard", { replace: true });
                 } else {
