@@ -1,6 +1,7 @@
 import React from 'react';
+import Avatar from './Avatar';
 
-const DashNavbar = ({ title, onToggleSidebar, isSidebarOpen }) => {
+const DashNavbar = ({ title, onToggleSidebar, isSidebarOpen, firstName, lastName }) => {
     const nav = {
         display: 'flex',
         justifyContent: 'space-between',
@@ -31,7 +32,8 @@ const DashNavbar = ({ title, onToggleSidebar, isSidebarOpen }) => {
                     <input type="text" placeholder='Search events...' style={{border: 'none', outline: 'none'}} className='' />
                 </div>
                 <i className='bi bi-bell fs-5'></i>
-                <img src="https://randomuser.me/api/portraits/men/32.jpg" width="35" className='rounded-5 ' />
+                <Avatar firstName={firstName} lastName={lastName}/>
+                {/* <img src="https://randomuser.me/api/portraits/men/32.jpg" width="35" className='rounded-5 ' /> */}
             </div>
         </div>
     );

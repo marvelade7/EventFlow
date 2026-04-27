@@ -2,6 +2,7 @@ import React from 'react';
 import Logo from './Logo';
 import './sidebar.css';
 import { NavLink } from 'react-router-dom';
+import Avatar from './Avatar';
 
 const Sidebar = ({ mobileOpen = false, firstName, lastName }) => {
     return (
@@ -22,7 +23,8 @@ const Sidebar = ({ mobileOpen = false, firstName, lastName }) => {
             </div>
 
             <div className="profile">
-                <img src="https://randomuser.me/api/portraits/men/32.jpg" width="40" height="40" className='rounded-5 ' />
+                {/* <img src="https://randomuser.me/api/portraits/men/32.jpg" width="40" height="40" className='rounded-5 ' /> */}
+                <Avatar firstName={firstName} lastName={lastName}/>
                 <p className="m-0 fw-semibold w-100">{firstName} {lastName}</p>
             </div>
         </div>
