@@ -1,28 +1,21 @@
-import React, { useState } from "react";
-import Sidebar from "../components/Sidebar";
+import React from "react";
 import CreateEventNav from "../components/CreateEventNav";
+import { useOutletContext } from "react-router-dom";
 
 const BrowseEventPage = () => {
-    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const { sidebarOpen, toggleSidebar } = useOutletContext();
 
     return (
-        <div className="create-event-page">
-            <Sidebar mobileOpen={sidebarOpen} />
-            <div
-                className={`sidebar-overlay ${sidebarOpen ? "show" : ""}`}
-                onClick={() => setSidebarOpen(false)}
-            ></div>
-            <div
-                className="create-event-main"
-                style={{ marginLeft: "300px", background: "rgb(249,250,251)" }}
-            >
+        <div
+            className="create-event-main"
+            style={{ marginLeft: "300px", background: "rgb(249,250,251)" }}
+        >
                 <CreateEventNav
-                    onToggleSidebar={() => setSidebarOpen((prev) => !prev)}
+                    onToggleSidebar={toggleSidebar}
                     isSidebarOpen={sidebarOpen}
                     title="Browse Events"
                     actionLabel=""
                 />
-            </div>
         </div>
     );
 };

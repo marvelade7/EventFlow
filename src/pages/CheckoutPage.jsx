@@ -3,7 +3,7 @@ import CheckoutNav from '../components/CheckoutNav';
 
 const CheckoutPage = () => {
     return (
-        <div className='checkout-page' style={{ background: 'rgb(249,250,251)', height: '100vh' }} >
+        <div className='create-event-main checkout-page' style={{ marginLeft: '300px', background: 'rgb(249,250,251)', minHeight: '100vh' }} >
             <CheckoutNav />
             <div className='d-flex align-items-start gap-4 checkout-layout' style={{ margin: '40px auto', width: '60%' }}>
                 <div className='d-flex flex-column gap-4 checkout-left' style={{ width: '60%' }}>

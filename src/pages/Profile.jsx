@@ -1,18 +1,18 @@
 import React, { useEffect, useRef, useState } from "react";
-import Sidebar from "../components/Sidebar";
 import CreateEventNav from "../components/CreateEventNav";
 import aos from "aos";
 import "aos/dist/aos.css";
+import { useOutletContext } from "react-router-dom";
 import {
     getStoredUserProfile,
     saveUserProfileDetails,
 } from "../utils/userProfile";
 
 const Profile = () => {
-    const [sidebarOpen, setSidebarOpen] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [avatarError, setAvatarError] = useState("");
     const fileInputRef = useRef(null);
+    const { sidebarOpen, toggleSidebar } = useOutletContext();
 
     const storedProfile = getStoredUserProfile();
     const initialProfile = {
@@ -86,18 +86,12 @@ const Profile = () => {
     };
 
     return (
-        <div className="dashboard-page">
-            <Sidebar mobileOpen={sidebarOpen} />
-            <div
-                className={`sidebar-overlay ${sidebarOpen ? "show" : ""}`}
-                onClick={() => setSidebarOpen(false)}
-            ></div>
-            <div
-                className="dashboard-main"
-                style={{ marginLeft: "300px", background: "rgb(249,250,251)" }}
-            >
+        <div
+            className="dashboard-main"
+            style={{ marginLeft: "300px", background: "rgb(249,250,251)" }}
+        >
                 <CreateEventNav
-                    onToggleSidebar={() => setSidebarOpen((prev) => !prev)}
+                    onToggleSidebar={toggleSidebar}
                     isSidebarOpen={sidebarOpen}
                     title="My Profile"
                     actionLabel={isEditing ? "Save Details" : "Edit Profile"}
@@ -235,7 +229,6 @@ const Profile = () => {
                         </div>
                     </div>
                 </div>
-            </div>
         </div>
     );
 };

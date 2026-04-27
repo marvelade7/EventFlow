@@ -29,26 +29,28 @@ const SignIn = () => {
         const credentials = { email, password };
         setLoading(true);
         axios
-            .post(
-                "https://eventflow-backend-fwv4.onrender.com/api/users/login",
-                credentials,
-            )
+            // .post(
+            //     "https://eventflow-backend-fwv4.onrender.com/api/users/login",
+            //     credentials,
+            // )
+            .post("http://localhost:5000/api/users/login", credentials)
             .then((response) => {
-                navigate("/dashboard");
-                seedUserProfileFromAuthUser(response.data.user);
+                if (response.data.token) {
+                    alert("Welcome back! You have successfully logged in.");
+                    localStorage.setItem("token", response.data.token);
+                    navigate("/dashboard");
+                    setErrorMsg("");
+                } else {
+                    setErrorMsg("Login failed. Please check your credentials.");
+                }
                 setLoading(false);
-                setErrorMsg("");
-                // alert("Login successful");
-                setFormData({ name: "", email: "" });
-                console.log(response.data.user.firstName);
             })
+            // seedUserProfileFromAuthUser(response.data.user);
             .catch((error) => {
                 setErrorMsg(
                     error.response?.data?.message || "Something went wrong",
                 );
                 setLoading(false);
-                console.error("Error logging in:", error);
-                // alert("Login failed");
             });
     };
 

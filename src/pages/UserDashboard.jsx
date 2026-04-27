@@ -9,11 +9,19 @@ import BrowseEventsHead from "../components/BrowseEventsHead";
 import RecentBookings from "../components/RecentBookings";
 import aos from "aos";
 import "aos/dist/aos.css";
-import { useOutlet } from "react-router-dom";
+import { useNavigate, useOutlet } from "react-router-dom";
+import axios from "axios";
 
 const UserDashboard = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const outlet = useOutlet();
+    const outlet = useOutlet({
+        sidebarOpen,
+        toggleSidebar: () => setSidebarOpen((prev) => !prev),
+        closeSidebar: () => setSidebarOpen(false),
+    });
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const [email, setEmail] = useState("");
 
     useEffect(() => {
         aos.init({
@@ -32,28 +40,69 @@ const UserDashboard = () => {
         scrollMarginTop: "60px",
     };
 
+    let navigate = useNavigate();
+    useEffect(() => {
+        let token = localStorage.getItem("token");
+        if (!token) {
+            navigate("/login");
+            return;
+        }
+
+        let url = "http://localhost:5000/api/users/dashboard";
+        axios
+            .get(url, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                },
+            })
+            .then((res) => {
+                setFirstName(res.data.user.firstName);
+                setLastName(res.data.user.lastName);
+                setEmail(res.data.user.email);
+            })
+            .catch((err) => {
+                if (err.response && err.response.status === 401) {
+                    localStorage.removeItem("token");
+                    navigate("/login");
+                }
+                console.error("Error:", err.response ? err.response.data : err);
+            });
+    }, [navigate]);
+
     return (
         <div className="dashboard-page">
+            <Sidebar
+                mobileOpen={sidebarOpen}
+                firstName={firstName}
+                lastName={lastName}
+            />
+            <div
+                className={`sidebar-overlay ${sidebarOpen ? "show" : ""}`}
+                onClick={() => setSidebarOpen(false)}
+            ></div>
+
             {outlet ? (
                 outlet
             ) : (
-                <>
-                    <Sidebar mobileOpen={sidebarOpen} />
-                    <div
-                        className={`sidebar-overlay ${sidebarOpen ? "show" : ""}`}
-                        onClick={() => setSidebarOpen(false)}
-                    ></div>
-                    <div
-                        className="dashboard-main"
-                        style={{ marginLeft: "300px", background: "rgb(249,250,251)" }}
-                    >
+                <div
+                    className="dashboard-main"
+                    style={{
+                        marginLeft: "300px",
+                        background: "rgb(249,250,251)",
+                    }}
+                >
                         <DashNavbar
                             onToggleSidebar={() => setSidebarOpen((prev) => !prev)}
                             isSidebarOpen={sidebarOpen}
                         />
 
                         <div data-aos="fade-left">
-                            <Greetings />
+                            <Greetings
+                                firstName={firstName}
+                                lastName={lastName}
+                            />
                         </div>
 
                         <div className="d-flex align-items-center justify-items-between gap-3 pt-3 pb-5 mx-4 dashboard-stats">
@@ -164,7 +213,9 @@ const UserDashboard = () => {
                                     button="Book Now"
                                     anim="fade-up"
                                     delay="70"
-                                    btnStyle={{ backgroundColor: "rgb(27,181,204)" }}
+                                    btnStyle={{
+                                        backgroundColor: "rgb(27,181,204)",
+                                    }}
                                 />
 
                                 <BrowseEvent
@@ -178,7 +229,9 @@ const UserDashboard = () => {
                                     button="Book Now"
                                     anim="fade-up"
                                     delay="140"
-                                    btnStyle={{ backgroundColor: "rgb(27,181,204)" }}
+                                    btnStyle={{
+                                        backgroundColor: "rgb(27,181,204)",
+                                    }}
                                 />
 
                                 <BrowseEvent
@@ -192,7 +245,9 @@ const UserDashboard = () => {
                                     button="Book Now"
                                     anim="fade-up"
                                     delay="210"
-                                    btnStyle={{ backgroundColor: "rgb(27,181,204)" }}
+                                    btnStyle={{
+                                        backgroundColor: "rgb(27,181,204)",
+                                    }}
                                 />
                             </div>
                         </div>
@@ -210,7 +265,6 @@ const UserDashboard = () => {
                             </div>
                         </div>
                     </div>
-                </>
             )}
         </div>
     );

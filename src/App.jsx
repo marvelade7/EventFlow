@@ -29,6 +29,7 @@ const ScrollToTop = () => {
 };
 
 const App = () => {
+    let token = localStorage.token
     return (
         <>
             <ScrollToTop />
@@ -39,7 +40,7 @@ const App = () => {
                 <Route path="/login" element={<Navigate to="/signin" replace />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
 
-                <Route path="/dashboard" element={<UserDashboard />}>
+                <Route path="/dashboard" element={token ? <UserDashboard/> : <Navigate to='/signin' replace />}>
                     <Route path="profile" element={<Profile />} />
                     <Route path="my-event" element={<MyEvent/>} />
                     <Route path="create-event" element={<CreateNewEventPage />} />

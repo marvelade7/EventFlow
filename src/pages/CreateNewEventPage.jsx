@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import Sidebar from '../components/Sidebar';
+import React, { useEffect } from 'react';
 import CreateEventNav from '../components/CreateEventNav';
 import EventBasis from '../components/EventBasis';
 import DateAndTimeForm from '../components/DateAndTimeForm';
@@ -12,9 +11,10 @@ import * as Yup from 'yup';
 import aos from 'aos';
 import 'aos/dist/aos.css';
 import axios from 'axios';
+import { useOutletContext } from 'react-router-dom';
 
 const CreateNewEventPage = () => {
-    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const { sidebarOpen, toggleSidebar } = useOutletContext();
     const now = new Date();
     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
     const today = now.toISOString().split('T')[0];
@@ -132,17 +132,11 @@ const CreateNewEventPage = () => {
     }, []);
 
     return (
-        <div className='create-event-page'>
-            <Sidebar mobileOpen={sidebarOpen} />
-            <div
-                className={`sidebar-overlay ${sidebarOpen ? 'show' : ''}`}
-                onClick={() => setSidebarOpen(false)}
-            ></div>
-            <div className='create-event-main' style={{ marginLeft: '300px', background: 'rgb(249,250,251)' }}>
+        <div className='create-event-main' style={{ marginLeft: '300px', background: 'rgb(249,250,251)' }}>
                 <form onSubmit={formik.handleSubmit} noValidate>
                     <div data-aos='fade-down'>
                         <CreateEventNav
-                            onToggleSidebar={() => setSidebarOpen((prev) => !prev)}
+                            onToggleSidebar={toggleSidebar}
                             isSidebarOpen={sidebarOpen}
                             onSaveDraft={handleSaveDraft}
                             isSubmitting={formik.isSubmitting}
@@ -178,7 +172,6 @@ const CreateNewEventPage = () => {
                         </div>
                     </div>
                 </form>
-            </div>
         </div>
     );
 };

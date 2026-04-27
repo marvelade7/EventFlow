@@ -3,7 +3,7 @@ import Logo from './Logo';
 import './sidebar.css';
 import { NavLink } from 'react-router-dom';
 
-const Sidebar = ({ mobileOpen = false }) => {
+const Sidebar = ({ mobileOpen = false, firstName, lastName }) => {
     return (
         <div className={`sidebar bg-white ${mobileOpen ? 'sidebar-mobile-open' : ''}`}>
             <div>
@@ -23,7 +23,7 @@ const Sidebar = ({ mobileOpen = false }) => {
 
             <div className="profile">
                 <img src="https://randomuser.me/api/portraits/men/32.jpg" width="40" height="40" className='rounded-5 ' />
-                <p className="m-0 fw-semibold w-100">John Doe</p>
+                <p className="m-0 fw-semibold w-100">{firstName} {lastName}</p>
             </div>
         </div>
     );
