@@ -50,12 +50,15 @@ const Profile = () => {
 
         setLoading(true);
         axios
-            .get("https://eventflow-backend-fwv4.onrender.com/api/users/dashboard", {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    Accept: "application/json",
+            .get(
+                "https://eventflow-backend-fwv4.onrender.com/api/users/dashboard",
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        Accept: "application/json",
+                    },
                 },
-            })
+            )
             .then((res) => {
                 const user = res.data?.user || {};
                 console.debug("[Profile] dashboard fetch user:", res.data);
@@ -69,6 +72,7 @@ const Profile = () => {
                     phoneNumber: user.phoneNumber || "",
                     avatar: user.profilePic || user.avatar || "",
                     location: user.location || "",
+                    isVerified: user.isVerified || false,
                 }));
             })
             .catch((err) => {
@@ -144,9 +148,11 @@ const Profile = () => {
                 email: updatedUser.email || prev.email,
                 bio: updatedUser.bio || prev.bio,
                 phoneNumber: updatedUser.phoneNumber || prev.phoneNumber,
-                avatar: updatedUser.profilePic || updatedUser.avatar || prev.avatar,
+                avatar:
+                    updatedUser.profilePic || updatedUser.avatar || prev.avatar,
                 location: updatedUser.location || prev.location,
                 file: null, // reset after upload
+                isVerified: updatedUser.isVerified || prev.isVerified,
             }));
 
             if (setUser) setUser(updatedUser);
@@ -193,6 +199,10 @@ const Profile = () => {
         }));
 
         setAvatarError("");
+    };
+
+    const handleEmailVerification = () => {
+        navigate("/verify-email");
     };
 
     return (
@@ -347,6 +357,31 @@ const Profile = () => {
                                 disabled={!isEditing || loading || isSaving}
                             />
                         </div>
+
+                        {profileData.isVerified ? (
+                            <div className="col-12 mt-0 mb-3">
+                                <p className="text-success m-0">
+                                    <i className="bi bi-check-circle-fill me-2"></i>
+                                    Your email is verified.
+                                </p>
+                            </div>
+                        ) : (
+                            <div
+                                style={{ cursor: "pointer" }}
+                                className="d-flex align-items-center gap-1 mt-0 mb-3 col-12"
+                            >
+                                <p className="text-danger m-0">
+                                    <i className="bi bi-exclamation-triangle-fill me-2"></i>
+                                    Your email is not verified.
+                                </p>
+                                <p
+                                    className="m-0 text-decoration-underline text-primary"
+                                    onClick={handleEmailVerification}
+                                >
+                                    Verify Email
+                                </p>
+                            </div>
+                        )}
 
                         <div className="col-12">
                             <label className="form-label fw-semibold">

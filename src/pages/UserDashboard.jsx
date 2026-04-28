@@ -25,6 +25,8 @@ const UserDashboard = () => {
     const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
     const [avatar, setAvatar] = useState("");
+    const [userId, setUserId] = useState("");
+    const [isVerified, setIsVerified] = useState(false);
     const [isHydrated, setIsHydrated] = useState(false);
     const [isRouteChanging, setIsRouteChanging] = useState(false);
     const { pathname } = useLocation();
@@ -76,6 +78,8 @@ const UserDashboard = () => {
                 setLastName(user.lastName || "");
                 setEmail(user.email || "");
                 setAvatar(user.avatar || user.profilePic || "");
+                setUserId(user._id || "");
+                setIsVerified(user.isVerified || false);
                 setIsHydrated(true);
             })
             .catch((err) => {
@@ -95,6 +99,8 @@ const UserDashboard = () => {
         setLastName(user.lastName || "");
         setEmail(user.email || "");
         setAvatar(user.avatar || user.profilePic || "");
+        setUserId(user._id || "");
+        setIsVerified(user.isVerified || false);
     }, [user, isHydrated]);
 
     useEffect(() => {
@@ -108,26 +114,7 @@ const UserDashboard = () => {
         return () => clearTimeout(timer);
     }, [pathname, isHydrated]);
 
-    if (!isHydrated) {
-        return (
-            <div className="dashboard-page">
-                <div
-                    className="dashboard-main d-flex align-items-center justify-content-center"
-                    style={{
-                        marginLeft: "300px",
-                        background: "rgb(249,250,251)",
-                        minHeight: "100vh",
-                    }}
-                >
-                    <div
-                        className="spinner-border text-info"
-                        role="status"
-                        aria-label="Loading dashboard"
-                    ></div>
-                </div>
-            </div>
-        );
-    }
+    // Initial hydration spinner removed — use the route-change overlay spinner with text instead
 
     return (
         <div className="dashboard-page">
@@ -183,6 +170,18 @@ const UserDashboard = () => {
                     <div data-aos="fade-left">
                         <Greetings firstName={firstName} lastName={lastName} />
                     </div>
+
+                    {isVerified ? null : (
+                        <div className="alert alert-warning alert-dismissible fade show mx-4" role="alert">
+                            <strong>Verify your email!</strong> Please go to your profile to verify your email.
+                            <button
+                                type="button"
+                                className="btn-close"
+                                data-bs-dismiss="alert"
+                                aria-label="Close"
+                            ></button>
+                        </div>
+                    )}
 
                     <div className="d-flex align-items-center justify-items-between gap-3 pt-3 pb-5 mx-4 dashboard-stats">
                         <div

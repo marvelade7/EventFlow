@@ -17,6 +17,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import MyEvent from "./pages/MyEvent";
 import MyTicketPage from "./pages/MyTicketPage";
 import BrowseEventPage from "./pages/BrowseEventPage";
+import EmailVerification from "./pages/EmailVerification";
 
 const ScrollToTop = () => {
     const { pathname } = useLocation();
@@ -40,6 +41,7 @@ const App = () => {
                 <Route path="/" element={<Home />} />
                 <Route path="/signup" element={<SignUp />} />
                 <Route path="/signin" element={<SignIn />} />
+                <Route path="/verify-email" element={<EmailVerification />} />
                 <Route path="/login" element={<Navigate to="/signin" replace />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
 

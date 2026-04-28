@@ -33,15 +33,21 @@ const SignUp = () => {
         },
         onSubmit: (values, {resetForm}) => {
             setLoading(true);
+            const normalizedEmail = values.email.trim().toLowerCase();
             // console.log(values);
             axios
-                .post("https://eventflow-backend-fwv4.onrender.com/api/users/register", values)
+                .post("https://eventflow-backend-fwv4.onrender.com/api/users/register", {
+                    ...values,
+                    email: normalizedEmail,
+                })
                 .then((res) => {
                     setLoading(false);
                     console.log(res.data.user);
                     console.log(res.data.message);
                     setErrorMsg("");
                     resetForm()
+                    // Store email in localStorage for verification page
+                    localStorage.setItem("verificationEmail", normalizedEmail);
                     setShowSuccessModal(true);
                 })
                 .catch((err) => {
@@ -104,6 +110,14 @@ const SignUp = () => {
     const handleContinueToSignIn = () => {
         setShowSuccessModal(false);
         navigate("/signin");
+    };
+
+    const handleVerifyEmail = () => {
+        setShowSuccessModal(false);
+        const storedEmail = localStorage.getItem("verificationEmail") || formik.values.email;
+        navigate(`/verify-email?email=${encodeURIComponent(storedEmail)}`, {
+            state: { email: storedEmail },
+        });
     };
 
     const passwordRules = {
@@ -500,16 +514,26 @@ const SignUp = () => {
                                     </div>
                                     <h5 className="fw-semibold mb-2">Account Created Successfully</h5>
                                     <p className="text-secondary mb-4">
-                                        Your EventFlow account is ready. Continue to sign in.
+                                        Your EventFlow account is ready. Would you like to verify your email now?
                                     </p>
-                                    <button
-                                        type="button"
-                                        className="btn text-white fw-semibold px-4"
-                                        style={{ backgroundColor: "rgb(226,131,8)" }}
-                                        onClick={handleContinueToSignIn}
-                                    >
-                                        Continue to Sign In
-                                    </button>
+                                    <div className="d-flex gap-3 justify-content-center">
+                                        <button
+                                            type="button"
+                                            className="btn text-white fw-semibold px-4"
+                                            style={{ backgroundColor: "rgb(226,131,8)" }}
+                                            onClick={handleVerifyEmail}
+                                        >
+                                            Verify Email Now
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="btn border border-2 fw-semibold px-4"
+                                            style={{ borderColor: "rgb(226,131,8)", color: "rgb(226,131,8)" }}
+                                            onClick={handleContinueToSignIn}
+                                        >
+                                            Skip to Sign In
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>

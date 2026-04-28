@@ -10,6 +10,8 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    z-index: 1300; /* keep sidebar above overlays */
+    pointer-events: auto;
 }
 
 .links {
@@ -32,6 +34,12 @@
     display: flex;
     align-items: center;
     gap: 15px;
+}
+
+/* Ensure anchor/navlink fills the list area and receives clicks */
+.sidebar .sidebar-link {
+    display: block;
+    width: 100%;
 }
 .links li:hover {
     background-color: rgba(128, 128, 128, 0.245);
