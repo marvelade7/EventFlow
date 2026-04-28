@@ -202,7 +202,7 @@ const Profile = () => {
     };
 
     const handleEmailVerification = () => {
-        navigate("/verify-email");
+        navigate("/verify-email", { state: { email: profileData.email } });
     };
 
     return (
@@ -375,10 +375,10 @@ const Profile = () => {
                                     Your email is not verified.
                                 </p>
                                 <p
-                                    className="m-0 text-decoration-underline text-primary"
+                                    className="m-0 fw-medium text-decoration-underline text-primary"
                                     onClick={handleEmailVerification}
                                 >
-                                    Verify Email
+                                    Verify Now
                                 </p>
                             </div>
                         )}

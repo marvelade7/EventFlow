@@ -172,7 +172,7 @@ const UserDashboard = () => {
                     </div>
 
                     {isVerified ? null : (
-                        <div className="alert alert-warning alert-dismissible fade show mx-4" role="alert">
+                        <div data-aos="fade-up" data-aos-delay="800" className="alert alert-warning alert-dismissible fade show mx-4" role="alert">
                             <strong>Verify your email!</strong> Please go to your profile to verify your email.
                             <button
                                 type="button"

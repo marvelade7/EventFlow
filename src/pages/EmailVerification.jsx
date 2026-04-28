@@ -18,6 +18,8 @@ const EmailVerification = () => {
     const [successMsg, setSuccessMsg] = useState("");
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [resendLoading, setResendLoading] = useState(false);
+    const [resendCountdown, setResendCountdown] = useState(0);
+    const [otpSentTime, setOtpSentTime] = useState(null);
 
     const handleAutoSendOtp = () => {
         axios
@@ -26,6 +28,8 @@ const EmailVerification = () => {
             })
             .then(() => {
                 setSuccessMsg("OTP sent to your email!");
+                setOtpSentTime(Date.now());
+                setResendCountdown(60);
             })
             .catch((err) => {
                 setErrorMsg(
@@ -41,6 +45,23 @@ const EmailVerification = () => {
             once: true,
         });
     }, []);
+
+    // Countdown timer for resend
+    useEffect(() => {
+        if (resendCountdown <= 0) return;
+        
+        const timer = setInterval(() => {
+            setResendCountdown((prev) => {
+                if (prev <= 1) {
+                    clearInterval(timer);
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+        
+        return () => clearInterval(timer);
+    }, [resendCountdown]);
 
     // Auto-send OTP when page loads
     useEffect(() => {
@@ -96,6 +117,8 @@ const EmailVerification = () => {
     };
 
     const handleResendCode = () => {
+        if (resendCountdown > 0) return; // Prevent resend if countdown active
+        
         setResendLoading(true);
         setErrorMsg("");
 
@@ -106,6 +129,10 @@ const EmailVerification = () => {
             .then(() => {
                 setResendLoading(false);
                 setSuccessMsg("Verification code sent to your email!");
+                setOtpSentTime(Date.now());
+                setResendCountdown(60);
+                setVerificationCode(""); // Clear input after resending
+                setErrorMsg(""); // Clear any previous error messages
             })
             .catch((err) => {
                 setResendLoading(false);
@@ -214,7 +241,7 @@ const EmailVerification = () => {
                             </p>
                             <button
                                 type="button"
-                                disabled={resendLoading}
+                                disabled={resendLoading || resendCountdown > 0}
                                 className="btn btn-link p-0 text-decoration-none fw-semibold"
                                 style={{ color: "rgb(226,131,8)" }}
                                 onClick={handleResendCode}
@@ -233,6 +260,14 @@ const EmailVerification = () => {
                                 )}
                             </button>
                         </div>
+
+                        {resendCountdown > 0 && (
+                            <div className="text-center mt-2">
+                                <small className="text-muted">
+                                    Wait {resendCountdown}s before requesting another OTP
+                                </small>
+                            </div>
+                        )}
 
                         <div className="mt-4 pt-3 border-top text-center">
                             <p className="text-secondary small mb-3">
