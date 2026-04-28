@@ -4,11 +4,13 @@ import LeftPanel from "../components/LeftPanel";
 import "../components/Auth.css";
 import aos from "aos";
 import "aos/dist/aos.css";
+import axios from "axios";
 
 const ForgotPassword = () => {
     const [email, setEmail] = useState("");
     const [submitted, setSubmitted] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [errorMsg, setErrorMsg] = useState("");
 
     useEffect(() => {
         aos.init({
@@ -23,10 +25,24 @@ const ForgotPassword = () => {
         if (!email.trim()) return;
 
         setLoading(true);
-        setTimeout(() => {
-            setLoading(false);
-            setSubmitted(true);
-        }, 700);
+        setErrorMsg("");
+        setSubmitted(false);
+
+        axios
+            .post("https://eventflow-backend-fwv4.onrender.com/api/users/forgot-password", {
+                email: email.trim().toLowerCase(),
+            })
+            .then(() => {
+                setLoading(false);
+                setSubmitted(true);
+            })
+            .catch((err) => {
+                setLoading(false);
+                setErrorMsg(
+                    err.response?.data?.message ||
+                        "Unable to send reset link. Please try again."
+                );
+            });
     };
 
     return (
@@ -88,6 +104,12 @@ const ForgotPassword = () => {
                                 "Send Reset Link"
                             )}
                         </button>
+
+                        {errorMsg && (
+                            <div className="fw-semibold text-danger text-center mb-3">
+                                {errorMsg}
+                            </div>
+                        )}
 
                         {submitted && (
                             <div

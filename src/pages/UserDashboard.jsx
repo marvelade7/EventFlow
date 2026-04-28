@@ -176,9 +176,9 @@ const UserDashboard = () => {
                             <strong>Verify your email!</strong> Please go to your profile to verify your email.
                             <button
                                 type="button"
-                                className="btn-close"
+                                className="btn-close shadow-none"
                                 data-bs-dismiss="alert"
-                                aria-label="Close"
+                                aria-label="close"
                             ></button>
                         </div>
                     )}
