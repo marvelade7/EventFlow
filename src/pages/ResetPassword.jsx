@@ -62,7 +62,7 @@ const ResetPassword = () => {
     };
 
     return (
-        <div className="d-flex align-items-stretch h-100 auth-layout auth-page">
+        <div style={{height: '100vh'}} className="d-flex align-items-stretch auth-layout auth-page">
             <LeftPanel
                 style="fs-1 mt-5"
                 head="Create a New Password"
