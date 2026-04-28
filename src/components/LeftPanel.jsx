@@ -12,7 +12,7 @@ const LeftPanel = ({ head, p, texthead, text1, text2, text3, text4, style, pStyl
     }, []);
 
     const leftPanel = {
-        background: 'linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(authImg.png)',
+        background: 'linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(/authImg.png)',
         backgroundPosition: 'center',
         backgroundSize: 'cover',
         color: 'white',
