@@ -42,11 +42,13 @@ const ResetPassword = () => {
         setSuccessMsg("");
 
         axios
-            // .post("https://eventflow-backend-fwv4.onrender.com/api/users/reset-password", {
-            .post("http://localhost:5000/api/users/reset-password", {
-                token,
-                newPassword,
-            })
+            .post(
+                `https://eventflow-backend-fwv4.onrender.com/api/users/reset-password/${token}`,
+                {
+                    token,
+                    newPassword,
+                }
+            )
             .then((res) => {
                 setLoading(false);
                 setSuccessMsg(res.data.message || "Password reset successful.");
