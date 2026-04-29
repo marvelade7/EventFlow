@@ -255,6 +255,7 @@ const BrowseEventPage = () => {
                                         event={category}
                                         eventIcon={getCategoryIcon(category)}
                                         price={formatPrice(event)}
+                                        createdAt={event?.createdAt}
                                         creatorName={getHostName(event)}
                                         creatorAvatar={event?.createdBy?.profilePic}
                                         button="Book Now"

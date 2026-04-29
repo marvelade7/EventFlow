@@ -24,6 +24,7 @@ const BrowseEvent = ({
     onLike,
     creatorName,
     creatorAvatar,
+    createdAt,
 }) => {
     const navigate = useNavigate();
 
@@ -133,7 +134,7 @@ const BrowseEvent = ({
                         </div>
 
                         {creatorName || creatorAvatar ? (
-                            <div className="browse-card-creator mt-4 mb-0 d-flex align-items-center gap-2">
+                            <div style={{marginTop: '2em'}} className="browse-card-creator  mb-0 d-flex align-items-center gap-2">
                                 {creatorAvatar ? (
                                     <img
                                         src={creatorAvatar}
@@ -146,11 +147,17 @@ const BrowseEvent = ({
                                             .toUpperCase()}
                                     </span>
                                 )}
-                                <div>
+                                <div className="d-flex justify-content-between align-items-center w-100">
                                     {/* <p style={{fontSize: '.8em'}} className="m-0">Hosted by</p> */}
                                     <span className='m-0'>
                                         {creatorName || "Event creator"}
                                     </span>
+                                    {createdAt ? (
+                                        <div className="text-secondary m-0 d-flex gap-2" style={{fontSize: '.9em'}}>
+                                            <p className="m-0">{new Date(createdAt).toLocaleString('en-NG', { month: 'short', day: 'numeric', year: 'numeric'})}</p>
+                                            <p className="m-0">{new Date(createdAt).toLocaleString('en-NG', { hour: 'numeric', minute: '2-digit', hour12: true })}</p>
+                                        </div>
+                                    ) : null}
                                 </div>
                             </div>
                         ) : null}
