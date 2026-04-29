@@ -10,28 +10,28 @@ const Location = ({ formik }) => {
                 <p style={{ padding: '2px 10px', backgroundColor: 'rgb(17,213,243)' }} className="m-0 rounded-5 text-white fw-semibold w-auto">3</p>
                 <h5 className='m-0'>Location</h5>
             </div>
-            <div className='form-group'>
+            <div className='form-group mt-2'>
                 <label htmlFor="venueName">Venue Name</label>
                 <input
                     type="text"
                     name="venueName"
                     id="venueName"
                     placeholder='e.g Madison Square Garden'
-                    className={`form-control shadow-none ${hasError('venueName') ? 'is-invalid' : ''}`}
+                    className={`form-control shadow-none mb-0 ${hasError('venueName') ? 'is-invalid' : ''}`}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     value={formik.values.venueName}
                 />
                 {hasError('venueName') ? <div className='invalid-feedback d-block'>{formik.errors.venueName}</div> : null}
             </div>
-            <div className='form-group w-100'>
+            <div className='form-group w-100 mt-2'>
                 <label htmlFor="address">Address</label>
                 <input
                     type="text"
                     name="address"
                     id="address"
                     placeholder='Street Address'
-                    className={`form-control shadow-none ${hasError('address') ? 'is-invalid' : ''}`}
+                    className={`form-control shadow-none mb-0 ${hasError('address') ? 'is-invalid' : ''}`}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     value={formik.values.address}
@@ -39,39 +39,39 @@ const Location = ({ formik }) => {
                 {hasError('address') ? <div className='invalid-feedback d-block'>{formik.errors.address}</div> : null}
             </div>
             <div className='d-flex gap-3'>
-                <div className='form-group w-100'>
+                <div className='form-group w-100 mt-2'>
                     <input
                         type="text"
                         name="city"
                         id="city"
                         placeholder='City'
-                        className={`form-control shadow-none ${hasError('city') ? 'is-invalid' : ''}`}
+                        className={`form-control shadow-none mb-0 ${hasError('city') ? 'is-invalid' : ''}`}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
                         value={formik.values.city}
                     />
                     {hasError('city') ? <div className='invalid-feedback d-block'>{formik.errors.city}</div> : null}
                 </div>
-                <div className='form-group w-100'>
+                <div className='form-group w-100 mt-2'>
                     <input
                         type="text"
                         name="state"
                         id="state"
                         placeholder='State'
-                        className={`form-control shadow-none ${hasError('state') ? 'is-invalid' : ''}`}
+                        className={`form-control shadow-none mb-0 ${hasError('state') ? 'is-invalid' : ''}`}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
                         value={formik.values.state}
                     />
                     {hasError('state') ? <div className='invalid-feedback d-block'>{formik.errors.state}</div> : null}
                 </div>
-                <div className='form-group w-100'>
+                <div className='form-group w-100 mt-2'>
                     <input
                         type="text"
                         name="country"
                         id="country"
                         placeholder='Country'
-                        className={`form-control shadow-none ${hasError('country') ? 'is-invalid' : ''}`}
+                        className={`form-control shadow-none mb-0 ${hasError('country') ? 'is-invalid' : ''}`}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
                         value={formik.values.country}

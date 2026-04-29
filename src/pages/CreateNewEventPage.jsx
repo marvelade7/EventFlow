@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import CreateEventNav from '../components/CreateEventNav';
 import EventBasis from '../components/EventBasis';
 import DateAndTimeForm from '../components/DateAndTimeForm';
@@ -12,9 +12,14 @@ import aos from 'aos';
 import 'aos/dist/aos.css';
 import axios from 'axios';
 import { useOutletContext } from 'react-router-dom';
+import { ProfileContext } from '../context/ProfileContext';
 
 const CreateNewEventPage = () => {
     const { sidebarOpen, toggleSidebar } = useOutletContext();
+    const { user } = useContext(ProfileContext);
+    const isUserLoaded = user !== null;
+    const isEmailVerified = Boolean(user?.isVerified);
+    const canPublish = isUserLoaded && isEmailVerified;
     const now = new Date();
     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
     const today = now.toISOString().split('T')[0];
@@ -102,19 +107,76 @@ const CreateNewEventPage = () => {
                         ['image/jpeg', 'image/png', 'image/webp'].includes(value.type)
                 ),
         }),
-        onSubmit: async (values, { setSubmitting }) => {
-            // try {
-            //     // Replace with API request when backend endpoint is ready.
-            //     console.log('Publishing event:', values);
-            // } finally {
-            //     setSubmitting(false);
-            // }
-            axios.post('https://eventflow-backend-fwv4.onrender.com/api/events/create-event').then((event) => {
-                console.log(event.message)
+        onSubmit: (values, { setSubmitting }) => {
+            if (!canPublish) {
+                setSubmitting(false);
+                return;
+            }
+
+            const token = localStorage.getItem('token');
+            if (!token) {
+                console.error('No token found');
+                setSubmitting(false);
+                return;
+            }
+
+            const formData = new FormData();
+            
+            // Map frontend field names to backend expectations
+            formData.append('title', values.eventName);
+            formData.append('description', values.description);
+            formData.append('category', values.category);
+            formData.append('startDate', values.startDate);
+            formData.append('startTime', values.startTime);
+            formData.append('endDate', values.endDate);
+            formData.append('endTime', values.endTime);
+            formData.append('venue', values.venueName);
+            formData.append('address', values.address);
+            formData.append('city', values.city);
+            formData.append('country', values.country);
+            formData.append('isFree', String(values.isFree));
+            formData.append('timeZone', values.timeZone);
+            
+            // Handle ticketTypes - send as JSON string for now
+            if (!values.isFree) {
+                const ticketTypes = [
+                    {
+                        name: 'General Admission',
+                        ticketPrice: Number(values.ticketPrice),
+                        quantity: Number(values.availableTickets),
+                    }
+                ];
+                formData.append('ticketTypes', JSON.stringify(ticketTypes));
+            } else {
+                formData.append('ticketTypes', JSON.stringify([]));
+            }
+            
+            // Append banner image at the end
+            if (values.eventBanner) {
+                formData.append('banner', values.eventBanner);
+            }
+
+            axios.post(
+                'https://eventflow-backend-fwv4.onrender.com/api/events/create-event',
+                formData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            )
+            .then((res) => {
+                console.log('Event created:', res.data);
+                // alert('Event created successfully!');
+                formik.resetForm();
             })
-            .then((err) => {
-                console.log(err);
+            .catch((err) => {
+                console.error('Error creating event:', err.response?.data || err.message);
+                alert(`Error: ${err.response?.data?.message || err.message}`);
             })
+            .finally(() => {
+                setSubmitting(false);
+            });
         },
     });
 
@@ -140,9 +202,16 @@ const CreateNewEventPage = () => {
                             isSidebarOpen={sidebarOpen}
                             onSaveDraft={handleSaveDraft}
                             isSubmitting={formik.isSubmitting}
+                            isPublishDisabled={!canPublish}
                             title='Create New Event'
                         />
                     </div>
+
+                    {!isUserLoaded ? (
+                        <div className='mx-4 mt-3 alert alert-info'>Checking your account status...</div>
+                    ) : !isEmailVerified ? (
+                        <div className='mx-4 mt-3 alert alert-warning'>Verify your email before publishing an event.</div>
+                    ) : null}
 
                     <div className='d-flex gap-3 px-4 pb-4 mt-2 create-event-layout'>
                         <div className='create-event-form-column' style={{width: '70%'}}>
@@ -168,6 +237,7 @@ const CreateNewEventPage = () => {
                                 values={formik.values}
                                 isSubmitting={formik.isSubmitting}
                                 onSaveDraft={handleSaveDraft}
+                                isPublishDisabled={!canPublish}
                             />
                         </div>
                     </div>

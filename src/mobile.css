@@ -305,6 +305,14 @@
         max-width: 360px;
     }
 
+    .browse-event-modal-img {
+        height: 210px;
+    }
+
+    .browse-filter-wrap {
+        flex-wrap: nowrap !important;
+    }
+
     .host-events button {
         font-size: 1em !important;
     }

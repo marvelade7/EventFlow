@@ -5,6 +5,7 @@ const CreateEventNav = ({
     isSidebarOpen,
     onSaveDraft,
     isSubmitting,
+    isPublishDisabled = false,
     title,
     actionLabel,
     onActionClick,
@@ -15,7 +16,10 @@ const CreateEventNav = ({
         alignItems: 'center',
         padding: '20px 30px',
         background: 'white',
-        borderBottom: '1px solid rgba(0,0,0,.12)'
+        borderBottom: '1px solid rgba(0,0,0,.12)',
+        position: 'sticky',
+        top: 0,
+        zIndex: 1040,
     };
     return (
         <div className='create-event-nav' style={nav}>
@@ -45,7 +49,7 @@ const CreateEventNav = ({
                 ) : (
                     <>
                         <button type='button' onClick={onSaveDraft} className='btn btn-outline-light text-dark border rounded-3 py-2 px-3'>Save Draft</button>
-                        <button type='submit' disabled={isSubmitting} style={{backgroundColor: 'rgb(17,213,243)'}} className='btn rounded-3 text-white py-2 fw-semibold px-3'>
+                        <button type='submit' disabled={isSubmitting || isPublishDisabled} style={{backgroundColor: 'rgb(17,213,243)'}} className='btn rounded-3 text-white py-2 fw-semibold px-3'>
                             {isSubmitting ? 'Publishing...' : 'Publish Event'}
                         </button>
                     </>

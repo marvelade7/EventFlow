@@ -12,14 +12,14 @@ const DateAndTimeForm = ({ formik }) => {
                 <p style={{ padding: '2px 10px', backgroundColor: 'rgb(17,213,243)' }} className="m-0 rounded-5 text-white fw-semibold w-auto">2</p>
                 <h5 className='m-0'>Date & Time</h5>
             </div>
-            <div className="d-flex gap-3">
-                <div className='form-group w-100'>
+            <div className="d-flex gap-3 ">
+                <div className='form-group w-100 mt-2'>
                     <label htmlFor="startDate">Start Date</label>
                     <input
                         type="date"
                         name="startDate"
                         id="startDate"
-                        className={`form-control shadow-none ${hasError('startDate') ? 'is-invalid' : ''}`}
+                        className={`form-control shadow-none mb-0 ${hasError('startDate') ? 'is-invalid' : ''}`}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
                         value={formik.values.startDate}
@@ -27,13 +27,13 @@ const DateAndTimeForm = ({ formik }) => {
                     />
                     {hasError('startDate') ? <div className='invalid-feedback d-block'>{formik.errors.startDate}</div> : null}
                 </div>
-                <div className='form-group w-100'>
+                <div className='form-group w-100 mt-2'>
                     <label htmlFor="startTime">Start Time</label>
                     <input
                         type="time"
                         name="startTime"
                         id="startTime"
-                        className={`form-control shadow-none ${hasError('startTime') ? 'is-invalid' : ''}`}
+                        className={`form-control shadow-none mb-0 ${hasError('startTime') ? 'is-invalid' : ''}`}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
                         value={formik.values.startTime}
@@ -42,13 +42,13 @@ const DateAndTimeForm = ({ formik }) => {
                 </div>
             </div>
             <div className="d-flex gap-3">
-                <div className='form-group w-100'>
+                <div className='form-group w-100 mt-2'>
                     <label htmlFor="endDate">End Date</label>
                     <input
                         type="date"
                         name="endDate"
                         id="endDate"
-                        className={`form-control shadow-none ${hasError('endDate') ? 'is-invalid' : ''}`}
+                        className={`form-control shadow-none mb-0 ${hasError('endDate') ? 'is-invalid' : ''}`}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
                         value={formik.values.endDate}
@@ -56,13 +56,13 @@ const DateAndTimeForm = ({ formik }) => {
                     />
                     {hasError('endDate') ? <div className='invalid-feedback d-block'>{formik.errors.endDate}</div> : null}
                 </div>
-                <div className='form-group w-100'>
+                <div className='form-group w-100 mt-2'>
                     <label htmlFor="endTime">End Time</label>
                     <input
                         type="time"
                         name="endTime"
                         id="endTime"
-                        className={`form-control shadow-none ${hasError('endTime') ? 'is-invalid' : ''}`}
+                        className={`form-control shadow-none mb-0 ${hasError('endTime') ? 'is-invalid' : ''}`}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
                         value={formik.values.endTime}
@@ -70,12 +70,12 @@ const DateAndTimeForm = ({ formik }) => {
                     {hasError('endTime') ? <div className='invalid-feedback d-block'>{formik.errors.endTime}</div> : null}
                 </div>
             </div>
-            <div className='form-group'>
+            <div className='form-group mt-2'>
                 <label htmlFor="timeZone">Time Zone</label>
                 <select
                     name="timeZone"
                     id="timeZone"
-                    className={`form-control shadow-none ${hasError('timeZone') ? 'is-invalid' : ''}`}
+                    className={`form-control shadow-none mb-0 ${hasError('timeZone') ? 'is-invalid' : ''}`}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     value={formik.values.timeZone}

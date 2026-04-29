@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from "react";
 
-const LivePreview = ({ values, isSubmitting, onSaveDraft }) => {
+const LivePreview = ({ values, isSubmitting, onSaveDraft, isPublishDisabled = false }) => {
     const preview = {
         position: "sticky",
         top: "10px",
@@ -88,7 +88,7 @@ const LivePreview = ({ values, isSubmitting, onSaveDraft }) => {
                 </button>
                 <button
                     type="submit"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || isPublishDisabled}
                     style={{ backgroundColor: "rgb(17,213,243)" }}
                     className="btn rounded-3 text-white w-100 py-2 fw-semibold px-3"
                 >

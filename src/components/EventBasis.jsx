@@ -16,19 +16,19 @@ const EventBasis = ({ formik }) => {
                     name="eventName"
                     id="eventName"
                     placeholder='Give your event a great name'
-                    className={`form-control shadow-none ${hasError('eventName') ? 'is-invalid' : ''}`}
+                    className={`form-control shadow-none mb-0 ${hasError('eventName') ? 'is-invalid' : ''}`}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     value={formik.values.eventName}
                 />
                 {hasError('eventName') ? <div className='invalid-feedback d-block'>{formik.errors.eventName}</div> : null}
             </div>
-            <div className='form-group'>
+            <div className='form-group mt-3'>
                 <label htmlFor="category">Category</label>
                 <select
                     name="category"
                     id="category"
-                    className={`form-control shadow-none ${hasError('category') ? 'is-invalid' : ''}`}
+                    className={`form-control shadow-none mb-0 ${hasError('category') ? 'is-invalid' : ''}`}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     value={formik.values.category}
@@ -43,13 +43,13 @@ const EventBasis = ({ formik }) => {
                 </select>
                 {hasError('category') ? <div className='invalid-feedback d-block'>{formik.errors.category}</div> : null}
             </div>
-            <div className='form-group'>
+            <div className='form-group mt-3'>
                 <label htmlFor="description">Short Description</label>
                 <textarea
                     name="description"
                     id="description"
                     placeholder='A brief exciting, description of your event...'
-                    className={`form-control shadow-none ${hasError('description') ? 'is-invalid' : ''}`}
+                    className={`form-control shadow-none mb-0 ${hasError('description') ? 'is-invalid' : ''}`}
                     rows='3'
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
