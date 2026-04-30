@@ -61,7 +61,7 @@ const BrowseEvent = ({
                     }
                     role={clickableCard ? "button" : undefined}
                     tabIndex={clickableCard ? 0 : undefined}
-                    style={clickableCard ? { cursor: "pointer" } : undefined}
+                    style={clickableCard ? { cursor: "pointer", transition: 'all 0.3s ease' } : undefined}
                 >
                     {showLikeButton ? (
                         <button

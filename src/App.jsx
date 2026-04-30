@@ -32,8 +32,12 @@ const ScrollToTop = () => {
 
 import { ProfileProvider } from "./context/ProfileContext";
 
-const App = () => {
+const ProtectedRoute = ({ element }) => {
     const token = localStorage.getItem("token");
+    return token ? element : <Navigate to="/signin" replace />;
+};
+
+const App = () => {
     return (
         <>
             <ScrollToTop />
@@ -47,7 +51,7 @@ const App = () => {
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password/:token" element={<ResetPassword />} />
 
-                <Route path="/dashboard" element={token ? <UserDashboard /> : <Navigate to="/signin" replace />}>
+                <Route path="/dashboard" element={<ProtectedRoute element={<UserDashboard />} />}>
                     <Route path="profile" element={<Profile />} />
                     <Route path="my-event" element={<MyEvent />} />
                     <Route path="create-event" element={<CreateNewEventPage />} />

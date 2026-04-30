@@ -42,11 +42,15 @@ const SignIn = () => {
                     response.data?.token ||
                     response.data?.accessToken ||
                     response.data?.data?.token;
+                const userData = response.data?.user || response.data?.data?.user || {};
 
                 if (token) {
-                    // alert("Welcome back! You have successfully logged in.");
-                    if (setUser) setUser(null);
+                    // Store user data in context
+                    if (setUser) setUser(userData);
                     localStorage.setItem("token", token);
+                    if (userData && userData._id) {
+                        localStorage.setItem("userId", userData._id);
+                    }
                     navigate("/dashboard", { replace: true });
                 } else {
                     setErrorMsg("Login failed. Please check your credentials.");
