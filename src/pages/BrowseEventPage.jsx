@@ -292,7 +292,7 @@ const BrowseEventPage = () => {
 
             <div className="px-4 pb-4 pt-4">
                 <div data-aos="fade-up">
-                    <div style={{position: 'sticky', top:'80px', zIndex: '1000', background: 'rgba(255, 255, 255, 0.8)', backdropFilter: 'blur(7px)'}} className="mb-4 pt-4 pb-1 px-4 rounded-3 shadow-sm" >
+                    <div style={{position: 'sticky', top:'80px', zIndex: '1000', background: 'rgba(255, 255, 255, 0.8)', backdropFilter: 'blur(7px)'}} className="event-filter mb-4 pt-4 pb-1 px-4 rounded-3 shadow-sm" >
                         <BrowseEventsHead
                             style={{ fontSize: "1.5em" }}
                             title="Find Your Next Event"

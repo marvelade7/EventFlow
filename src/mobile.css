@@ -464,6 +464,10 @@
         max-width: 540px;
         padding: 2rem 1rem !important;
     }
+
+    .event-filter {
+        top: 65px !important;
+    }
 }
 
 @media (max-width: 480px) {
@@ -579,5 +583,9 @@
 
     .auth-layout .auth-form-card {
         padding: 1.5rem 0.9rem !important;
+    }
+
+    .event-filter {
+        top: 60px !important;
     }
 }
