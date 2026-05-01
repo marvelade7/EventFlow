@@ -15,6 +15,7 @@ const Profile = () => {
     const [isSaving, setIsSaving] = useState(false);
     const [requestError, setRequestError] = useState("");
     const [requestSuccess, setRequestSuccess] = useState("");
+    const [notifications, setNotifications] = useState([]);
     const fileInputRef = useRef(null);
     const { sidebarOpen, toggleSidebar } = useOutletContext();
     const navigate = useNavigate();
@@ -90,6 +91,16 @@ const Profile = () => {
             .finally(() => setLoading(false));
     }, [navigate]);
 
+    const showNotification = (message, type = "info") => {
+        const id = Date.now();
+        const notification = { id, message, type };
+        setNotifications((prev) => [...prev, notification]);
+
+        setTimeout(() => {
+            setNotifications((prev) => prev.filter((n) => n.id !== id));
+        }, 3000);
+    };
+
     const handleFieldChange = (e) => {
         const { name, value } = e.target;
         setProfileData((prev) => ({ ...prev, [name]: value }));
@@ -158,7 +169,7 @@ const Profile = () => {
             if (setUser) setUser(updatedUser);
 
             setIsEditing(false);
-            setRequestSuccess("Profile updated successfully.");
+            showNotification("Profile updated successfully.", "success");
         } catch (err) {
             if (err.response?.status === 401) {
                 localStorage.removeItem("token");
@@ -166,9 +177,10 @@ const Profile = () => {
                 return;
             }
 
-            setRequestError(
+            showNotification(
                 err.response?.data?.message ||
                     "Unable to update profile right now.",
+                "error"
             );
         } finally {
             setIsSaving(false);
@@ -429,6 +441,75 @@ const Profile = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Toast Notifications */}
+            <div
+                style={{
+                    position: "fixed",
+                    bottom: "20px",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    zIndex: 9999,
+                    maxWidth: "500px",
+                    width: "90%",
+                }}
+            >
+                {notifications.map((notification) => (
+                    <div
+                        key={notification.id}
+                        style={{
+                            marginBottom: "10px",
+                            animation: "slideIn 0.3s ease-in-out",
+                        }}
+                    >
+                        <div
+                            className={`alert alert-${
+                                notification.type === "success"
+                                    ? "success"
+                                    : notification.type === "error"
+                                    ? "danger"
+                                    : "info"
+                            } d-flex align-items-center gap-2 mb-0`}
+                            role="alert"
+                            style={{
+                                boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                                borderRadius: "8px",
+                                animation: "slideOut 0.3s ease-in-out 2.7s forwards",
+                            }}
+                        >
+                            {notification.type === "success" && (
+                                <i className="bi bi-check-circle-fill"></i>
+                            )}
+                            {notification.type === "error" && (
+                                <i className="bi bi-exclamation-circle-fill"></i>
+                            )}
+                            {notification.type === "info" && (
+                                <i className="bi bi-info-circle-fill"></i>
+                            )}
+                            <span>{notification.message}</span>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            <style>{`
+                @keyframes slideIn {
+                    from {
+                        transform: translateY(100px);
+                        opacity: 0;
+                    }
+                    to {
+                        transform: translateY(0);
+                        opacity: 1;
+                    }
+                }
+                @keyframes slideOut {
+                    to {
+                        transform: translateY(100px);
+                        opacity: 0;
+                    }
+                }
+            `}</style>
         </div>
     );
 };

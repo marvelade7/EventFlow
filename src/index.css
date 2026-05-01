@@ -213,11 +213,22 @@ input[type="number"]::-webkit-inner-spin-button {
 
 .browse-event-backdrop {
     z-index: 1290;
+    pointer-events: auto;
 }
 
 .browse-event-modal .modal-dialog,
 .browse-event-modal .modal-content {
     pointer-events: auto;
+}
+
+.browse-event-modal .modal-dialog {
+    position: relative;
+    z-index: 1310;
+}
+
+.browse-event-modal .modal-content {
+    position: relative;
+    z-index: 1311;
 }
 
 .browse-event-modal-img {

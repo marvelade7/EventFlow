@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import CreateEventNav from '../components/CreateEventNav';
 import EventBasis from '../components/EventBasis';
 import DateAndTimeForm from '../components/DateAndTimeForm';
@@ -20,9 +20,21 @@ const CreateNewEventPage = () => {
     const isUserLoaded = user !== null;
     const isEmailVerified = Boolean(user?.isVerified);
     const canPublish = isUserLoaded && isEmailVerified;
+    const [notifications, setNotifications] = useState([]);
     const now = new Date();
     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
     const today = now.toISOString().split('T')[0];
+
+    const showNotification = (message, type = "info") => {
+        const id = Date.now();
+        const notification = { id, message, type };
+        setNotifications((prev) => [...prev, notification]);
+
+        // Auto-dismiss after 3 seconds
+        setTimeout(() => {
+            setNotifications((prev) => prev.filter((n) => n.id !== id));
+        }, 3000);
+    };
 
     const formik = useFormik({
         initialValues: {
@@ -167,12 +179,12 @@ const CreateNewEventPage = () => {
             )
             .then((res) => {
                 console.log('Event created:', res.data);
-                // alert('Event created successfully!');
+                showNotification('Event created successfully!', 'success');
                 formik.resetForm();
             })
             .catch((err) => {
                 console.error('Error creating event:', err.response?.data || err.message);
-                alert(`Error: ${err.response?.data?.message || err.message}`);
+                showNotification(`Error: ${err.response?.data?.message || err.message}`, 'error');
             })
             .finally(() => {
                 setSubmitting(false);
@@ -242,6 +254,75 @@ const CreateNewEventPage = () => {
                         </div>
                     </div>
                 </form>
+
+                {/* Toast Notifications */}
+                <div
+                    style={{
+                        position: "fixed",
+                        bottom: "20px",
+                        left: "50%",
+                        transform: "translateX(-50%)",
+                        zIndex: 9999,
+                        maxWidth: "500px",
+                        width: "90%",
+                    }}
+                >
+                    {notifications.map((notification) => (
+                        <div
+                            key={notification.id}
+                            style={{
+                                marginBottom: "10px",
+                                animation: "slideIn 0.3s ease-in-out",
+                            }}
+                        >
+                            <div
+                                className={`alert alert-${
+                                    notification.type === "success"
+                                        ? "success"
+                                        : notification.type === "error"
+                                        ? "danger"
+                                        : "info"
+                                } d-flex align-items-center gap-2 mb-0`}
+                                role="alert"
+                                style={{
+                                    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                                    borderRadius: "8px",
+                                    animation: "slideOut 0.3s ease-in-out 2.7s forwards",
+                                }}
+                            >
+                                {notification.type === "success" && (
+                                    <i className="bi bi-check-circle-fill"></i>
+                                )}
+                                {notification.type === "error" && (
+                                    <i className="bi bi-exclamation-circle-fill"></i>
+                                )}
+                                {notification.type === "info" && (
+                                    <i className="bi bi-info-circle-fill"></i>
+                                )}
+                                <span>{notification.message}</span>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                <style>{`
+                    @keyframes slideIn {
+                        from {
+                            transform: translateY(100px);
+                            opacity: 0;
+                        }
+                        to {
+                            transform: translateY(0);
+                            opacity: 1;
+                        }
+                    }
+                    @keyframes slideOut {
+                        to {
+                            transform: translateY(100px);
+                            opacity: 0;
+                        }
+                    }
+                `}</style>
         </div>
     );
 };

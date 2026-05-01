@@ -201,6 +201,46 @@ const BrowseEventPage = () => {
         };
     }, []);
 
+    // Listen for event updates from MyEvent page
+    useEffect(() => {
+        const handleEventUpdated = async (event) => {
+            const eventId = event.detail?.eventId;
+            if (!eventId) return;
+
+            // Find and update the event in the list
+            const token = localStorage.getItem("token");
+            try {
+                const res = await axios.get(EVENTS_ENDPOINT, {
+                    headers: token
+                        ? {
+                              Authorization: `Bearer ${token}`,
+                              Accept: "application/json",
+                          }
+                        : {
+                              Accept: "application/json",
+                          },
+                });
+                setEvents(getEventsFromResponse(res.data));
+            } catch (err) {
+                console.error("Error refreshing events:", err);
+            }
+        };
+
+        window.addEventListener("eventUpdated", handleEventUpdated);
+        return () => window.removeEventListener("eventUpdated", handleEventUpdated);
+    }, []);
+
+    useEffect(() => {
+        if (!selectedEvent) return;
+
+        const previousOverflow = document.body.style.overflow;
+        document.body.style.overflow = "hidden";
+
+        return () => {
+            document.body.style.overflow = previousOverflow;
+        };
+    }, [selectedEvent]);
+
     const categories = useMemo(() => {
         const eventCategories = events
             .map((event) => getCategory(event))
@@ -248,7 +288,7 @@ const BrowseEventPage = () => {
 
             <div className="px-4 pb-4 pt-4">
                 <div data-aos="fade-up">
-                    <div style={{position: 'sticky', top:'80px', zIndex: '1000'}} className="mb-4 bg-white pt-4 pb-1 px-4 rounded-3 shadow-sm" >
+                    <div style={{position: 'sticky', top:'80px', zIndex: '1000', background: 'rgba(255, 255, 255, 0.8)', backdropFilter: 'blur(7px)'}} className="mb-4 pt-4 pb-1 px-4 rounded-3 shadow-sm" >
                         <BrowseEventsHead
                             style={{ fontSize: "1.5em" }}
                             title="Find Your Next Event"
@@ -347,12 +387,25 @@ const BrowseEventPage = () => {
                               tabIndex="-1"
                               role="dialog"
                               aria-modal="true"
+                              onClick={() => setSelectedEvent(null)}
+                              style={{
+                                  position: "fixed",
+                                  inset: 0,
+                                  overflowY: "auto",
+                                  padding: "1rem",
+                                  backgroundColor: "rgba(0, 0, 0, 0.5)",
+                              }}
                           >
                               <div
                                   className="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg"
                                   role="document"
+                                  onClick={(e) => e.stopPropagation()}
                               >
-                                  <div className="modal-content border-0 shadow rounded-4 overflow-hidden">
+                                  <div
+                                      className="modal-content border-0 shadow rounded-4 overflow-hidden"
+                                      onClick={(e) => e.stopPropagation()}
+                                      style={{ position: "relative", zIndex: 1310 }}
+                                  >
                                       <img
                                           src={getEventImage(selectedEvent)}
                                           alt={getEventTitle(selectedEvent)}
@@ -566,10 +619,6 @@ const BrowseEventPage = () => {
                                   </div>
                               </div>
                           </div>
-                          <div
-                              className="modal-backdrop fade show browse-event-backdrop"
-                              onClick={() => setSelectedEvent(null)}
-                          ></div>
                       </>,
                       document.body,
                   )

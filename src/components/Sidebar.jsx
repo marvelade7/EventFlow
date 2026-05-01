@@ -4,7 +4,14 @@ import "./sidebar.css";
 import { Link, NavLink } from "react-router-dom";
 import Avatar from "./Avatar";
 
-const Sidebar = ({ mobileOpen = false, firstName, lastName, avatar, onLinkClick }) => {
+const Sidebar = ({
+    mobileOpen = false,
+    firstName,
+    lastName,
+    avatar,
+    onLinkClick,
+    onLogout,
+}) => {
     return (
         <div
             className={`sidebar bg-white ${mobileOpen ? "sidebar-mobile-open" : ""}`}
@@ -85,22 +92,32 @@ const Sidebar = ({ mobileOpen = false, firstName, lastName, avatar, onLinkClick 
                 </ul>
             </div>
 
-            <Link
-                to="/dashboard/profile"
-                className="text-decoration-none text-dark"
-                onClick={onLinkClick}
-            >
-                <div className="profile">
-                    <Avatar
-                        firstName={firstName}
-                        lastName={lastName}
-                        avatarUrl={avatar}
-                    />
-                    <p className="m-0 fw-semibold w-100">
-                        {(firstName || "") + " " + (lastName || "")}
-                    </p>
-                </div>
-            </Link>
+            <div>
+                <Link
+                    to="/dashboard/profile"
+                    className="text-decoration-none text-dark"
+                    onClick={onLinkClick}
+                >
+                    <div className="profile">
+                        <Avatar
+                            firstName={firstName}
+                            lastName={lastName}
+                            avatarUrl={avatar}
+                        />
+                        <p className="m-0 fw-semibold w-100">
+                            {(firstName || "") + " " + (lastName || "")}
+                        </p>
+                    </div>
+                </Link>
+                <button
+                    type="button"
+                    onClick={onLogout}
+                    className="btn btn-outline-danger w-100 mt-3 d-flex align-items-center gap-2 justify-content-center"
+                >
+                    <i className="bi bi-box-arrow-right"></i>
+                    Logout
+                </button>
+            </div>
         </div>
     );
 };

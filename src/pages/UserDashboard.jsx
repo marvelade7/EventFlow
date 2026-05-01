@@ -48,6 +48,14 @@ const UserDashboard = () => {
     };
 
     let navigate = useNavigate();
+
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("userId");
+        if (setUser) setUser(null);
+        navigate("/signin", { replace: true });
+    };
+
     useEffect(() => {
         let token = localStorage.getItem("token");
         if (!token) {
@@ -123,6 +131,7 @@ const UserDashboard = () => {
                 lastName={lastName}
                 avatar={avatar}
                 onLinkClick={() => setSidebarOpen(false)}
+                onLogout={handleLogout}
             />
             <div
                 className={`sidebar-overlay ${sidebarOpen ? "show" : ""}`}

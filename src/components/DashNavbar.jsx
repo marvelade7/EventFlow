@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Avatar from './Avatar';
 
 const DashNavbar = ({
@@ -9,6 +10,15 @@ const DashNavbar = ({
     lastName,
     avatar,
 }) => {
+    const navigate = useNavigate();
+    const [showProfileMenu, setShowProfileMenu] = useState(false);
+
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("userId");
+        navigate("/signin", { replace: true });
+    };
+
     const nav = {
         display: 'flex',
         justifyContent: 'space-between',
@@ -39,14 +49,80 @@ const DashNavbar = ({
                     <input type="text" placeholder='Search events...' style={{border: 'none', outline: 'none'}} className='' />
                 </div>
                 <i className='bi bi-bell fs-5'></i>
-                <Avatar
-                    firstName={firstName}
-                    lastName={lastName}
-                    avatarUrl={avatar}
-                    width="50px"
-                    height="40px"
-                    fontSize="14px"
-                />
+                <div style={{ position: 'relative' }}>
+                    <div
+                        onClick={() => setShowProfileMenu(!showProfileMenu)}
+                        style={{ cursor: 'pointer' }}
+                    >
+                        <Avatar
+                            firstName={firstName}
+                            lastName={lastName}
+                            avatarUrl={avatar}
+                            width="50px"
+                            height="40px"
+                            fontSize="14px"
+                        />
+                    </div>
+                    {showProfileMenu && (
+                        <div
+                            style={{
+                                position: 'absolute',
+                                top: '100%',
+                                right: 0,
+                                backgroundColor: 'white',
+                                border: '1px solid #ddd',
+                                borderRadius: '8px',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                                zIndex: 1001,
+                                minWidth: '180px',
+                                marginTop: '5px',
+                            }}
+                        >
+                            <div style={{ padding: '12px 0' }}>
+                                <button
+                                    onClick={() => {
+                                        setShowProfileMenu(false);
+                                        navigate('/dashboard/profile');
+                                    }}
+                                    style={{
+                                        width: '100%',
+                                        border: 'none',
+                                        background: 'none',
+                                        padding: '10px 16px',
+                                        textAlign: 'left',
+                                        cursor: 'pointer',
+                                        fontSize: '14px',
+                                    }}
+                                    className='d-flex align-items-center gap-2'
+                                    onMouseEnter={(e) => e.target.parentElement.style.backgroundColor = '#f5f5f5'}
+                                    onMouseLeave={(e) => e.target.parentElement.style.backgroundColor = 'transparent'}
+                                >
+                                    <i className='bi bi-person'></i>
+                                    Profile
+                                </button>
+                                <button
+                                    onClick={handleLogout}
+                                    style={{
+                                        width: '100%',
+                                        border: 'none',
+                                        background: 'none',
+                                        padding: '10px 16px',
+                                        textAlign: 'left',
+                                        cursor: 'pointer',
+                                        fontSize: '14px',
+                                        color: '#dc3545',
+                                    }}
+                                    className='d-flex align-items-center gap-2'
+                                    onMouseEnter={(e) => e.target.style.backgroundColor = '#fff5f5'}
+                                    onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                                >
+                                    <i className='bi bi-box-arrow-right'></i>
+                                    Logout
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );

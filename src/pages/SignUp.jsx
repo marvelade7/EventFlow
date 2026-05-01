@@ -18,10 +18,16 @@ const SignUp = () => {
         });
     }, []);
 
-    const [errorMsg, setErrorMsg] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [showSuccessModal, setShowSuccessModal] = useState(false);
-    const navigate = useNavigate();
+    const showNotification = (message, type = "info") => {
+        const id = Date.now();
+        const notification = { id, message, type };
+        setNotifications((prev) => [...prev, notification]);
+
+        setTimeout(() => {
+            setNotifications((prev) => prev.filter((n) => n.id !== id));
+        }, 3000);
+    };
+
     const formik = useFormik({
         initialValues: {
             firstName: "",
@@ -48,13 +54,14 @@ const SignUp = () => {
                     resetForm()
                     // Store email in localStorage for verification page
                     localStorage.setItem("verificationEmail", normalizedEmail);
-                    setShowSuccessModal(true);
+                    showNotification("Registration successful! Please verify your email.", "success");
+                    setTimeout(() => {
+                        setShowSuccessModal(true);
+                    }, 500);
                 })
                 .catch((err) => {
                     setLoading(false);
-                    setErrorMsg(
-                        err.response?.data?.message || "Something went wrong",
-                    );
+                    showNotification(err.response?.data?.message || "Something went wrong", "error");
                 });
         },
         validateOnMount: true, // 👈 important
@@ -541,6 +548,75 @@ const SignUp = () => {
                     <div className="modal-backdrop fade show"></div>
                 </>
             )}
+
+            {/* Toast Notifications */}
+            <div
+                style={{
+                    position: "fixed",
+                    bottom: "20px",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    zIndex: 9999,
+                    maxWidth: "500px",
+                    width: "90%",
+                }}
+            >
+                {notifications.map((notification) => (
+                    <div
+                        key={notification.id}
+                        style={{
+                            marginBottom: "10px",
+                            animation: "slideIn 0.3s ease-in-out",
+                        }}
+                    >
+                        <div
+                            className={`alert alert-${
+                                notification.type === "success"
+                                    ? "success"
+                                    : notification.type === "error"
+                                    ? "danger"
+                                    : "info"
+                            } d-flex align-items-center gap-2 mb-0`}
+                            role="alert"
+                            style={{
+                                boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                                borderRadius: "8px",
+                                animation: "slideOut 0.3s ease-in-out 2.7s forwards",
+                            }}
+                        >
+                            {notification.type === "success" && (
+                                <i className="bi bi-check-circle-fill"></i>
+                            )}
+                            {notification.type === "error" && (
+                                <i className="bi bi-exclamation-circle-fill"></i>
+                            )}
+                            {notification.type === "info" && (
+                                <i className="bi bi-info-circle-fill"></i>
+                            )}
+                            <span>{notification.message}</span>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            <style>{`
+                @keyframes slideIn {
+                    from {
+                        transform: translateY(100px);
+                        opacity: 0;
+                    }
+                    to {
+                        transform: translateY(0);
+                        opacity: 1;
+                    }
+                }
+                @keyframes slideOut {
+                    to {
+                        transform: translateY(100px);
+                        opacity: 0;
+                    }
+                }
+            `}</style>
         </div>
     );
 };

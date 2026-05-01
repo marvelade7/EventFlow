@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 const CreateEvent = () => {
     return (
-        <Link to='/create-event' className='text-decoration-none text-dark'>
+        <Link to='/dashboard/create-event' className='text-decoration-none text-dark'>
             <div className='create-event'>
                 <div className=' d-flex align-items-center gap-3'>
                     <i style={{ background: 'rgb(27,181,204,.15)', color: 'rgb(27,181,204)' }} className='bi bi-plus-circle py-2 px-3 rounded-3 fs-4'></i>
