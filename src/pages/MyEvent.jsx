@@ -501,7 +501,10 @@ const MyEvent = () => {
                                 <div className="mb-3">
                                     <p className="text-secondary mb-1">Location</p>
                                     <h6 className="mb-0">
-                                        {selectedEvent?.location?.venue}, {selectedEvent?.location?.city}, {selectedEvent?.location?.country}
+                                        {selectedEvent?.location?.venue}{selectedEvent?.location?.venue ? ', ' : ''}
+                                        {selectedEvent?.location?.city}{selectedEvent?.location?.city ? ', ' : ''}
+                                        {selectedEvent?.location?.state}{selectedEvent?.location?.state ? ', ' : ''}
+                                        {selectedEvent?.location?.country}
                                     </h6>
                                 </div>
                                 {Array.isArray(selectedEvent?.ticketTypes) && selectedEvent.ticketTypes.length > 0 ? (

@@ -9,6 +9,7 @@ const BrowseEvent = ({
     event,
     eventIcon,
     price,
+    state,
     button = "Book Now",
     btnStyle,
     anim = "fade-up",

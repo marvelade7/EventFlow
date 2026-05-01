@@ -97,19 +97,23 @@ const formatPrice = (event) => {
 
 const getVenue = (event) => {
     const location = event?.location || {};
-    const parts = [location.venue, location.city, location.country].filter(
-        Boolean,
-    );
+    const parts = [
+        location.venue || event?.venue,
+        location.city || event?.city,
+        location.state || event?.state,
+        location.country || event?.country,
+    ].filter(Boolean);
     return parts.length ? parts.join(", ") : "Venue TBD";
 };
 
 const getFullAddress = (event) => {
     const location = event?.location || {};
     const parts = [
-        location.venue,
-        location.address,
-        location.city,
-        location.country,
+        location.venue || event?.venue,
+        location.address || event?.address,
+        location.city || event?.city,
+        location.state || event?.state,
+        location.country || event?.country,
     ].filter(Boolean);
     return parts.length ? parts.join(", ") : "Venue TBD";
 };

@@ -145,7 +145,17 @@ const CreateNewEventPage = () => {
             formData.append('venue', values.venueName);
             formData.append('address', values.address);
             formData.append('city', values.city);
+            formData.append('state', values.state);
             formData.append('country', values.country);
+            // Include a structured location object as well for backend that supports nested location
+            const locationPayload = {
+                venue: values.venueName || "",
+                address: values.address || "",
+                city: values.city || "",
+                state: values.state || "",
+                country: values.country || "",
+            };
+            formData.append('location', JSON.stringify(locationPayload));
             formData.append('isFree', String(values.isFree));
             formData.append('timeZone', values.timeZone);
             
