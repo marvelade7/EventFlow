@@ -18,6 +18,12 @@ const SignUp = () => {
         });
     }, []);
 
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
+    const [errorMsg, setErrorMsg] = useState("");
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [notifications, setNotifications] = useState([]);
+
     const showNotification = (message, type = "info") => {
         const id = Date.now();
         const notification = { id, message, type };
