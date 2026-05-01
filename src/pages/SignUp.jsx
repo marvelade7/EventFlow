@@ -545,7 +545,7 @@ const SignUp = () => {
                             </div>
                         </div>
                     </div>
-                    <div className="modal-backdrop fade show"></div>
+                    {/* <div className="modal-backdrop fade show"></div> */}
                 </>
             )}
 
