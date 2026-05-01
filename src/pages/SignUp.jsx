@@ -559,6 +559,7 @@ const SignUp = () => {
                     zIndex: 9999,
                     maxWidth: "500px",
                     width: "90%",
+                    pointerEvents: "none",
                 }}
             >
                 {notifications.map((notification) => (
