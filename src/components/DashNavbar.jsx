@@ -58,7 +58,7 @@ const DashNavbar = ({
                             firstName={firstName}
                             lastName={lastName}
                             avatarUrl={avatar}
-                            width="50px"
+                            width="40px"
                             height="40px"
                             fontSize="14px"
                         />
