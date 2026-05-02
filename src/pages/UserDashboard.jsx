@@ -28,8 +28,6 @@ const UserDashboard = () => {
     const [userId, setUserId] = useState("");
     const [isVerified, setIsVerified] = useState(false);
     const [isHydrated, setIsHydrated] = useState(false);
-    const [isRouteChanging, setIsRouteChanging] = useState(false);
-    const { pathname } = useLocation();
 
     useEffect(() => {
         aos.init({
@@ -98,7 +96,7 @@ const UserDashboard = () => {
                 console.error("Error:", err.response ? err.response.data : err);
                 setIsHydrated(true);
             });
-    }, [navigate]);
+    }, []);
 
     useEffect(() => {
         if (!user || !isHydrated) return;
@@ -110,18 +108,6 @@ const UserDashboard = () => {
         setIsVerified(user.isVerified || false);
     }, [user, isHydrated]);
 
-    useEffect(() => {
-        if (!isHydrated) return;
-
-        setIsRouteChanging(true);
-        const timer = setTimeout(() => {
-            setIsRouteChanging(false);
-        }, 220);
-
-        return () => clearTimeout(timer);
-    }, [pathname, isHydrated]);
-
-    // Initial hydration spinner removed — use the route-change overlay spinner with text instead
 
     return (
         <div className="dashboard-page">
@@ -139,24 +125,6 @@ const UserDashboard = () => {
             ></div>
 
             <div className="position-relative w-100">
-                {isRouteChanging ? (
-                    <div
-                        className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
-                        style={{ background: "rgba(249,250,251,0.78)", zIndex: 1200 }}
-                    >
-                        <div className="text-center">
-                            <div
-                                className="spinner-border text-info"
-                                role="status"
-                                aria-hidden="true"
-                            ></div>
-                            <p className="mt-2 mb-0 text-secondary fw-semibold">
-                                Loading...
-                            </p>
-                        </div>
-                    </div>
-                ) : null}
-
                 {outlet ? (
                     outlet
                 ) : (
