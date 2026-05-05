@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import axios from "axios";
 import aos from "aos";
 import "aos/dist/aos.css";
 import CreateEventNav from "../components/CreateEventNav";
@@ -8,10 +7,7 @@ import BrowseEvent from "../components/BrowseEvent";
 import BrowseEventsFilter from "../components/BrowseEventsFilter";
 import BrowseEventsHead from "../components/BrowseEventsHead";
 import { useNavigate, useOutletContext } from "react-router-dom";
-
-// const EVENTS_ENDPOINT = "http://localhost:5000/api/events/get-events";
-const EVENTS_ENDPOINT =
-    "https://eventflow-backend-fwv4.onrender.com/api/events/get-events";
+import { fetchEvents } from "../utils/eventsApi";
 
 const categoryIcons = {
     music: "bi bi-music-note-beamed",
@@ -23,11 +19,6 @@ const categoryIcons = {
     foods: "bi bi-cup-hot",
     food: "bi bi-cup-hot",
     "food & drinks": "bi bi-cup-hot",
-};
-
-const getEventsFromResponse = (data) => {
-    if (Array.isArray(data?.events)) return data.events;
-    return [];
 };
 
 const getTicketTypes = (event) => {
@@ -167,24 +158,13 @@ const BrowseEventPage = () => {
         const controller = new AbortController();
         let isActive = true;
 
-        axios
-            .get(EVENTS_ENDPOINT, {
-                signal: controller.signal,
-                headers: token
-                    ? {
-                          Authorization: `Bearer ${token}`,
-                          Accept: "application/json",
-                      }
-                    : {
-                          Accept: "application/json",
-                      },
-            })
-            .then((res) => {
+        fetchEvents({ token, signal: controller.signal })
+            .then((eventList) => {
                 if (!isActive) return;
-                setEvents(getEventsFromResponse(res.data));
+                setEvents(eventList);
             })
             .catch((err) => {
-                if (err.name === "CanceledError" || !isActive) return;
+                if (err.name === "CanceledError" || err.code === "ERR_CANCELED" || !isActive) return;
                 console.error(
                     "Error fetching events:",
                     err.response?.data || err.message,
@@ -207,31 +187,24 @@ const BrowseEventPage = () => {
 
     // Listen for event updates from MyEvent page
     useEffect(() => {
-        const handleEventUpdated = async (event) => {
+        const handleEventUpdated = (event) => {
             const eventId = event.detail?.eventId;
             if (!eventId) return;
 
             // Find and update the event in the list
             const token = localStorage.getItem("token");
-            try {
-                const res = await axios.get(EVENTS_ENDPOINT, {
-                    headers: token
-                        ? {
-                              Authorization: `Bearer ${token}`,
-                              Accept: "application/json",
-                          }
-                        : {
-                              Accept: "application/json",
-                          },
+            fetchEvents({ token })
+                .then((eventList) => {
+                    setEvents(eventList);
+                })
+                .catch((err) => {
+                    console.error("Error refreshing events:", err);
                 });
-                setEvents(getEventsFromResponse(res.data));
-            } catch (err) {
-                console.error("Error refreshing events:", err);
-            }
         };
 
         window.addEventListener("eventUpdated", handleEventUpdated);
-        return () => window.removeEventListener("eventUpdated", handleEventUpdated);
+        return () =>
+            window.removeEventListener("eventUpdated", handleEventUpdated);
     }, []);
 
     useEffect(() => {
@@ -292,7 +265,16 @@ const BrowseEventPage = () => {
 
             <div className="px-4 pb-4 pt-4">
                 <div data-aos="fade-up">
-                    <div style={{position: 'sticky', top:'80px', zIndex: '1000', background: 'rgba(255, 255, 255, 0.8)', backdropFilter: 'blur(7px)'}} className="event-filter mb-4 pt-4 pb-1 px-4 rounded-3 shadow-sm" >
+                    <div
+                        style={{
+                            position: "sticky",
+                            top: "80px",
+                            zIndex: "1000",
+                            background: "rgba(255, 255, 255, 0.8)",
+                            backdropFilter: "blur(7px)",
+                        }}
+                        className="event-filter mb-4 pt-4 pb-1 px-4 rounded-3 shadow-sm"
+                    >
                         <BrowseEventsHead
                             style={{ fontSize: "1.5em" }}
                             title="Find Your Next Event"
@@ -369,9 +351,15 @@ const BrowseEventPage = () => {
                                         isLiked={Boolean(likedEvents[eventId])}
                                         likeCount={getLikeCount(event, eventId)}
                                         onLike={() => handleLikeEvent(eventId)}
-                                        onAction={() =>
-                                            navigate("/dashboard/checkout")
-                                        }
+                                        onAction={() => {
+                                            localStorage.setItem(
+                                                "checkoutEvent",
+                                                JSON.stringify(event),
+                                            );
+                                            navigate("/dashboard/checkout", {
+                                                state: { event },
+                                            });
+                                        }}
                                         onCardClick={() =>
                                             setSelectedEvent(event)
                                         }
@@ -408,7 +396,10 @@ const BrowseEventPage = () => {
                                   <div
                                       className="modal-content border-0 shadow rounded-4 overflow-hidden"
                                       onClick={(e) => e.stopPropagation()}
-                                      style={{ position: "relative", zIndex: 1310 }}
+                                      style={{
+                                          position: "relative",
+                                          zIndex: 1310,
+                                      }}
                                   >
                                       <img
                                           src={getEventImage(selectedEvent)}
@@ -605,11 +596,22 @@ const BrowseEventPage = () => {
                                               </button>
                                               <button
                                                   type="button"
-                                                  onClick={() =>
+                                                  onClick={() => {
+                                                      localStorage.setItem(
+                                                          "checkoutEvent",
+                                                          JSON.stringify(
+                                                              selectedEvent,
+                                                          ),
+                                                      );
                                                       navigate(
                                                           "/dashboard/checkout",
-                                                      )
-                                                  }
+                                                          {
+                                                              state: {
+                                                                  event: selectedEvent,
+                                                              },
+                                                          },
+                                                      );
+                                                  }}
                                                   style={{
                                                       backgroundColor:
                                                           "rgb(27,181,204)",

@@ -145,7 +145,8 @@ const SignUp = () => {
     return (
         <div>
             <div className="d-flex align-items-stretch auth-layout auth-page">
-                <LeftPanel
+                
+                    <LeftPanel
                     head="EventFlow Join the community of event lovers"
                     p="Discover, book, and experience events like never before."
                     texthead="Why Choose EventFlow for your event ticketing?"
@@ -435,11 +436,11 @@ const SignUp = () => {
                                 />
                                 <label htmlFor="terms" className="m-0">
                                     I agree to the{" "}
-                                    <span className="text-primary">
+                                    <span style={{cursor: 'pointer'}} className="text-primary">
                                         Terms of Service
                                     </span>{" "}
                                     and{" "}
-                                    <span className="text-primary">
+                                    <span style={{cursor: 'pointer'}} className="text-primary">
                                         Privacy Policy
                                     </span>
                                 </label>
