@@ -3,9 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import CheckoutNav from "../components/CheckoutNav";
 import { ProfileContext } from "../context/ProfileContext";
-
-const BOOKINGS_API_BASE =
-    "https://eventflow-backend-fwv4.onrender.com/api/payments";
+import { apiUrl } from "../utils/apiConfig";
 
 const FALLBACK_EVENT = {
     title: "Summer Beats Festival 2026",
@@ -156,13 +154,13 @@ const CheckoutPage = () => {
     const eventFromState = location.state?.event || null;
     const eventFromStorage = getStoredCheckoutEvent();
     const selectedEvent = eventFromState || eventFromStorage || FALLBACK_EVENT;
-    const ticketTypes = useMemo(
-        () =>
-            Array.isArray(selectedEvent?.ticketTypes) && selectedEvent.ticketTypes.length
-                ? selectedEvent.ticketTypes
-                : FALLBACK_EVENT.ticketTypes,
-        [selectedEvent],
-    );
+    // Use the event's `ticketTypes` if it exists (even when empty). Only use
+    // the fallback when the event does not provide `ticketTypes` at all.
+    const ticketTypes = useMemo(() => {
+        return Array.isArray(selectedEvent?.ticketTypes)
+            ? selectedEvent.ticketTypes
+            : FALLBACK_EVENT.ticketTypes;
+    }, [selectedEvent]);
     const [quantities, setQuantities] = useState(() =>
         buildDefaultQuantities(ticketTypes),
     );
@@ -196,7 +194,7 @@ const CheckoutPage = () => {
         setVerificationMessage("");
 
         axios
-            .get("https://eventflow-backend-fwv4.onrender.com/api/users/dashboard", {
+            .get(apiUrl("/users/dashboard"), {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     Accept: "application/json",
@@ -303,7 +301,7 @@ const CheckoutPage = () => {
         }
 
         return axios
-            .get("https://eventflow-backend-fwv4.onrender.com/api/users/dashboard", authConfig)
+            .get(apiUrl("/users/dashboard"), authConfig)
             .then((res) => {
                 const responseData = res.data || {};
                 const userData =
@@ -320,8 +318,6 @@ const CheckoutPage = () => {
                     tokenUserId ||
                     "";
 
-                console.log("Dashboard response for booking user resolution:", responseData);
-                console.log("Dashboard user keys:", Object.keys(userData || {}));
                 if (tokenUserId) {
                     console.log("Resolved booking user id from token payload.");
                 }
@@ -338,39 +334,53 @@ const CheckoutPage = () => {
             });
     };
 
-    const selectedItems = ticketTypes
+    let selectedItems = ticketTypes
         .map((ticket, index) => ({
             ticketTypeName: getTicketTypeName(ticket, index),
             quantity: Number(quantities[index] || 0),
         }))
         .filter((item) => item.quantity > 0);
 
+    // If the event is free and has no ticketTypes, default to one free ticket
+    // so the user can confirm booking without ticket selection UI.
+    if (selectedItems.length === 0 && freeEvent && ticketTypes.length === 0) {
+        selectedItems = [
+            {
+                ticketTypeName: (selectedEvent?.ticketTypes && selectedEvent.ticketTypes[0] && (selectedEvent.ticketTypes[0].name || selectedEvent.ticketTypes[0].title)) || 'Free',
+                quantity: 1,
+            },
+        ];
+    }
+
     const eventId = selectedEvent?._id || selectedEvent?.id;
 
     const checkTicketAvailability = (item) => {
-        // Skip availability check as it's causing 500 errors on backend
-        // Just return a successful response
-        return Promise.resolve({
-            data: {
-                remaining: 999,
-                available: true,
+        return axios.get(apiUrl("/available/check-availability"), {
+            params: {
+                eventId,
+                ticketTypeName: item.ticketTypeName,
+            },
+            headers: {
+                Accept: "application/json",
             },
         });
     };
 
-    const buildInitPaymentPayload = (ticketTypeName, userId) => ({
+    const buildInitPaymentPayload = (ticketTypeName, userId, quantity) => ({
         eventId,
         event: eventId,
         ticketTypeName,
         ticketType: ticketTypeName,
+        quantity,
         user: userId,
         userId,
     });
 
-    const buildPaymentSuccessPayload = (reference, userId) => ({
+    const buildPaymentSuccessPayload = (reference, userId, quantity) => ({
         reference,
         user: userId,
         userId,
+        quantity,
     });
 
     const withUserHeaders = (config, userId) => ({
@@ -382,7 +392,7 @@ const CheckoutPage = () => {
         },
     });
 
-    const createBookingByPayment = (ticketTypeName) => {
+    const createBookingByPayment = (ticketTypeName, quantity) => {
         const authConfig = getAuthConfig();
         if (!authConfig) {
             console.error("No auth config - token missing from localStorage");
@@ -392,16 +402,13 @@ const CheckoutPage = () => {
         }
 
         const token = localStorage.getItem("token");
-        // console.log("Token in localStorage:", token ? `${token.slice(0, 20)}...` : "MISSING");
-        // console.log("Auth header being sent:", authConfig.headers?.Authorization ? "✓ Present" : "✗ Missing");
-
-        const initPaymentUrl = `${BOOKINGS_API_BASE}/initialize-payment`;
-        // console.log("Calling initialize-payment at:", initPaymentUrl);
+        
+        const initPaymentUrl = apiUrl("/payments/initialize-payment");
 
         return resolveBookingUserId()
             .then((userId) => axios.post(
                 initPaymentUrl,
-                buildInitPaymentPayload(ticketTypeName, userId),
+                buildInitPaymentPayload(ticketTypeName, userId, quantity),
                 withUserHeaders(authConfig, userId),
             ))
             .then((initRes) => {
@@ -411,39 +418,22 @@ const CheckoutPage = () => {
                     return Promise.reject(new Error("Payment reference was not returned."));
                 }
 
-                const successUrl = `https://eventflow-backend-fwv4.onrender.com/api/bookings/payment/success`;
-                // console.log("Calling payment/success at:", successUrl);
+                const successUrl = apiUrl("/bookings/payment/success");
 
                 return resolveBookingUserId().then((userId) => axios.post(
                     successUrl,
-                    buildPaymentSuccessPayload(reference, userId),
+                    buildPaymentSuccessPayload(reference, userId, quantity),
                     withUserHeaders(authConfig, userId),
                 ));
             })
             .catch((err) => {
-                // console.error("Booking API error:", {
-                //     status: err.response?.status,
-                //     statusText: err.response?.statusText,
-                //     url: err.config?.url,
-                //     method: err.config?.method,
-                //     message: err.message,
-                //     responseData: err.response?.data,
-                //     requestData: err.config?.data,
-                // });
                 throw err;
             })
-            .then((res) => res.data);
+            .then((res) => res.data?.bookings || (res.data ? [res.data] : []));
     };
 
     const createBookingsForItem = (item) => {
-        const attempts = Array.from({ length: item.quantity });
-        return attempts.reduce((chain, _unused, runIndex) => {
-            return chain.then((bookings) => {
-                return createBookingByPayment(item.ticketTypeName).then((booking) => {
-                    return [...bookings, booking];
-                });
-            });
-        }, Promise.resolve([]));
+        return createBookingByPayment(item.ticketTypeName, item.quantity);
     };
 
     const createAllBookings = () => {
@@ -467,7 +457,7 @@ const CheckoutPage = () => {
     const handlePaymentSubmit = (event) => {
         event.preventDefault();
 
-        if (!subtotal) {
+        if (!freeEvent && !subtotal) {
             setPaymentStatus("error");
             setPaymentMessage("Select at least one ticket before continuing.");
             return;
@@ -510,19 +500,25 @@ const CheckoutPage = () => {
             freeEvent ? "Confirming free booking..." : "Processing payment...",
         );
 
-        Promise.all(selectedItems.map((item) => checkTicketAvailability(item)))
-            .then((availabilityResponses) => {
-                const unavailable = availabilityResponses.find((response, index) => {
-                    const remaining = Number(response?.data?.remaining ?? 0);
-                    return remaining < selectedItems[index].quantity;
-                });
+        const availabilityPromise = freeEvent
+            ? Promise.resolve([])
+            : Promise.all(selectedItems.map((item) => checkTicketAvailability(item)));
 
-                if (unavailable) {
-                    return Promise.reject(
-                        new Error(
-                            "Some selected tickets are no longer available in the requested quantity.",
-                        ),
-                    );
+        availabilityPromise
+            .then((availabilityResponses) => {
+                if (!freeEvent) {
+                    const unavailable = availabilityResponses.find((response, index) => {
+                        const remaining = Number(response?.data?.remaining ?? 0);
+                        return remaining < selectedItems[index].quantity;
+                    });
+
+                    if (unavailable) {
+                        return Promise.reject(
+                            new Error(
+                                "Some selected tickets are no longer available in the requested quantity.",
+                            ),
+                        );
+                    }
                 }
 
                 return createAllBookings();
