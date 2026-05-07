@@ -7,12 +7,13 @@ import CreateEvent from "../components/CreateEvent";
 import BrowseEvent from "../components/BrowseEvent";
 import BrowseEventsHead from "../components/BrowseEventsHead";
 import RecentBookings from "../components/RecentBookings";
+import QrVerificationModal from "../components/QrVerificationModal";
 import aos from "aos";
 import "aos/dist/aos.css";
 import { useNavigate, useOutlet, useLocation } from "react-router-dom";
 import axios from "axios";
 import { ProfileContext } from "../context/ProfileContext";
-import { fetchEvents } from "../utils/eventsApi";
+import { fetchEvents, fetchDashboardStats } from "../utils/eventsApi";
 
 const categoryIcons = {
     music: "bi bi-music-note-beamed",
@@ -102,6 +103,14 @@ const UserDashboard = () => {
     const [isLoadingUpcomingEvents, setIsLoadingUpcomingEvents] =
         useState(true);
     const [upcomingEventsError, setUpcomingEventsError] = useState("");
+    const [isQrVerificationOpen, setIsQrVerificationOpen] = useState(false);
+    const [dashboardStats, setDashboardStats] = useState({
+        totalEvents: 0,
+        activeTickets: 0,
+        eventsAttended: 0,
+    });
+    const [isLoadingDashboardStats, setIsLoadingDashboardStats] = useState(true);
+    const [dashboardStatsError, setDashboardStatsError] = useState("");
 
     useEffect(() => {
         aos.init({
@@ -220,6 +229,45 @@ const UserDashboard = () => {
         };
     }, []);
 
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            setIsLoadingDashboardStats(false);
+            return;
+        }
+
+        const controller = new AbortController();
+        let isActive = true;
+
+        fetchDashboardStats({ token, signal: controller.signal })
+            .then((stats) => {
+                if (!isActive) return;
+
+                setDashboardStats({
+                    totalEvents: Number(stats?.totalEvents || 0),
+                    activeTickets: Number(stats?.activeTickets || 0),
+                    eventsAttended: Number(stats?.eventsAttended || 0),
+                });
+            })
+            .catch((err) => {
+                if (err.name === "CanceledError" || err.code === "ERR_CANCELED" || !isActive) {
+                    return;
+                }
+
+                console.error("Error loading dashboard stats:", err);
+                setDashboardStatsError("Unable to load dashboard stats.");
+            })
+            .finally(() => {
+                if (!isActive) return;
+                setIsLoadingDashboardStats(false);
+            });
+
+        return () => {
+            isActive = false;
+            controller.abort();
+        };
+    }, []);
+
     return (
         <div className="dashboard-page">
             <Sidebar
@@ -298,8 +346,8 @@ const UserDashboard = () => {
                                         padding: "5px 10px",
                                         borderRadius: "7px",
                                     }}
-                                    status="3"
-                                    num="5"
+                                    status={isLoadingDashboardStats ? "..." : "Live"}
+                                    num={isLoadingDashboardStats ? "..." : dashboardStats.totalEvents}
                                     title="Upcoming Events"
                                     statusStyle={{
                                         color: "green",
@@ -324,8 +372,8 @@ const UserDashboard = () => {
                                         padding: "5px 10px",
                                         borderRadius: "7px",
                                     }}
-                                    status="Active"
-                                    num="8"
+                                    status={isLoadingDashboardStats ? "..." : "Live"}
+                                    num={isLoadingDashboardStats ? "..." : dashboardStats.activeTickets}
                                     title="Active Tickets"
                                     statusStyle={{
                                         color: "green",
@@ -351,8 +399,8 @@ const UserDashboard = () => {
                                         padding: "5px 10px",
                                         borderRadius: "7px",
                                     }}
-                                    status="All time"
-                                    num="23"
+                                    status={isLoadingDashboardStats ? "..." : "Live"}
+                                    num={isLoadingDashboardStats ? "..." : dashboardStats.eventsAttended}
                                     title="Events Attended"
                                     statusStyle={{
                                         color: "black",
@@ -462,17 +510,39 @@ const UserDashboard = () => {
                             data-aos="fade-up"
                             data-aos-delay="80"
                         >
-                            <BrowseEventsHead
-                                title="My Recent Bookings"
-                                style={{ fontSize: "1.3em" }}
-                            />
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <BrowseEventsHead
+                                    title="Bookings for Your Events"
+                                    style={{ fontSize: "1.3em" }}
+                                />
+                                <button
+                                    onClick={() => setIsQrVerificationOpen(true)}
+                                    style={{
+                                        padding: '8px 16px',
+                                        backgroundColor: '#007bff',
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: '6px',
+                                        cursor: 'pointer',
+                                        fontWeight: '500',
+                                        fontSize: '0.9rem',
+                                    }}
+                                >
+                                    Verify QR Code
+                                </button>
+                            </div>
                             <div data-aos="fade-up" data-aos-delay="140">
-                                <RecentBookings />
+                                <RecentBookings scope="organizer" />
                             </div>
                         </div>
                     </div>
                 )}
             </div>
+
+            <QrVerificationModal
+                isOpen={isQrVerificationOpen}
+                onClose={() => setIsQrVerificationOpen(false)}
+            />
         </div>
     );
 };

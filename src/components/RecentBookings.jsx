@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import axios from "axios";
-import { apiUrl } from "../utils/apiConfig";
+import { fetchBookings } from "../utils/eventsApi";
 
 const formatMoney = (amount) =>
     new Intl.NumberFormat("en-US", {
@@ -23,7 +22,7 @@ const formatBookedDateTime = (value) => {
     });
 };
 
-const RecentBookings = () => {
+const RecentBookings = ({ scope = "user" }) => {
     const [bookings, setBookings] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState("");
@@ -48,26 +47,23 @@ const RecentBookings = () => {
             return;
         }
 
+        const controller = new AbortController();
         let isActive = true;
 
-        axios
-            .get(apiUrl("/bookings/my-bookings"), {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    Accept: "application/json",
-                },
-            })
-            .then((res) => {
+        fetchBookings({ token, signal: controller.signal, scope })
+            .then((data) => {
                 if (!isActive) return;
                 setBookings(
-                    Array.isArray(res.data?.bookings) ? res.data.bookings : [],
+                    Array.isArray(data?.bookings) ? data.bookings : [],
                 );
             })
             .catch((error) => {
                 if (!isActive) return;
                 setErrorMessage(
                     error.response?.data?.message ||
-                        "Unable to load your bookings right now.",
+                        (scope === "organizer"
+                            ? "Unable to load your event bookings right now."
+                            : "Unable to load your bookings right now."),
                 );
             })
             .finally(() => {
@@ -77,8 +73,9 @@ const RecentBookings = () => {
 
         return () => {
             isActive = false;
+            controller.abort();
         };
-    }, []);
+    }, [scope]);
 
     const groupedBookings = useMemo(() => {
         const groups = new Map();
@@ -158,7 +155,7 @@ const RecentBookings = () => {
                         aria-hidden="true"
                     ></div>
                     <p className="mt-3 mb-0 text-secondary fw-semibold">
-                        Loading your bookings...
+                        Loading {scope === "organizer" ? "event bookings" : "your bookings"}...
                     </p>
                 </div>
             ) : errorMessage ? (
@@ -167,9 +164,13 @@ const RecentBookings = () => {
                 </div>
             ) : groupedBookings.length === 0 ? (
                 <div className="py-5 text-center">
-                    <h6 className="mb-1">No bookings yet</h6>
+                    <h6 className="mb-1">
+                        {scope === "organizer" ? "No event bookings yet" : "No bookings yet"}
+                    </h6>
                     <p className="text-secondary mb-0">
-                        Book an event to see your tickets here.
+                        {scope === "organizer"
+                            ? "Bookings for your events will appear here."
+                            : "Book an event to see your tickets here."}
                     </p>
                 </div>
             ) : (

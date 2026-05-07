@@ -256,6 +256,23 @@ input[type="number"]::-webkit-inner-spin-button {
     padding: 12px 30px !important;
 }
 
+.recent-bookings-wrap {
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+}
+
+.recent-bookings-table {
+    min-width: 920px;
+    width: max-content;
+}
+
+.recent-bookings-table th,
+.recent-bookings-table td {
+    white-space: nowrap;
+}
+
 .event-media{
     transition: .2s;
 }

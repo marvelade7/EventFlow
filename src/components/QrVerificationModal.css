@@ -1,0 +1,237 @@
+.qr-verification-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1050;
+}
+
+.qr-verification-modal {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.qr-verification-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.qr-verification-header h3 {
+    margin: 0;
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+.qr-verification-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #666;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.qr-verification-close:hover {
+    background-color: #f5f5f5;
+    border-radius: 4px;
+}
+
+.qr-verification-body {
+    padding: 20px;
+}
+
+.qr-verification-input-group {
+    margin-bottom: 20px;
+}
+
+.qr-verification-input-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-size: 0.95rem;
+}
+
+.qr-verification-textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-family: 'Monaco', 'Courier New', monospace;
+    font-size: 0.85rem;
+    resize: vertical;
+    transition: border-color 0.2s;
+}
+
+.qr-verification-textarea:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.qr-verification-error {
+    padding: 12px;
+    background-color: #fee;
+    border: 1px solid #fcc;
+    border-radius: 6px;
+    color: #c33;
+    margin-bottom: 16px;
+    font-size: 0.9rem;
+}
+
+.qr-verification-result {
+    margin-bottom: 20px;
+}
+
+.qr-result-status {
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.qr-result-status.checked-in {
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+.qr-result-status.booked {
+    background-color: #cfe2ff;
+    border: 1px solid #b6d4fe;
+    color: #084298;
+}
+
+.qr-result-details {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 16px;
+}
+
+.qr-result-details h5 {
+    margin: 0 0 12px 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 0.9rem;
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: #555;
+    min-width: 120px;
+}
+
+.detail-value {
+    color: #333;
+    word-break: break-word;
+}
+
+.detail-value.status-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.detail-value.status-badge.checked-in {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.detail-value.status-badge.booked {
+    background-color: #cfe2ff;
+    color: #084298;
+}
+
+.qr-verification-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.qr-verification-actions .btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+}
+
+.qr-verification-actions .btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+
+.qr-verification-actions .btn-primary:hover:not(:disabled) {
+    background-color: #0056b3;
+}
+
+.qr-verification-actions .btn-primary:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.qr-verification-actions .btn-outline-secondary {
+    background-color: transparent;
+    color: #555;
+    border: 1px solid #ddd;
+}
+
+.qr-verification-actions .btn-outline-secondary:hover {
+    background-color: #f5f5f5;
+    border-color: #999;
+}
+
+@media (max-width: 640px) {
+    .qr-verification-modal {
+        width: 95%;
+        max-height: 90vh;
+    }
+
+    .qr-verification-textarea {
+        font-size: 0.75rem;
+    }
+
+    .detail-row {
+        flex-direction: column;
+        padding: 10px 0;
+    }
+
+    .detail-label {
+        margin-bottom: 4px;
+    }
+}
