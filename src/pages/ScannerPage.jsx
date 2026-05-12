@@ -15,6 +15,25 @@ const defaultTicket = {
         "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=220&q=80",
 };
 
+const getDisplayTicket = (booking = {}) => {
+    const user = booking?.user || {};
+    const firstName = user?.firstName || booking?.firstName || booking?.userName || "";
+    const lastName = user?.lastName || booking?.lastName || "";
+    const attendeeName = `${firstName}${lastName ? ` ${lastName}` : ""}`.trim() || booking?.userName || defaultTicket.attendeeName;
+
+    return {
+        attendeeName,
+        eventName: booking?.event?.title || booking?.eventTitle || booking?.eventName || defaultTicket.eventName,
+        ticketType: booking?.ticketTypeName || booking?.ticketType || defaultTicket.ticketType,
+        ticketCode:
+            booking?.ticketCode || booking?.reference || booking?.paymentReference || defaultTicket.ticketCode,
+        checkedInTime:
+            booking?.checkedInAt || booking?.checkedInTime || booking?.updatedAt || defaultTicket.checkedInTime,
+        avatarUrl:
+            user?.profilePic || user?.avatar || booking?.profilePic || booking?.avatar || defaultTicket.avatarUrl,
+    };
+};
+
 const ScannerPage = () => {
     const navigate = useNavigate();
     const [ticketState, setTicketState] = useState("idle");
@@ -90,21 +109,55 @@ const ScannerPage = () => {
     }, []);
 
     const handleConfirmCheckIn = () => {
-        setTicketState("success");
-        setIsSuccessFlash(true);
+        confirmCheckIn();
+    };
 
-        if (successTimerRef.current)
-            window.clearTimeout(successTimerRef.current);
-        if (resetTimerRef.current) window.clearTimeout(resetTimerRef.current);
+    const confirmCheckIn = () => {
+        if (!scannedTicket) {
+            console.error("No ticket to check in");
+            return;
+        }
 
-        successTimerRef.current = window.setTimeout(() => {
-            setIsSuccessFlash(false);
-        }, 900);
+        const ticketCode =
+            scannedTicket?.ticketCode ||
+            scannedTicket?.reference ||
+            scannedTicket?.paymentReference;
+        const token = localStorage.getItem("token");
 
-        resetTimerRef.current = window.setTimeout(() => {
-            setTicketState("idle");
-            setIsSuccessFlash(false);
-        }, 3200);
+        if (!ticketCode || !token) {
+            console.error("Missing ticket code or token");
+            setTicketState("invalid");
+            return;
+        }
+
+        axios
+            .post(`${API_BASE_URL}/check-in/${ticketCode}`, {}, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then(() => {
+                setTicketState("success");
+                setIsSuccessFlash(true);
+
+                if (successTimerRef.current)
+                    window.clearTimeout(successTimerRef.current);
+                if (resetTimerRef.current)
+                    window.clearTimeout(resetTimerRef.current);
+
+                successTimerRef.current = window.setTimeout(() => {
+                    setIsSuccessFlash(false);
+                }, 900);
+
+                resetTimerRef.current = window.setTimeout(() => {
+                    setTicketState("idle");
+                    setIsSuccessFlash(false);
+                }, 3200);
+            })
+            .catch((err) => {
+                console.error("Check-in failed:", err);
+                setTicketState("invalid");
+            });
     };
 
     const closeResultModal = () => {
@@ -167,7 +220,7 @@ const ScannerPage = () => {
     const renderResultContent = () => {
         if (ticketState === "idle") return null;
 
-        const ticket = scannedTicket || defaultTicket;
+        const ticket = getDisplayTicket(scannedTicket || defaultTicket);
 
         if (ticketState === "verifying") {
             return (
@@ -405,7 +458,7 @@ const ScannerPage = () => {
                     </div>
                 </section>
 
-                <section className="scanner-shortcuts">
+                {/* <section className="scanner-shortcuts">
                     <button
                         type="button"
                         className="scanner-shortcut-btn scanner-shortcut-btn--ghost"
@@ -437,7 +490,7 @@ const ScannerPage = () => {
                     >
                         Clear Result
                     </button>
-                </section>
+                </section> */}
             </div>
 
             {ticketState !== "idle" && (
