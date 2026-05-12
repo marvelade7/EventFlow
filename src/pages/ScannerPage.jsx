@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { API_BASE_URL } from "../utils/apiConfig";
 import "./ScannerPage.css";
+import { Html5Qrcode } from "html5-qrcode";
 
 const defaultTicket = {
     attendeeName: "Full name",
@@ -20,58 +21,81 @@ const ScannerPage = () => {
     const [isSuccessFlash, setIsSuccessFlash] = useState(false);
     const [cameraStatus, setCameraStatus] = useState("loading");
     const [scannedTicket, setScannedTicket] = useState(null);
-    const [verifying, setVerifying] = useState(false);
     const successTimerRef = useRef(null);
     const resetTimerRef = useRef(null);
-    const videoRef = useRef(null);
-    const streamRef = useRef(null);
+    const scannerRef = useRef(null);
+    const isProcessingRef = useRef(false);
 
     useEffect(() => {
-        let isActive = true;
+        const scanner = new Html5Qrcode("reader");
 
-        const startCamera = () => {
-            if (!navigator.mediaDevices?.getUserMedia) {
-                setCameraStatus("unsupported");
-                return;
-            }
+        scannerRef.current = scanner;
 
-            navigator.mediaDevices
-                .getUserMedia({
-                    video: {
-                        facingMode: { ideal: "environment" },
-                    },
-                    audio: false,
-                })
-                .then((stream) => {
-                    if (!isActive) {
-                        stream.getTracks().forEach((track) => track.stop());
-                        return;
-                    }
+        let isMounted = true;
+        let scannerStarted = false;
 
-                    streamRef.current = stream;
-                    if (videoRef.current) {
-                        videoRef.current.srcObject = stream;
-                        videoRef.current.play().catch(() => {});
-                    }
-                    setCameraStatus("ready");
-                })
-                .catch((error) => {
-                    console.error("Unable to access camera:", error);
-                    if (isActive) setCameraStatus("blocked");
-                });
-        };
+        scanner
+            .start(
+                { facingMode: "environment" },
+                {
+                    fps: 10,
+                    qrbox: { width: 350, height: 350 },
+                },
+                (decodedText) => {
+                    if (isProcessingRef.current) return;
 
-        startCamera();
+                    isProcessingRef.current = true;
+
+                    console.log("QR detected:", decodedText);
+
+                    postTicketCode(decodedText).then((res) => {
+                        scanner.pause();
+                        const data = res?.data;
+                        if (data && data.booking) {
+                            setScannedTicket(data.booking);
+
+                            const status =
+                                res?.data?.booking?.status ||
+                                res?.data?.booking?.state ||
+                                null;
+                            if (
+                                status === "checked-in" ||
+                                res?.data?.booking?.checkedIn
+                            ) {
+                                setTicketState("already_checked_in");
+                            } else {
+                                setTicketState("valid");
+                            }
+                        } else {
+                            setTicketState("invalid");
+                        }
+                        setTimeout(() => {
+                            isProcessingRef.current = false;
+                            scanner.resume();
+                        }, 2000);
+                    });
+                },
+                () => {},
+            )
+            .then(() => {
+                if (!isMounted) return;
+
+                scannerStarted = true;
+                setCameraStatus("ready");
+            })
+            .catch((err) => {
+                console.error(err);
+                setCameraStatus("blocked");
+            });
 
         return () => {
-            isActive = false;
-            if (successTimerRef.current)
-                window.clearTimeout(successTimerRef.current);
-            if (resetTimerRef.current)
-                window.clearTimeout(resetTimerRef.current);
-            if (streamRef.current) {
-                streamRef.current.getTracks().forEach((track) => track.stop());
-                streamRef.current = null;
+            isMounted = false;
+
+            if (scannerStarted) {
+                scanner
+                    .stop()
+                    .then(() => scanner.clear())
+                    .catch(() => {});
             }
         };
     }, []);
@@ -99,43 +123,10 @@ const ScannerPage = () => {
         setIsSuccessFlash(false);
     };
 
-    const restartCamera = () => {
-        if (!navigator.mediaDevices?.getUserMedia) {
-            setCameraStatus("unsupported");
-            return;
-        }
-
-        if (streamRef.current) {
-            streamRef.current.getTracks().forEach((track) => track.stop());
-        }
-
-        setCameraStatus("loading");
-        navigator.mediaDevices
-            .getUserMedia({
-                video: {
-                    facingMode: { ideal: "environment" },
-                },
-                audio: false,
-            })
-            .then((stream) => {
-                streamRef.current = stream;
-                if (videoRef.current) {
-                    videoRef.current.srcObject = stream;
-                    videoRef.current.play().catch(() => {});
-                }
-                setCameraStatus("ready");
-            })
-            .catch((error) => {
-                console.error("Unable to restart camera:", error);
-                setCameraStatus("blocked");
-            });
-    };
-
     const postTicketCode = (ticketCode) => {
         setTicketState("verifying");
-        setVerifying(true);
 
-        axios
+        return axios
             .post(`${API_BASE_URL}/bookings/verify-qr`, { ticketCode })
             .then((res) => {
                 const data = res && res.data ? res.data : null;
@@ -157,9 +148,6 @@ const ScannerPage = () => {
             .catch((err) => {
                 console.error("Ticket verification failed:", err);
                 setTicketState("invalid");
-            })
-            .finally(() => {
-                setVerifying(false);
             });
     };
 
@@ -343,13 +331,11 @@ const ScannerPage = () => {
                     <div className="scanner-camera-frame">
                         <div className="scanner-camera-card">
                             <div className="scanner-camera-viewfinder">
-                                <video
-                                    ref={videoRef}
-                                    className="scanner-camera-video"
-                                    autoPlay
-                                    muted
-                                    playsInline
-                                />
+                                <div
+                                    id="reader"
+                                    className="scanner-reader"
+                                ></div>
+
                                 {cameraStatus !== "ready" && (
                                     <div className="scanner-camera-placeholder">
                                         {cameraStatus === "loading" && (
@@ -363,15 +349,18 @@ const ScannerPage = () => {
                                                 </span>
                                             </>
                                         )}
+
                                         {cameraStatus === "blocked" && (
                                             <>
                                                 <span className="scanner-placeholder-title">
                                                     Camera access is blocked
                                                 </span>
+
                                                 <span className="scanner-placeholder-text">
                                                     Enable camera permission in
                                                     your browser and try again.
                                                 </span>
+
                                                 <button
                                                     type="button"
                                                     className="scanner-placeholder-btn"
@@ -381,63 +370,40 @@ const ScannerPage = () => {
                                                 </button>
                                             </>
                                         )}
-                                        {cameraStatus === "unsupported" && (
-                                            <>
-                                                <span className="scanner-placeholder-title">
-                                                    Camera not supported
-                                                </span>
-                                                <span className="scanner-placeholder-text">
-                                                    This browser does not
-                                                    support live camera access.
-                                                </span>
-                                            </>
-                                        )}
                                     </div>
                                 )}
+
                                 <div className="scanner-corner scanner-corner--tl" />
                                 <div className="scanner-corner scanner-corner--tr" />
                                 <div className="scanner-corner scanner-corner--bl" />
                                 <div className="scanner-corner scanner-corner--br" />
+
                                 <div className="scanner-scan-line" />
                                 <div className="scanner-scan-grid" />
+
                                 <div className="scanner-camera-center scanner-camera-center--overlay">
                                     <div className="scanner-camera-ring scanner-camera-ring--outer" />
                                     <div className="scanner-camera-ring scanner-camera-ring--inner" />
+
                                     <i className="bi bi-qr-code-scan scanner-camera-icon" />
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <p className="scanner-instruction">
-                        {cameraStatus === "ready"
-                            ? "Scanning for QR code..."
-                            : "Starting camera..."}
-                    </p>
-                    <p className="scanner-supporting-text">
-                        {cameraStatus === "ready"
-                            ? "Position the ticket QR inside the frame. The scanner is ready to detect instantly."
-                            : "Allow access so the live camera feed can appear here."}
-                    </p>
                 </section>
 
                 <section className="scanner-shortcuts">
                     <button
                         type="button"
                         className="scanner-shortcut-btn scanner-shortcut-btn--ghost"
-                        onClick={() => {
-                            setScannedTicket(defaultTicket);
-                            postTicketCode(defaultTicket.ticketCode);
-                        }}
+                        onClick={() => postTicketCode(defaultTicket.ticketCode)}
                     >
                         Valid Ticket
                     </button>
                     <button
                         type="button"
                         className="scanner-shortcut-btn scanner-shortcut-btn--error"
-                        onClick={() => {
-                            setScannedTicket(defaultTicket);
-                            setTicketState("invalid");
-                        }}
+                        onClick={() => setTicketState("invalid")}
                     >
                         Invalid Ticket
                     </button>

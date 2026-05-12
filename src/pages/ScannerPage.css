@@ -34,8 +34,6 @@
     justify-content: center;
     color: #1f1f1f;
     background: rgba(255, 255, 255, 0.58);
-    /* box-shadow: 0 10px 22px rgba(0, 0, 0, 0.08); */
-    /* border: 1px solid rgba(120, 120, 120, 0.2); */
 }
 
 .scanner-topbar-eyebrow,
@@ -273,11 +271,6 @@
     line-height: 1.6;
 }
 
-.scanner-result-wrap {
-    width: 100%;
-    margin-top: 6px;
-}
-
 .scanner-result-card {
     position: relative;
     display: grid;
@@ -506,6 +499,45 @@
 
 .scanner-shortcut-btn--ghost {
     border-color: rgba(27, 181, 204, 0.3);
+}
+
+#reader {
+    width: 100% !important;
+    height: 100% !important;
+    border: none !important;
+}
+
+#reader video {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: inherit;
+}
+
+#reader img {
+    display: none !important;
+}
+
+#reader__scan_region {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: unset !important;
+}
+
+#reader__dashboard {
+    display: none !important;
+}
+
+#reader__header_message {
+    display: none !important;
+}
+
+.scanner-reader {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: inherit;
+    position: relative;
 }
 
 @keyframes scanLine {

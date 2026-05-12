@@ -23,20 +23,8 @@ const formatBookedDateTime = (value) => {
     });
 };
 
-const CHECK_IN_BASE_URL = 
-    "https://marvel-event-flow.vercel.app";
-
-const buildCheckInUrl = (ticketCode) => {
-    const normalizedTicketCode = (ticketCode || "").toString().trim();
-
-    if (!normalizedTicketCode) {
-        return "";
-    }
-
-    return new URL(
-        `/check-in/${encodeURIComponent(normalizedTicketCode)}`,
-        CHECK_IN_BASE_URL,
-    ).toString();
+const formatTicketCode = (ticketCode) => {
+    return (ticketCode || "").toString().trim();
 };
 
 const RecentBookings = ({ scope = "user" }) => {
@@ -72,7 +60,7 @@ const RecentBookings = ({ scope = "user" }) => {
             return;
         }
 
-        const checkInUrl = buildCheckInUrl(ticketCode);
+        const checkInUrl = formatTicketCode(ticketCode);
         setQrGenerationError("");
         setIsGeneratingQr(Boolean(checkInUrl));
         setSelectedQrCode({
