@@ -34,50 +34,39 @@ const ScannerPage = () => {
         let isMounted = true;
         let scannerStarted = false;
 
+        console.log("Initializing QR code scanner...");
         scanner
             .start(
                 { facingMode: "environment" },
                 {
                     fps: 10,
-                    qrbox: { width: 350, height: 350 },
+                    // qrbox: { width: 380, height: 380 },
+                    qrbox: undefined,
+                    aspectRatio: 1.0,
+                    disableFlip: true,
                 },
                 (decodedText) => {
+                    console.log("Processing flag:", isProcessingRef.current);
                     if (isProcessingRef.current) return;
 
                     isProcessingRef.current = true;
 
                     console.log("QR detected:", decodedText);
+                    scanner.pause();
 
-                    postTicketCode(decodedText).then((res) => {
-                        scanner.pause();
-                        const data = res?.data;
-                        if (data && data.booking) {
-                            setScannedTicket(data.booking);
-
-                            const status =
-                                res?.data?.booking?.status ||
-                                res?.data?.booking?.state ||
-                                null;
-                            if (
-                                status === "checked-in" ||
-                                res?.data?.booking?.checkedIn
-                            ) {
-                                setTicketState("already_checked_in");
-                            } else {
-                                setTicketState("valid");
-                            }
-                        } else {
-                            setTicketState("invalid");
-                        }
+                    postTicketCode(decodedText).finally(() => {
                         setTimeout(() => {
                             isProcessingRef.current = false;
                             scanner.resume();
                         }, 2000);
                     });
                 },
-                () => {},
+                (err) => {
+                    console.log("Scan error:", err);
+                },
             )
             .then(() => {
+                console.log("Scanner started successfully");
                 if (!isMounted) return;
 
                 scannerStarted = true;
@@ -129,25 +118,30 @@ const ScannerPage = () => {
         return axios
             .post(`${API_BASE_URL}/bookings/verify-qr`, { ticketCode })
             .then((res) => {
-                const data = res && res.data ? res.data : null;
-                if (data && data.booking) {
-                    setScannedTicket(data.booking);
+                const data = res?.data;
 
-                    const booking = data.booking;
-                    const status = booking.status || booking.state || null;
-
-                    if (status === "checked-in" || booking.checkedIn) {
-                        setTicketState("already_checked_in");
-                    } else {
-                        setTicketState("valid");
-                    }
-                } else {
+                if (!data?.booking) {
                     setTicketState("invalid");
+                    return null;
                 }
+
+                const booking = data.booking;
+                setScannedTicket(booking);
+
+                const status = booking.status || booking.state;
+
+                if (status === "checked-in" || booking.checkedIn) {
+                    setTicketState("already_checked_in");
+                } else {
+                    setTicketState("valid");
+                }
+
+                return data; // 👈 IMPORTANT
             })
             .catch((err) => {
                 console.error("Ticket verification failed:", err);
                 setTicketState("invalid");
+                return null;
             });
     };
 
