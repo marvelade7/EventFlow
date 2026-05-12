@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import AdminSidebar from "../components/AdminSidebar";
 import AdminTopbar from "../components/AdminTopbar";
-import QrVerificationModal from "../components/QrVerificationModal";
 import AOS from "aos";
 import "aos/dist/aos.css";
 
@@ -99,7 +98,6 @@ const AdminDashboard = () => {
         "2 flagged events need manual review today.",
     ]);
     const [announcementDraft, setAnnouncementDraft] = useState("");
-    const [isQrVerificationOpen, setIsQrVerificationOpen] = useState(false);
     const [activityLog, setActivityLog] = useState([
         "Published spotlight banner for Lagos Sound Summit.",
         "Suspended one organizer account for policy review.",
@@ -269,13 +267,6 @@ const AdminDashboard = () => {
                             Create New Event
                         </button>
                     </Link>
-                    <button
-                        type="button"
-                        onClick={() => setIsQrVerificationOpen(true)}
-                        className="btn admin-secondary-btn fw-semibold"
-                    >
-                        Verify QR Code
-                    </button>
                     <button
                         type="button"
                         onClick={() => setActiveSection("posts")}
@@ -672,11 +663,6 @@ const AdminDashboard = () => {
                     {sectionMap[activeSection]}
                 </div>
             </div>
-
-            <QrVerificationModal
-                isOpen={isQrVerificationOpen}
-                onClose={() => setIsQrVerificationOpen(false)}
-            />
         </div>
     );
 };

@@ -7,7 +7,6 @@ import CreateEvent from "../components/CreateEvent";
 import BrowseEvent from "../components/BrowseEvent";
 import BrowseEventsHead from "../components/BrowseEventsHead";
 import RecentBookings from "../components/RecentBookings";
-import QrVerificationModal from "../components/QrVerificationModal";
 import aos from "aos";
 import "aos/dist/aos.css";
 import { useNavigate, useOutlet, useLocation } from "react-router-dom";
@@ -103,7 +102,6 @@ const UserDashboard = () => {
     const [isLoadingUpcomingEvents, setIsLoadingUpcomingEvents] =
         useState(true);
     const [upcomingEventsError, setUpcomingEventsError] = useState("");
-    const [isQrVerificationOpen, setIsQrVerificationOpen] = useState(false);
     const [dashboardStats, setDashboardStats] = useState({
         totalEvents: 0,
         activeTickets: 0,
@@ -515,21 +513,6 @@ const UserDashboard = () => {
                                     title="Bookings for Your Events"
                                     style={{ fontSize: "1.3em" }}
                                 />
-                                <button
-                                    onClick={() => setIsQrVerificationOpen(true)}
-                                    style={{
-                                        padding: '8px 16px',
-                                        backgroundColor: '#007bff',
-                                        color: 'white',
-                                        border: 'none',
-                                        borderRadius: '6px',
-                                        cursor: 'pointer',
-                                        fontWeight: '500',
-                                        fontSize: '0.9rem',
-                                    }}
-                                >
-                                    Verify QR Code
-                                </button>
                             </div>
                             <div data-aos="fade-up" data-aos-delay="140">
                                 <RecentBookings scope="organizer" />
@@ -538,11 +521,6 @@ const UserDashboard = () => {
                     </div>
                 )}
             </div>
-
-            <QrVerificationModal
-                isOpen={isQrVerificationOpen}
-                onClose={() => setIsQrVerificationOpen(false)}
-            />
         </div>
     );
 };

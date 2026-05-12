@@ -315,10 +315,10 @@ const ScannerPage = () => {
                         <p className="scanner-topbar-eyebrow">Ticket scanner</p>
                         <h1 className="scanner-topbar-title">Scan Tickets</h1>
                     </div>
-                    <span className="scanner-live-pill">
+                    {/* <span className="scanner-live-pill">
                         <span className="scanner-live-dot" />
                         Live
-                    </span>
+                    </span> */}
                 </header>
 
                 <section className="scanner-stage">
