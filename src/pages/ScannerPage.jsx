@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { API_BASE_URL } from "../utils/apiConfig";
 import "./ScannerPage.css";
 
 const defaultTicket = {
@@ -17,6 +19,8 @@ const ScannerPage = () => {
     const [ticketState, setTicketState] = useState("idle");
     const [isSuccessFlash, setIsSuccessFlash] = useState(false);
     const [cameraStatus, setCameraStatus] = useState("loading");
+    const [scannedTicket, setScannedTicket] = useState(null);
+    const [verifying, setVerifying] = useState(false);
     const successTimerRef = useRef(null);
     const resetTimerRef = useRef(null);
     const videoRef = useRef(null);
@@ -127,8 +131,58 @@ const ScannerPage = () => {
             });
     };
 
+    const postTicketCode = (ticketCode) => {
+        setTicketState("verifying");
+        setVerifying(true);
+
+        axios
+            .post(`${API_BASE_URL}/bookings/verify-qr`, { ticketCode })
+            .then((res) => {
+                const data = res && res.data ? res.data : null;
+                if (data && data.booking) {
+                    setScannedTicket(data.booking);
+
+                    const booking = data.booking;
+                    const status = booking.status || booking.state || null;
+
+                    if (status === "checked-in" || booking.checkedIn) {
+                        setTicketState("already_checked_in");
+                    } else {
+                        setTicketState("valid");
+                    }
+                } else {
+                    setTicketState("invalid");
+                }
+            })
+            .catch((err) => {
+                console.error("Ticket verification failed:", err);
+                setTicketState("invalid");
+            })
+            .finally(() => {
+                setVerifying(false);
+            });
+    };
+
     const renderResultContent = () => {
         if (ticketState === "idle") return null;
+
+        const ticket = scannedTicket || defaultTicket;
+
+        if (ticketState === "verifying") {
+            return (
+                <div className="scanner-result-card">
+                    <div className="scanner-result-stack">
+                        <p className="scanner-result-eyebrow">Verifying</p>
+                        <h2 className="scanner-result-title">
+                            Checking ticket
+                        </h2>
+                        <p className="scanner-result-text">
+                            Please wait while we verify this ticket.
+                        </p>
+                    </div>
+                </div>
+            );
+        }
 
         if (ticketState === "invalid") {
             return (
@@ -164,7 +218,7 @@ const ScannerPage = () => {
                             Already checked in
                         </h2>
                         <p className="scanner-result-text">
-                            Checked in at {defaultTicket.checkedInTime}
+                            Checked in at {ticket.checkedInTime}
                         </p>
                     </div>
                     <div className="scanner-result-meta">
@@ -213,8 +267,8 @@ const ScannerPage = () => {
                     <div className="scanner-result-avatar-wrap">
                         <img
                             className="scanner-result-avatar"
-                            src={defaultTicket.avatarUrl}
-                            alt={defaultTicket.attendeeName}
+                            src={ticket.avatarUrl}
+                            alt={ticket.attendeeName}
                         />
                     </div>
                 </div>
@@ -223,13 +277,13 @@ const ScannerPage = () => {
                     <div className="scanner-detail-row">
                         <span className="scanner-detail-label">Attendee</span>
                         <span className="scanner-detail-value">
-                            {defaultTicket.attendeeName}
+                            {ticket.attendeeName}
                         </span>
                     </div>
                     <div className="scanner-detail-row">
                         <span className="scanner-detail-label">Event</span>
                         <span className="scanner-detail-value">
-                            {defaultTicket.eventName}
+                            {ticket.eventName}
                         </span>
                     </div>
                     <div className="scanner-detail-row">
@@ -237,7 +291,7 @@ const ScannerPage = () => {
                             Ticket Type
                         </span>
                         <span className="scanner-detail-value">
-                            {defaultTicket.ticketType}
+                            {ticket.ticketType}
                         </span>
                     </div>
                     <div className="scanner-detail-row">
@@ -245,7 +299,7 @@ const ScannerPage = () => {
                             Ticket Code
                         </span>
                         <span className="scanner-detail-code">
-                            {defaultTicket.ticketCode}
+                            {ticket.ticketCode}
                         </span>
                     </div>
                 </div>
@@ -300,14 +354,24 @@ const ScannerPage = () => {
                                     <div className="scanner-camera-placeholder">
                                         {cameraStatus === "loading" && (
                                             <>
-                                                <span className="scanner-placeholder-title">Opening camera...</span>
-                                                <span className="scanner-placeholder-text">Allow camera access to start scanning.</span>
+                                                <span className="scanner-placeholder-title">
+                                                    Opening camera...
+                                                </span>
+                                                <span className="scanner-placeholder-text">
+                                                    Allow camera access to start
+                                                    scanning.
+                                                </span>
                                             </>
                                         )}
                                         {cameraStatus === "blocked" && (
                                             <>
-                                                <span className="scanner-placeholder-title">Camera access is blocked</span>
-                                                <span className="scanner-placeholder-text">Enable camera permission in your browser and try again.</span>
+                                                <span className="scanner-placeholder-title">
+                                                    Camera access is blocked
+                                                </span>
+                                                <span className="scanner-placeholder-text">
+                                                    Enable camera permission in
+                                                    your browser and try again.
+                                                </span>
                                                 <button
                                                     type="button"
                                                     className="scanner-placeholder-btn"
@@ -319,8 +383,13 @@ const ScannerPage = () => {
                                         )}
                                         {cameraStatus === "unsupported" && (
                                             <>
-                                                <span className="scanner-placeholder-title">Camera not supported</span>
-                                                <span className="scanner-placeholder-text">This browser does not support live camera access.</span>
+                                                <span className="scanner-placeholder-title">
+                                                    Camera not supported
+                                                </span>
+                                                <span className="scanner-placeholder-text">
+                                                    This browser does not
+                                                    support live camera access.
+                                                </span>
                                             </>
                                         )}
                                     </div>
@@ -355,21 +424,30 @@ const ScannerPage = () => {
                     <button
                         type="button"
                         className="scanner-shortcut-btn scanner-shortcut-btn--ghost"
-                        onClick={() => setTicketState("valid")}
+                        onClick={() => {
+                            setScannedTicket(defaultTicket);
+                            postTicketCode(defaultTicket.ticketCode);
+                        }}
                     >
                         Valid Ticket
                     </button>
                     <button
                         type="button"
                         className="scanner-shortcut-btn scanner-shortcut-btn--error"
-                        onClick={() => setTicketState("invalid")}
+                        onClick={() => {
+                            setScannedTicket(defaultTicket);
+                            setTicketState("invalid");
+                        }}
                     >
                         Invalid Ticket
                     </button>
                     <button
                         type="button"
                         className="scanner-shortcut-btn scanner-shortcut-btn--warning"
-                        onClick={() => setTicketState("already_checked_in")}
+                        onClick={() => {
+                            setScannedTicket(defaultTicket);
+                            setTicketState("already_checked_in");
+                        }}
                     >
                         Already Checked In
                     </button>
@@ -384,7 +462,10 @@ const ScannerPage = () => {
             </div>
 
             {ticketState !== "idle" && (
-                <div className="scanner-modal-backdrop" onClick={closeResultModal}>
+                <div
+                    className="scanner-modal-backdrop"
+                    onClick={closeResultModal}
+                >
                     <div
                         className="scanner-modal-shell"
                         onClick={(e) => e.stopPropagation()}
