@@ -131,7 +131,7 @@ const ScannerPage = () => {
         }
 
         axios
-            .post(`${API_BASE_URL}/check-in/${ticketCode}`, {}, {
+            .post(`${API_BASE_URL}/bookings/check-in/${ticketCode}`, {}, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -305,9 +305,9 @@ const ScannerPage = () => {
         return (
             <div className="scanner-result-card scanner-result-card--success">
                 <div className="scanner-result-header">
-                    <div className="scanner-result-icon-wrap scanner-result-icon-wrap--success">
+                    {/* <div className="scanner-result-icon-wrap scanner-result-icon-wrap--success">
                         <i className="bi bi-shield-check scanner-result-icon" />
-                    </div>
+                    </div> */}
                     <div className="scanner-result-stack">
                         <p className="scanner-result-eyebrow">
                             Ticket verified
@@ -318,13 +318,13 @@ const ScannerPage = () => {
                             entry.
                         </p>
                     </div>
-                    <div className="scanner-result-avatar-wrap">
+                    {/* <div className="scanner-result-avatar-wrap">
                         <img
                             className="scanner-result-avatar"
                             src={ticket.avatarUrl}
                             alt={ticket.attendeeName}
                         />
-                    </div>
+                    </div> */}
                 </div>
 
                 <div className="scanner-result-details">

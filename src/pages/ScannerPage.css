@@ -404,8 +404,8 @@
 }
 
 .scanner-detail-code {
-    letter-spacing: 0.08em;
-    color: rgb(27, 181, 204);
+    /* letter-spacing: 0.08em; */
+    /* color: rgb(27, 181, 204); */
 }
 
 .scanner-result-meta {
