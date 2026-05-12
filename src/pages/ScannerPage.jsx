@@ -115,8 +115,20 @@ const ScannerPage = () => {
     const postTicketCode = (ticketCode) => {
         setTicketState("verifying");
 
+        const token = localStorage.getItem("token");
+
         return axios
-            .post(`${API_BASE_URL}/bookings/verify-qr`, { ticketCode })
+            .post(
+                `${API_BASE_URL}/bookings/verify-qr`,
+                { ticketCode: (ticketCode || "").toString().trim() },
+                {
+                    headers: token
+                        ? {
+                              Authorization: `Bearer ${token}`,
+                          }
+                        : {},
+                },
+            )
             .then((res) => {
                 const data = res?.data;
 
@@ -140,6 +152,13 @@ const ScannerPage = () => {
             })
             .catch((err) => {
                 console.error("Ticket verification failed:", err);
+
+                const status = err?.response?.status;
+                if (status === 401 || status === 403) {
+                    setTicketState("idle");
+                    return null;
+                }
+
                 setTicketState("invalid");
                 return null;
             });
