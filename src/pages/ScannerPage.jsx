@@ -16,15 +16,59 @@ const ScannerPage = () => {
     const navigate = useNavigate();
     const [ticketState, setTicketState] = useState("idle");
     const [isSuccessFlash, setIsSuccessFlash] = useState(false);
+    const [cameraStatus, setCameraStatus] = useState("loading");
     const successTimerRef = useRef(null);
     const resetTimerRef = useRef(null);
+    const videoRef = useRef(null);
+    const streamRef = useRef(null);
 
     useEffect(() => {
+        let isActive = true;
+
+        const startCamera = () => {
+            if (!navigator.mediaDevices?.getUserMedia) {
+                setCameraStatus("unsupported");
+                return;
+            }
+
+            navigator.mediaDevices
+                .getUserMedia({
+                    video: {
+                        facingMode: { ideal: "environment" },
+                    },
+                    audio: false,
+                })
+                .then((stream) => {
+                    if (!isActive) {
+                        stream.getTracks().forEach((track) => track.stop());
+                        return;
+                    }
+
+                    streamRef.current = stream;
+                    if (videoRef.current) {
+                        videoRef.current.srcObject = stream;
+                        videoRef.current.play().catch(() => {});
+                    }
+                    setCameraStatus("ready");
+                })
+                .catch((error) => {
+                    console.error("Unable to access camera:", error);
+                    if (isActive) setCameraStatus("blocked");
+                });
+        };
+
+        startCamera();
+
         return () => {
+            isActive = false;
             if (successTimerRef.current)
                 window.clearTimeout(successTimerRef.current);
             if (resetTimerRef.current)
                 window.clearTimeout(resetTimerRef.current);
+            if (streamRef.current) {
+                streamRef.current.getTracks().forEach((track) => track.stop());
+                streamRef.current = null;
+            }
         };
     }, []);
 
@@ -49,6 +93,38 @@ const ScannerPage = () => {
     const closeResultModal = () => {
         setTicketState("idle");
         setIsSuccessFlash(false);
+    };
+
+    const restartCamera = () => {
+        if (!navigator.mediaDevices?.getUserMedia) {
+            setCameraStatus("unsupported");
+            return;
+        }
+
+        if (streamRef.current) {
+            streamRef.current.getTracks().forEach((track) => track.stop());
+        }
+
+        setCameraStatus("loading");
+        navigator.mediaDevices
+            .getUserMedia({
+                video: {
+                    facingMode: { ideal: "environment" },
+                },
+                audio: false,
+            })
+            .then((stream) => {
+                streamRef.current = stream;
+                if (videoRef.current) {
+                    videoRef.current.srcObject = stream;
+                    videoRef.current.play().catch(() => {});
+                }
+                setCameraStatus("ready");
+            })
+            .catch((error) => {
+                console.error("Unable to restart camera:", error);
+                setCameraStatus("blocked");
+            });
     };
 
     const renderResultContent = () => {
@@ -211,16 +287,51 @@ const ScannerPage = () => {
 
                 <section className="scanner-stage">
                     <div className="scanner-camera-frame">
-                        <div className="scanner-camera-glow" />
                         <div className="scanner-camera-card">
                             <div className="scanner-camera-viewfinder">
+                                <video
+                                    ref={videoRef}
+                                    className="scanner-camera-video"
+                                    autoPlay
+                                    muted
+                                    playsInline
+                                />
+                                {cameraStatus !== "ready" && (
+                                    <div className="scanner-camera-placeholder">
+                                        {cameraStatus === "loading" && (
+                                            <>
+                                                <span className="scanner-placeholder-title">Opening camera...</span>
+                                                <span className="scanner-placeholder-text">Allow camera access to start scanning.</span>
+                                            </>
+                                        )}
+                                        {cameraStatus === "blocked" && (
+                                            <>
+                                                <span className="scanner-placeholder-title">Camera access is blocked</span>
+                                                <span className="scanner-placeholder-text">Enable camera permission in your browser and try again.</span>
+                                                <button
+                                                    type="button"
+                                                    className="scanner-placeholder-btn"
+                                                    onClick={restartCamera}
+                                                >
+                                                    Try Again
+                                                </button>
+                                            </>
+                                        )}
+                                        {cameraStatus === "unsupported" && (
+                                            <>
+                                                <span className="scanner-placeholder-title">Camera not supported</span>
+                                                <span className="scanner-placeholder-text">This browser does not support live camera access.</span>
+                                            </>
+                                        )}
+                                    </div>
+                                )}
                                 <div className="scanner-corner scanner-corner--tl" />
                                 <div className="scanner-corner scanner-corner--tr" />
                                 <div className="scanner-corner scanner-corner--bl" />
                                 <div className="scanner-corner scanner-corner--br" />
                                 <div className="scanner-scan-line" />
                                 <div className="scanner-scan-grid" />
-                                <div className="scanner-camera-center">
+                                <div className="scanner-camera-center scanner-camera-center--overlay">
                                     <div className="scanner-camera-ring scanner-camera-ring--outer" />
                                     <div className="scanner-camera-ring scanner-camera-ring--inner" />
                                     <i className="bi bi-qr-code-scan scanner-camera-icon" />
@@ -229,11 +340,14 @@ const ScannerPage = () => {
                         </div>
                     </div>
                     <p className="scanner-instruction">
-                        Scanning for QR code...
+                        {cameraStatus === "ready"
+                            ? "Scanning for QR code..."
+                            : "Starting camera..."}
                     </p>
                     <p className="scanner-supporting-text">
-                        Position the ticket QR inside the frame. The scanner is
-                        ready to detect instantly.
+                        {cameraStatus === "ready"
+                            ? "Position the ticket QR inside the frame. The scanner is ready to detect instantly."
+                            : "Allow access so the live camera feed can appear here."}
                     </p>
                 </section>
 
