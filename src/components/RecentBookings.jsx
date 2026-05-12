@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import QRCode from "qrcode";
 import { fetchBookings } from "../utils/eventsApi";
 
 const formatMoney = (amount) =>
@@ -22,11 +23,29 @@ const formatBookedDateTime = (value) => {
     });
 };
 
+const CHECK_IN_BASE_URL = 
+    "https://marvel-event-flow.vercel.app";
+
+const buildCheckInUrl = (ticketCode) => {
+    const normalizedTicketCode = (ticketCode || "").toString().trim();
+
+    if (!normalizedTicketCode) {
+        return "";
+    }
+
+    return new URL(
+        `/check-in/${encodeURIComponent(normalizedTicketCode)}`,
+        CHECK_IN_BASE_URL,
+    ).toString();
+};
+
 const RecentBookings = ({ scope = "user" }) => {
     const [bookings, setBookings] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState("");
     const [selectedQrCode, setSelectedQrCode] = useState(null);
+    const [isGeneratingQr, setIsGeneratingQr] = useState(false);
+    const [qrGenerationError, setQrGenerationError] = useState("");
 
     const handleDownloadQr = (qrDataUrl, ticketCode) => {
         if (!qrDataUrl) return;
@@ -36,6 +55,67 @@ const RecentBookings = ({ scope = "user" }) => {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+    };
+
+    const openQrCode = (booking) => {
+        const ticketCode = (
+            booking?.ticketCode ||
+            booking?.reference ||
+            booking?.paymentReference ||
+            booking?._id ||
+            ""
+        )
+            .toString()
+            .trim();
+
+        if (!ticketCode) {
+            return;
+        }
+
+        const checkInUrl = buildCheckInUrl(ticketCode);
+        setQrGenerationError("");
+        setIsGeneratingQr(Boolean(checkInUrl));
+        setSelectedQrCode({
+            qrDataUrl: "",
+            checkInUrl,
+            ticketCode,
+            userName: booking.userName,
+            userEmail: booking.userEmail,
+            eventTitle: booking.eventTitle,
+            checkedIn: booking.checkedIn,
+        });
+
+        if (!checkInUrl) {
+            setIsGeneratingQr(false);
+            return;
+        }
+
+        QRCode.toDataURL(checkInUrl, {
+            errorCorrectionLevel: "M",
+            margin: 2,
+            width: 320,
+        })
+            .then((qrDataUrl) => {
+                setSelectedQrCode((current) => {
+                    if (!current || current.ticketCode !== ticketCode) {
+                        return current;
+                    }
+
+                    return {
+                        ...current,
+                        qrDataUrl,
+                    };
+                });
+            })
+            .catch((error) => {
+                console.error("Unable to generate QR code", error);
+                setQrGenerationError(
+                    "Unable to generate the ticket QR code right now.",
+                );
+            })
+            .finally(() => {
+                setIsGeneratingQr(false);
+            });
     };
 
     useEffect(() => {
@@ -53,9 +133,7 @@ const RecentBookings = ({ scope = "user" }) => {
         fetchBookings({ token, signal: controller.signal, scope })
             .then((data) => {
                 if (!isActive) return;
-                setBookings(
-                    Array.isArray(data?.bookings) ? data.bookings : [],
-                );
+                setBookings(Array.isArray(data?.bookings) ? data.bookings : []);
             })
             .catch((error) => {
                 if (!isActive) return;
@@ -103,7 +181,8 @@ const RecentBookings = ({ scope = "user" }) => {
             }
 
             // Extract user details
-            const userName = booking?.user?.firstName || booking?.user?.name || "User";
+            const userName =
+                booking?.user?.firstName || booking?.user?.name || "User";
             const userLastName = booking?.user?.lastName || "";
             const fullUserName = `${userName}${userLastName ? ` ${userLastName}` : ""}`;
             const userEmail = booking?.user?.email || "N/A";
@@ -126,6 +205,7 @@ const RecentBookings = ({ scope = "user" }) => {
                 status:
                     booking?.paymentStatus === "paid" ? "Confirmed" : "Pending",
                 ticketCode: booking?.ticketCode || "",
+                reference: booking?.reference || booking?.paymentReference || "",
                 qrCode: booking?.qrCode || null,
                 createdAt: formatBookedDateTime(booking?.createdAt),
                 userName: fullUserName,
@@ -155,7 +235,11 @@ const RecentBookings = ({ scope = "user" }) => {
                         aria-hidden="true"
                     ></div>
                     <p className="mt-3 mb-0 text-secondary fw-semibold">
-                        Loading {scope === "organizer" ? "event bookings" : "your bookings"}...
+                        Loading{" "}
+                        {scope === "organizer"
+                            ? "event bookings"
+                            : "your bookings"}
+                        ...
                     </p>
                 </div>
             ) : errorMessage ? (
@@ -165,7 +249,9 @@ const RecentBookings = ({ scope = "user" }) => {
             ) : groupedBookings.length === 0 ? (
                 <div className="py-5 text-center">
                     <h6 className="mb-1">
-                        {scope === "organizer" ? "No event bookings yet" : "No bookings yet"}
+                        {scope === "organizer"
+                            ? "No event bookings yet"
+                            : "No bookings yet"}
                     </h6>
                     <p className="text-secondary mb-0">
                         {scope === "organizer"
@@ -223,25 +309,20 @@ const RecentBookings = ({ scope = "user" }) => {
                                     </button>
                                 </td>
                                 <td>
-                                    {booking.qrCode && (
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                setSelectedQrCode({
-                                                    qrCode: booking.qrCode,
-                                                    ticketCode: booking.ticketCode,
-                                                    userName: booking.userName,
-                                                    userEmail: booking.userEmail,
-                                                    eventTitle: booking.eventTitle,
-                                                    checkedIn: booking.checkedIn,
-                                                })
-                                            }
-                                            className="btn btn-sm btn-outline-info"
-                                            title="View QR Code"
-                                        >
-                                            View QR Code
-                                        </button>
-                                    )}
+                                    <button
+                                        type="button"
+                                        onClick={() => openQrCode(booking)}
+                                        className="btn btn-sm btn-outline-info"
+                                        title="View QR Code"
+                                        disabled={
+                                            !booking.ticketCode &&
+                                            !booking.reference &&
+                                            !booking.paymentReference &&
+                                            !booking._id
+                                        }
+                                    >
+                                        View QR Code
+                                    </button>
                                 </td>
                                 <td>{booking.createdAt}</td>
                             </tr>
@@ -285,22 +366,51 @@ const RecentBookings = ({ scope = "user" }) => {
                                 aria-label="Close"
                             ></button>
                         </div>
-                        <img
-                            src={selectedQrCode.qrCode}
-                            alt="QR Code"
-                            style={{
-                                width: "100%",
-                                maxWidth: "300px",
-                                borderRadius: "8px",
-                                border: "1px solid #ddd",
-                                marginBottom: "16px",
-                            }}
-                        />
-                            <p className="mb-2">
-                                <strong>Ticket Code:</strong> {selectedQrCode.ticketCode}
-                            </p>
+                        <div className="d-flex justify-content-center align-items-center mb-3">
+                            {isGeneratingQr && !selectedQrCode.qrDataUrl ? (
+                                <div className="py-5 text-center w-100">
+                                    <div
+                                        className="spinner-border text-info"
+                                        role="status"
+                                        aria-hidden="true"
+                                    ></div>
+                                    <p className="mt-3 mb-0 text-secondary fw-semibold">
+                                        Generating QR code...
+                                    </p>
+                                </div>
+                            ) : (
+                                <img
+                                    src={selectedQrCode.qrDataUrl}
+                                    alt="QR Code"
+                                    style={{
+                                        width: "100%",
+                                        maxWidth: "300px",
+                                        borderRadius: "8px",
+                                        border: "1px solid #ddd",
+                                        marginBottom: "16px",
+                                    }}
+                                />
+                            )}
+                        </div>
+                        {qrGenerationError && (
+                            <div
+                                className="alert alert-warning text-start"
+                                role="alert"
+                            >
+                                {qrGenerationError}
+                            </div>
+                        )}
+                        <p className="mb-2">
+                            <strong>Ticket Code:</strong>{" "}
+                            {selectedQrCode.ticketCode}
+                        </p>
+                        {/* <p className="text-secondary small mb-3 text-break">
+                            <strong>Check-in URL:</strong>{" "}
+                            {selectedQrCode.checkInUrl}
+                        </p> */}
                         <p className="text-secondary mb-3 fs-6">
-                            Scan this code to verify your ticket at the event entrance.
+                            Scan this code to verify your ticket at the event
+                            entrance.
                         </p>
                         <div className="d-flex gap-2">
                             <button
@@ -308,17 +418,21 @@ const RecentBookings = ({ scope = "user" }) => {
                                 className="btn btn-info flex-grow-1"
                                 onClick={() =>
                                     handleDownloadQr(
-                                        selectedQrCode.qrCode,
+                                        selectedQrCode.qrDataUrl,
                                         selectedQrCode.ticketCode,
                                     )
                                 }
+                                disabled={!selectedQrCode.qrDataUrl}
                             >
                                 Download QR
                             </button>
                             <button
                                 type="button"
                                 className="btn btn-secondary"
-                                onClick={() => setSelectedQrCode(null)}
+                                onClick={() => {
+                                    setSelectedQrCode(null);
+                                    setQrGenerationError("");
+                                }}
                             >
                                 Close
                             </button>

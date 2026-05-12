@@ -19,6 +19,9 @@ import MyTicketPage from "./pages/MyTicketPage";
 import BrowseEventPage from "./pages/BrowseEventPage";
 import EmailVerification from "./pages/EmailVerification";
 import ResetPassword from "./pages/ResetPassword";
+import { ProfileProvider } from "./context/ProfileContext";
+// import CheckInPage from "./pages/CheckInPage";
+import ScannerPage from "./pages/ScannerPage";
 
 const ScrollToTop = () => {
     const { pathname } = useLocation();
@@ -30,7 +33,6 @@ const ScrollToTop = () => {
     return null;
 };
 
-import { ProfileProvider } from "./context/ProfileContext";
 
 const ProtectedRoute = ({ element }) => {
     const token = localStorage.getItem("token");
@@ -44,12 +46,14 @@ const App = () => {
             <ProfileProvider>
             <Routes>
                 <Route path="/" element={<Home />} />
+                <Route path="/home" element={<Navigate to="/" replace />} />
                 <Route path="/signup" element={<SignUp />} />
                 <Route path="/signin" element={<SignIn />} />
                 <Route path="/verify-email" element={<EmailVerification />} />
                 <Route path="/login" element={<Navigate to="/signin" replace />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password/:token" element={<ResetPassword />} />
+                {/* <Route path="/check-in/:ticketCode" element={<ProtectedRoute element={<CheckInPage />} />} /> */}
 
                 <Route path="/dashboard" element={<ProtectedRoute element={<UserDashboard />} />}>
                     <Route path="profile" element={<Profile />} />
@@ -58,6 +62,7 @@ const App = () => {
                     <Route path="checkout" element={<CheckoutPage />} />
                     <Route path="tickets" element={<MyTicketPage />} />
                     <Route path="browse-event" element={<BrowseEventPage />} />
+                    <Route path="scanner" element={<ScannerPage />} />
                 </Route>
 
                 <Route path="/admin-auth" element={<AdminAuthPage />} />

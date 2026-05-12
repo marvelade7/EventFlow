@@ -79,6 +79,17 @@ const Sidebar = ({
                         </li>
                     </NavLink>
                     <NavLink
+                        to="/dashboard/scanner"
+                        onClick={onLinkClick}
+                        className={({ isActive }) =>
+                            `text-decoration-none text-dark w-100 sidebar-link ${isActive ? "active" : ""}`
+                        }
+                    >
+                        <li>
+                            <i className="bi bi-camera"></i> Scan Tickets
+                        </li>
+                    </NavLink>
+                    <NavLink
                         to="/dashboard/create-event"
                         onClick={onLinkClick}
                         className={({ isActive }) =>
