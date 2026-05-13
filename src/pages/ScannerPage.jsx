@@ -63,6 +63,7 @@ const ScannerPage = () => {
     const [scannedTicket, setScannedTicket] = useState(null);
     const successTimerRef = useRef(null);
     const resetTimerRef = useRef(null);
+    const errorTimerRef = useRef(null);
     const scannerRef = useRef(null);
     const isProcessingRef = useRef(false);
 
@@ -212,6 +213,7 @@ const ScannerPage = () => {
 
                 if (!data?.booking) {
                     setTicketState("invalid");
+                    setErrorTimer();
                     return null;
                 }
 
@@ -222,6 +224,7 @@ const ScannerPage = () => {
 
                 if (status === "checked-in" || booking.checkedIn) {
                     setTicketState("already_checked_in");
+                    setErrorTimer();
                 } else {
                     setTicketState("valid");
                 }
@@ -235,18 +238,28 @@ const ScannerPage = () => {
 
                 if (status === 403) {
                     setTicketState("unauthorized");
+                    setErrorTimer();
                     return null;
                 }
 
-                if (status === 401 || status === 403) {
+                if (status === 401) {
                     setTicketState("idle");
                     return null;
                 }
 
                 setTicketState("invalid");
+                setErrorTimer();
 
                 return null;
             });
+    };
+
+    const setErrorTimer = () => {
+        if (errorTimerRef.current) window.clearTimeout(errorTimerRef.current);
+        
+        errorTimerRef.current = window.setTimeout(() => {
+            setTicketState("idle");
+        }, 4000);
     };
 
     const renderResultContent = () => {
@@ -428,10 +441,7 @@ const ScannerPage = () => {
                         <p className="scanner-topbar-eyebrow">Ticket scanner</p>
                         <h1 className="scanner-topbar-title">Scan Tickets</h1>
                     </div>
-                    {/* <span className="scanner-live-pill">
-                        <span className="scanner-live-dot" />
-                        Live
-                    </span> */}
+                    
                 </header>
 
                 <section className="scanner-stage">
