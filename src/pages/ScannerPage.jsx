@@ -194,12 +194,21 @@ const ScannerPage = () => {
     const postTicketCode = (ticketCode) => {
         setTicketState("verifying");
 
+        const normalizedCode = (ticketCode || "").toString().trim();
+        console.log("Scanning ticket code:", { raw: ticketCode, normalized: normalizedCode });
+
         const token = localStorage.getItem("token");
+
+        // Show what's being scanned
+        console.log("Sending to API:", {
+            url: `${API_BASE_URL}/bookings/verify-qr`,
+            payload: { ticketCode: normalizedCode }
+        });
 
         return axios
             .post(
                 `${API_BASE_URL}/bookings/verify-qr`,
-                { ticketCode: (ticketCode || "").toString().trim() },
+                { ticketCode: normalizedCode },
                 {
                     headers: token
                         ? {
@@ -232,7 +241,11 @@ const ScannerPage = () => {
                 return data; 
             })
             .catch((err) => {
-                console.error("Ticket verification failed:", err);
+                console.error("Ticket verification failed:", {
+                    status: err?.response?.status,
+                    message: err?.response?.data?.message,
+                    error: err?.message
+                });
 
                 const status = err?.response?.status;
 
