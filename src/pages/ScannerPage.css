@@ -163,6 +163,27 @@
     font-weight: 800;
 }
 
+.scanner-confirm-btn:disabled {
+    opacity: 0.82;
+    cursor: not-allowed;
+}
+
+.scanner-btn-spinner-wrap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.scanner-btn-spinner {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #fff;
+    animation: scannerSpin 0.8s linear infinite;
+}
+
 .scanner-scan-grid {
     position: absolute;
     inset: 0;
@@ -604,6 +625,12 @@
     }
     100% {
         background: #f1f1f1;
+    }
+}
+
+@keyframes scannerSpin {
+    to {
+        transform: rotate(360deg);
     }
 }
 

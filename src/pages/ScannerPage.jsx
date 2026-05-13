@@ -61,6 +61,7 @@ const ScannerPage = () => {
     const [isSuccessFlash, setIsSuccessFlash] = useState(false);
     const [cameraStatus, setCameraStatus] = useState("loading");
     const [scannedTicket, setScannedTicket] = useState(null);
+    const [isCheckingIn, setIsCheckingIn] = useState(false);
     const successTimerRef = useRef(null);
     const resetTimerRef = useRef(null);
     const errorTimerRef = useRef(null);
@@ -140,6 +141,10 @@ const ScannerPage = () => {
             return;
         }
 
+        if (isCheckingIn) {
+            return;
+        }
+
         const ticketCode =
             scannedTicket?.ticketCode ||
             scannedTicket?.reference ||
@@ -152,6 +157,8 @@ const ScannerPage = () => {
             return;
         }
 
+        setIsCheckingIn(true);
+
         axios
             .post(
                 `${API_BASE_URL}/bookings/check-in/${ticketCode}`,
@@ -162,8 +169,21 @@ const ScannerPage = () => {
                     },
                 },
             )
-            .then(() => {
-                setTicketState("success");
+            .then((res) => {
+                const updatedBooking = res?.data?.booking;
+
+                if (updatedBooking) {
+                    setScannedTicket((current) => ({
+                        ...current,
+                        ...updatedBooking,
+                        checkedIn: true,
+                        checkedInAt:
+                            updatedBooking.checkedInAt || new Date().toISOString(),
+                        status: "checked-in",
+                    }));
+                }
+
+                setTicketState("already_checked_in");
                 setIsSuccessFlash(true);
 
                 if (successTimerRef.current)
@@ -183,6 +203,9 @@ const ScannerPage = () => {
             .catch((err) => {
                 console.error("Check-in failed:", err);
                 setTicketState("invalid");
+            })
+            .finally(() => {
+                setIsCheckingIn(false);
             });
     };
 
@@ -441,9 +464,17 @@ const ScannerPage = () => {
                 <button
                     type="button"
                     className="scanner-confirm-btn"
+                    disabled={isCheckingIn}
                     onClick={handleConfirmCheckIn}
                 >
-                    Confirm Check-In
+                    {isCheckingIn ? (
+                        <span className="scanner-btn-spinner-wrap">
+                            <span className="scanner-btn-spinner" aria-hidden="true" />
+                            Confirming...
+                        </span>
+                    ) : (
+                        "Confirm Check-In"
+                    )}
                 </button>
             </div>
         );
