@@ -193,12 +193,37 @@ const RecentBookings = ({ scope = "user" }) => {
                 status:
                     booking?.paymentStatus === "paid" ? "Confirmed" : "Pending",
                 ticketCode: booking?.ticketCode || "",
-                reference: booking?.reference || booking?.paymentReference || "",
+                reference:
+                    booking?.reference || booking?.paymentReference || "",
                 qrCode: booking?.qrCode || null,
                 createdAt: formatBookedDateTime(booking?.createdAt),
                 userName: fullUserName,
                 userEmail: userEmail,
                 checkedIn: booking?.status === "checked-in" ? "Yes" : "No",
+
+                eventDate: event?.startDateTime
+                    ? new Date(event.startDateTime).toLocaleDateString(
+                          "en-US",
+                          {
+                              month: "long",
+                              day: "numeric",
+                              year: "numeric",
+                          },
+                      )
+                    : "Date TBD",
+
+                eventTime: event?.startDateTime
+                    ? new Date(event.startDateTime).toLocaleTimeString(
+                          "en-US",
+                          {
+                              hour: "numeric",
+                              minute: "2-digit",
+                          },
+                      )
+                    : "Time TBD",
+
+                eventLocation:
+                    event?.location || event?.venue || "Venue not specified",
             });
         });
 
@@ -392,10 +417,6 @@ const RecentBookings = ({ scope = "user" }) => {
                             <strong>Ticket Code:</strong>{" "}
                             {selectedQrCode.ticketCode}
                         </p>
-                        {/* <p className="text-secondary small mb-3 text-break">
-                            <strong>Check-in URL:</strong>{" "}
-                            {selectedQrCode.checkInUrl}
-                        </p> */}
                         <p className="text-secondary mb-3 fs-6">
                             Scan this code to verify your ticket at the event
                             entrance.
@@ -428,6 +449,126 @@ const RecentBookings = ({ scope = "user" }) => {
                     </div>
                 </div>
             )}
+
+            {/* {selectedQrCode && (
+                <div
+                    className="ticket-modal-backdrop"
+                    onClick={() => setSelectedQrCode(null)}
+                >
+                    <div
+                        className="ticket-modal-card"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <button
+                            type="button"
+                            className="ticket-modal-close"
+                            onClick={() => setSelectedQrCode(null)}
+                        >
+                            <i className="bi bi-x-lg"></i>
+                        </button>
+
+                        <div className="ticket-card-ui">
+                            <div className="ticket-card-top">
+                                <div>
+                                    <span className="ticket-badge">
+                                        EVENTFLOW PASS
+                                    </span>
+
+                                    <h2 className="ticket-event-title">
+                                        {selectedQrCode.eventTitle}
+                                    </h2>
+
+                                    <p className="ticket-event-subtitle">
+                                        Admit One
+                                    </p>
+                                </div>
+
+                                <div className="ticket-status-dot"></div>
+                            </div>
+
+                            <div className="ticket-divider"></div>
+
+                            <div className="ticket-details-grid">
+                                <div>
+                                    <span>Attendee</span>
+                                    <p>{selectedQrCode.userName}</p>
+                                </div>
+
+                                <div>
+                                    <span>Email</span>
+                                    <p>{selectedQrCode.userEmail}</p>
+                                </div>
+
+                                <div>
+                                    <span>Date</span>
+                                    <p>
+                                        {selectedQrCode.eventDate ||
+                                            "May 24, 2026"}
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <span>Time</span>
+                                    <p>
+                                        {selectedQrCode.eventTime || "4:00 PM"}
+                                    </p>
+                                </div>
+
+                                <div className="ticket-location">
+                                    <span>Location</span>
+                                    <p>
+                                        {selectedQrCode.eventLocation ||
+                                            "Eko Convention Center"}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="ticket-qr-wrap">
+                                {isGeneratingQr && !selectedQrCode.qrDataUrl ? (
+                                    <div className="py-5 text-center">
+                                        <div
+                                            className="spinner-border text-info"
+                                            role="status"
+                                        ></div>
+
+                                        <p className="mt-3 text-light">
+                                            Generating ticket...
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <img
+                                        src={selectedQrCode.qrDataUrl}
+                                        alt="QR Code"
+                                        className="ticket-qr-image"
+                                    />
+                                )}
+                            </div>
+
+                            <div className="ticket-footer">
+                                <div>
+                                    <span>Ticket Code</span>
+
+                                    <h3>{selectedQrCode.ticketCode}</h3>
+                                </div>
+
+                                <button
+                                    type="button"
+                                    className="ticket-download-btn"
+                                    onClick={() =>
+                                        handleDownloadQr(
+                                            selectedQrCode.qrDataUrl,
+                                            selectedQrCode.ticketCode,
+                                        )
+                                    }
+                                    disabled={!selectedQrCode.qrDataUrl}
+                                >
+                                    Download
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )} */}
         </div>
     );
 };

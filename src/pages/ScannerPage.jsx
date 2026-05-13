@@ -17,20 +17,41 @@ const defaultTicket = {
 
 const getDisplayTicket = (booking = {}) => {
     const user = booking?.user || {};
-    const firstName = user?.firstName || booking?.firstName || booking?.userName || "";
+    const firstName =
+        user?.firstName || booking?.firstName || booking?.userName || "";
     const lastName = user?.lastName || booking?.lastName || "";
-    const attendeeName = `${firstName}${lastName ? ` ${lastName}` : ""}`.trim() || booking?.userName || defaultTicket.attendeeName;
+    const attendeeName =
+        `${firstName}${lastName ? ` ${lastName}` : ""}`.trim() ||
+        booking?.userName ||
+        defaultTicket.attendeeName;
 
     return {
         attendeeName,
-        eventName: booking?.event?.title || booking?.eventTitle || booking?.eventName || defaultTicket.eventName,
-        ticketType: booking?.ticketTypeName || booking?.ticketType || defaultTicket.ticketType,
+        eventName:
+            booking?.event?.title ||
+            booking?.eventTitle ||
+            booking?.eventName ||
+            defaultTicket.eventName,
+        ticketType:
+            booking?.ticketTypeName ||
+            booking?.ticketType ||
+            defaultTicket.ticketType,
         ticketCode:
-            booking?.ticketCode || booking?.reference || booking?.paymentReference || defaultTicket.ticketCode,
+            booking?.ticketCode ||
+            booking?.reference ||
+            booking?.paymentReference ||
+            defaultTicket.ticketCode,
         checkedInTime:
-            booking?.checkedInAt || booking?.checkedInTime || booking?.updatedAt || defaultTicket.checkedInTime,
+            booking?.checkedInAt ||
+            booking?.checkedInTime ||
+            booking?.updatedAt ||
+            defaultTicket.checkedInTime,
         avatarUrl:
-            user?.profilePic || user?.avatar || booking?.profilePic || booking?.avatar || defaultTicket.avatarUrl,
+            user?.profilePic ||
+            user?.avatar ||
+            booking?.profilePic ||
+            booking?.avatar ||
+            defaultTicket.avatarUrl,
     };
 };
 
@@ -131,11 +152,15 @@ const ScannerPage = () => {
         }
 
         axios
-            .post(`${API_BASE_URL}/bookings/check-in/${ticketCode}`, {}, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
+            .post(
+                `${API_BASE_URL}/bookings/check-in/${ticketCode}`,
+                {},
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
                 },
-            })
+            )
             .then(() => {
                 setTicketState("success");
                 setIsSuccessFlash(true);
@@ -201,18 +226,25 @@ const ScannerPage = () => {
                     setTicketState("valid");
                 }
 
-                return data; // 👈 IMPORTANT
+                return data; 
             })
             .catch((err) => {
                 console.error("Ticket verification failed:", err);
 
                 const status = err?.response?.status;
+
+                if (status === 403) {
+                    setTicketState("unauthorized");
+                    return null;
+                }
+
                 if (status === 401 || status === 403) {
                     setTicketState("idle");
                     return null;
                 }
 
                 setTicketState("invalid");
+
                 return null;
             });
     };
@@ -254,6 +286,15 @@ const ScannerPage = () => {
                             booking.
                         </p>
                     </div>
+                </div>
+            );
+        }
+
+        if (ticketState === "unauthorized") {
+            return (
+                <div className="scanner-result-card scanner-result-card--error">
+                    <h2>Unauthorized Scanner</h2>
+                    <p>This ticket belongs to another event.</p>
                 </div>
             );
         }

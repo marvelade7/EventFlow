@@ -403,11 +403,6 @@
     color: #1f1f1f;
 }
 
-.scanner-detail-code {
-    /* letter-spacing: 0.08em; */
-    /* color: rgb(27, 181, 204); */
-}
-
 .scanner-result-meta {
     display: flex;
     justify-content: flex-start;
