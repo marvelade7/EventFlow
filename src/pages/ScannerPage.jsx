@@ -194,7 +194,7 @@ const ScannerPage = () => {
     const postTicketCode = (ticketCode) => {
         setTicketState("verifying");
 
-        const normalizedCode = (ticketCode || "").toString().trim();
+        const normalizedCode = (ticketCode || "").toString().trim().toUpperCase();
         console.log("Scanning ticket code:", { raw: ticketCode, normalized: normalizedCode });
 
         const token = localStorage.getItem("token");
@@ -220,7 +220,16 @@ const ScannerPage = () => {
             .then((res) => {
                 const data = res?.data;
 
+                console.log("Verification response received:", {
+                    status: res?.status,
+                    hasBooking: !!data?.booking,
+                    bookingStatus: data?.booking?.status,
+                    ticketCode: data?.booking?.ticketCode,
+                    paymentStatus: data?.booking?.paymentStatus
+                });
+
                 if (!data?.booking) {
+                    console.log("Response missing booking field");
                     setTicketState("invalid");
                     setErrorTimer();
                     return null;
@@ -231,10 +240,14 @@ const ScannerPage = () => {
 
                 const status = booking.status || booking.state;
 
+                console.log("Setting ticket state. Status:", status, "CheckedIn:", booking.checkedIn);
+
                 if (status === "checked-in" || booking.checkedIn) {
+                    console.log("Setting state to: already_checked_in");
                     setTicketState("already_checked_in");
                     setErrorTimer();
                 } else {
+                    console.log("Setting state to: valid");
                     setTicketState("valid");
                 }
 
