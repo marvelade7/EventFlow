@@ -185,7 +185,7 @@ const ScannerPage = () => {
                     }));
                 }
 
-                setTicketState("already_checked_in");
+                setTicketState("success");
                 setIsSuccessFlash(true);
 
                 if (successTimerRef.current)
