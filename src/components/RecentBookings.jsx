@@ -64,12 +64,13 @@ const TicketModal = ({ ticket, onClose }) => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                padding: "16px",
+                padding: "clamp(6px, 2vw, 16px)",
+                overflowY: "auto",
             }}
         >
             <div
                 onClick={(e) => e.stopPropagation()}
-                style={{ width: "100%", maxWidth: "890px" }}
+                style={{ width: "100%", maxWidth: "min(890px, 98vw)" }}
             >
                 <div className="bg-white rounded-3 py-4 px-4">
                     {/* ── Ticket Card ── */}
@@ -84,7 +85,12 @@ const TicketModal = ({ ticket, onClose }) => {
                         }}
                     >
                         {/* Top section */}
-                        <div style={{ padding: "20px 36px 0" }}>
+                        <div
+                            style={{
+                                padding:
+                                    "clamp(10px, 2.2vw, 20px) clamp(10px, 3.8vw, 36px) 0",
+                            }}
+                        >
                             {/* Header row */}
                             <div
                                 style={{
@@ -97,7 +103,7 @@ const TicketModal = ({ ticket, onClose }) => {
                                 <p
                                     style={{
                                         margin: 0,
-                                        fontSize: "16px",
+                                        fontSize: "clamp(10px, 1.7vw, 16px)",
                                         color: "#666",
                                     }}
                                 >
@@ -125,12 +131,19 @@ const TicketModal = ({ ticket, onClose }) => {
                         <div style={{ display: "flex" }}>
                             {/* Left info */}
 
-                            <div style={{ flex: 1, padding: "20px 36px" }}>
+                            <div
+                                style={{
+                                    flex: 1,
+                                    minWidth: 0,
+                                    padding:
+                                        "clamp(10px, 2.2vw, 20px) clamp(10px, 3.8vw, 36px)",
+                                }}
+                            >
                                 {/* Organiser */}
                                 <p
                                     style={{
                                         margin: "0 0 4px",
-                                        fontSize: "15pxm",
+                                        fontSize: "clamp(10px, 1.5vw, 15px)",
                                         color: "#888",
                                     }}
                                 >
@@ -143,7 +156,7 @@ const TicketModal = ({ ticket, onClose }) => {
                                 <h2
                                     style={{
                                         margin: "0 0 10px",
-                                        fontSize: "24px",
+                                        fontSize: "clamp(14px, 2.4vw, 24px)",
                                         fontWeight: 700,
                                         color: "#202124",
                                         lineHeight: 1.3,
@@ -156,7 +169,7 @@ const TicketModal = ({ ticket, onClose }) => {
                                 <p
                                     style={{
                                         margin: "0 0 3px",
-                                        fontSize: "14px",
+                                        fontSize: "clamp(10px, 1.4vw, 14px)",
                                         // width: "70%",
                                         color: "#555",
                                         lineHeight: 1.5,
@@ -169,7 +182,7 @@ const TicketModal = ({ ticket, onClose }) => {
                                 <p
                                     style={{
                                         margin: 0,
-                                        fontSize: "14px",
+                                        fontSize: "clamp(10px, 1.4vw, 14px)",
                                         fontWeight: 600,
                                         color: "#202124",
                                     }}
@@ -183,8 +196,8 @@ const TicketModal = ({ ticket, onClose }) => {
                                     style={{
                                         display: "grid",
                                         gridTemplateColumns: "1fr 1fr",
-                                        gap: "16px 12px",
-                                        marginTop: "20px",
+                                        gap: "clamp(8px, 1.8vw, 16px) clamp(8px, 1.4vw, 12px)",
+                                        marginTop: "clamp(12px, 2vw, 20px)",
                                     }}
                                 >
                                     <InfoField
@@ -225,8 +238,8 @@ const TicketModal = ({ ticket, onClose }) => {
                                     flexDirection: "column",
                                     alignItems: "center",
                                     justifyContent: "center",
-                                    padding: "0px 16px",
-                                    gap: "8px",
+                                    padding: "0px clamp(8px, 1.8vw, 16px)",
+                                    gap: "clamp(4px, 1vw, 8px)",
                                     flexShrink: 0,
                                 }}
                             >
@@ -235,8 +248,8 @@ const TicketModal = ({ ticket, onClose }) => {
                                         src={ticket.qrDataUrl}
                                         alt="QR Code"
                                         style={{
-                                            width: "300px",
-                                            height: "300px",
+                                            width: "clamp(85px, 25vw, 300px)",
+                                            height: "clamp(85px, 25vw, 300px)",
                                             borderRadius: "4px",
                                             display: "block",
                                         }}
@@ -261,7 +274,7 @@ const TicketModal = ({ ticket, onClose }) => {
                                 <p
                                     style={{
                                         margin: 0,
-                                        fontSize: "12px",
+                                        fontSize: "clamp(9px, 1.2vw, 12px)",
                                         color: "#999",
                                         textAlign: "center",
                                         letterSpacing: "0.3px",
@@ -277,13 +290,18 @@ const TicketModal = ({ ticket, onClose }) => {
                             style={{
                                 background: "#f8f9fa",
                                 borderTop: "0.5px solid #e0e0e0",
-                                padding: "9px 24px",
+                                padding: "clamp(7px, 1.2vw, 9px) clamp(10px, 2.4vw, 24px)",
                                 display: "flex",
                                 justifyContent: "center",
                                 alignItems: "center",
                             }}
                         >
-                            <span style={{ fontSize: "13px", color: "#bbb" }}>
+                            <span
+                                style={{
+                                    fontSize: "clamp(9px, 1.3vw, 13px)",
+                                    color: "#bbb",
+                                }}
+                            >
                                 © {new Date().getFullYear()} EventFlow · All
                                 Rights Reserved.
                             </span>
