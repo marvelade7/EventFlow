@@ -95,13 +95,14 @@ const ScannerPage = () => {
 
                     console.log("QR detected:", decodedText);
                     scanner.pause();
+                    postTicketCode(decodedText);
 
-                    postTicketCode(decodedText).finally(() => {
-                        setTimeout(() => {
-                            isProcessingRef.current = false;
-                            scanner.resume();
-                        }, 2000);
-                    });
+                    // postTicketCode(decodedText).finally(() => {
+                    //     setTimeout(() => {
+                    //         isProcessingRef.current = false;
+                    //         scanner.resume();
+                    //     }, 2000);
+                    // });
                 },
                 (err) => {
                     console.log("Scan error:", err);
@@ -199,6 +200,13 @@ const ScannerPage = () => {
                 resetTimerRef.current = window.setTimeout(() => {
                     setTicketState("idle");
                     setIsSuccessFlash(false);
+                    setScannedTicket(null);
+
+                    // Allow the scanner to read codes again safely after auto-close
+                    if (scannerRef.current) {
+                        isProcessingRef.current = false;
+                        scannerRef.current.resume();
+                    }
                 }, 3200);
             })
             .catch((err) => {
@@ -213,7 +221,13 @@ const ScannerPage = () => {
     const closeResultModal = () => {
         setTicketState("idle");
         setIsSuccessFlash(false);
-        setScannedTicket(null)
+        setScannedTicket(null);
+
+        // Allow the scanner to read codes again safely
+        if (scannerRef.current) {
+            isProcessingRef.current = false;
+            scannerRef.current.resume();
+        }
     };
 
     const postTicketCode = (ticketCode) => {
