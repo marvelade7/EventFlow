@@ -213,10 +213,12 @@ const ScannerPage = () => {
     const closeResultModal = () => {
         setTicketState("idle");
         setIsSuccessFlash(false);
+        setScannedTicket(null)
     };
 
     const postTicketCode = (ticketCode) => {
         setTicketState("verifying");
+        setScannedTicket(null);
 
         const normalizedCode = (ticketCode || "")
             .toString()
