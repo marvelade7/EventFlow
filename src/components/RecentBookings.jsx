@@ -1,6 +1,7 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import QRCode from "qrcode";
 import { fetchBookings } from "../utils/eventsApi";
+import Logo from "./Logo";
 
 const formatMoney = (amount) =>
     new Intl.NumberFormat("en-US", {
@@ -13,7 +14,6 @@ const formatBookedDateTime = (value) => {
     if (!value) return "N/A";
     const parsed = new Date(value);
     if (Number.isNaN(parsed.getTime())) return "N/A";
-
     return parsed.toLocaleString("en-US", {
         month: "short",
         day: "numeric",
@@ -23,87 +23,381 @@ const formatBookedDateTime = (value) => {
     });
 };
 
-const formatTicketCode = (ticketCode) => {
-    return (ticketCode || "").toString().trim();
+const formatTicketCode = (ticketCode) => (ticketCode || "").toString().trim();
+
+// ──Ticket Modal ─────────────────────────────────────────────────────────
+const TicketModal = ({ ticket, onClose }) => {
+    const ticketRef = useRef(null);
+    const [isDownloading, setIsDownloading] = useState(false);
+
+    const handleDownload = async () => {
+        if (!ticketRef.current || isDownloading) return;
+        setIsDownloading(true);
+        try {
+            const html2canvas = (await import("html2canvas")).default;
+            const canvas = await html2canvas(ticketRef.current, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: "#ffffff",
+            });
+            const link = document.createElement("a");
+            link.href = canvas.toDataURL("image/png");
+            link.download = `ticket-${ticket.ticketCode}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch (err) {
+            console.error("Download failed", err);
+        } finally {
+            setIsDownloading(false);
+        }
+    };
+
+    return (
+        <div
+            onClick={onClose}
+            style={{
+                position: "fixed",
+                inset: 0,
+                backgroundColor: "rgba(0,0,0,0.55)",
+                zIndex: 9999,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "16px",
+            }}
+        >
+            <div
+                onClick={(e) => e.stopPropagation()}
+                style={{ width: "100%", maxWidth: "890px" }}
+            >
+                <div className="bg-white rounded-3 py-4 px-4">
+                    {/* ── Ticket Card ── */}
+                    <div
+                        ref={ticketRef}
+                        style={{
+                            background: "rgb(255,255,255)",
+                            borderRadius: "12px",
+                            border: "0.5px solid #e0e0e0",
+                            overflow: "hidden",
+                            fontFamily: "'Roboto', 'Segoe UI', sans-serif",
+                        }}
+                    >
+                        {/* Top section */}
+                        <div style={{ padding: "20px 36px 0" }}>
+                            {/* Header row */}
+                            <div
+                                style={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                    marginBottom: "14px",
+                                }}
+                            >
+                                <p
+                                    style={{
+                                        margin: 0,
+                                        fontSize: "16px",
+                                        color: "#666",
+                                    }}
+                                >
+                                    This is your ticket, {ticket.userName}
+                                </p>
+                                {/* logo */}
+                                <Logo size={30} fontSize="18px" />
+                            </div>
+                        </div>
+
+                        {/* Dashed divider with notches */}
+                        <div style={{ position: "relative", height: "1px" }}>
+                            <div
+                                style={{
+                                    borderTop: "1.5px dashed #d8d8d8",
+                                    position: "absolute",
+                                    left: 14,
+                                    right: 14,
+                                    top: 0,
+                                }}
+                            />
+                        </div>
+
+                        {/* Body: info + QR */}
+                        <div style={{ display: "flex" }}>
+                            {/* Left info */}
+
+                            <div style={{ flex: 1, padding: "20px 36px" }}>
+                                {/* Organiser */}
+                                <p
+                                    style={{
+                                        margin: "0 0 4px",
+                                        fontSize: "15pxm",
+                                        color: "#888",
+                                    }}
+                                >
+                                    {" "}
+                                    <span className="fw-semibold">Host: </span>
+                                    {ticket.organizerName || "EventFlow"}
+                                </p>
+
+                                {/* Event title */}
+                                <h2
+                                    style={{
+                                        margin: "0 0 10px",
+                                        fontSize: "24px",
+                                        fontWeight: 700,
+                                        color: "#202124",
+                                        lineHeight: 1.3,
+                                    }}
+                                >
+                                    {ticket.eventTitle}
+                                </h2>
+
+                                {/* Venue */}
+                                <p
+                                    style={{
+                                        margin: "0 0 3px",
+                                        fontSize: "14px",
+                                        // width: "70%",
+                                        color: "#555",
+                                        lineHeight: 1.5,
+                                    }}
+                                >
+                                    {ticket.eventLocation}
+                                </p>
+
+                                {/* Date + Time */}
+                                <p
+                                    style={{
+                                        margin: 0,
+                                        fontSize: "14px",
+                                        fontWeight: 600,
+                                        color: "#202124",
+                                    }}
+                                >
+                                    {ticket.eventDate}
+                                    {ticket.eventTime
+                                        ? `, ${ticket.eventTime}`
+                                        : ""}
+                                </p>
+                                <div
+                                    style={{
+                                        display: "grid",
+                                        gridTemplateColumns: "1fr 1fr",
+                                        gap: "16px 12px",
+                                        marginTop: "20px",
+                                    }}
+                                >
+                                    <InfoField
+                                        label="Attendee"
+                                        value={ticket.userName}
+                                    />
+                                    <InfoField
+                                        label="Ticket Type"
+                                        value={
+                                            ticket.ticketTypeName ||
+                                            "General Admission"
+                                        }
+                                    />
+                                    <InfoField
+                                        label="Ticket Code"
+                                        value={ticket.ticketCode}
+                                        mono
+                                    />
+                                    <InfoField
+                                        label="Status"
+                                        value={ticket.status}
+                                        accent={
+                                            ticket.status === "Confirmed"
+                                                ? "#34A853"
+                                                : "#F9A825"
+                                        }
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Right QR */}
+                            <div
+                                style={{
+                                    width: "auto",
+                                    borderLeft: "1.5px dashed #d8d8d8",
+                                    background: "#fafafa",
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    padding: "0px 16px",
+                                    gap: "8px",
+                                    flexShrink: 0,
+                                }}
+                            >
+                                {ticket.qrDataUrl ? (
+                                    <img
+                                        src={ticket.qrDataUrl}
+                                        alt="QR Code"
+                                        style={{
+                                            width: "300px",
+                                            height: "300px",
+                                            borderRadius: "4px",
+                                            display: "block",
+                                        }}
+                                    />
+                                ) : (
+                                    <div
+                                        style={{
+                                            width: 110,
+                                            height: 110,
+                                            background: "#eee",
+                                            borderRadius: 4,
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            fontSize: 11,
+                                            color: "#aaa",
+                                        }}
+                                    >
+                                        Loading…
+                                    </div>
+                                )}
+                                <p
+                                    style={{
+                                        margin: 0,
+                                        fontSize: "12px",
+                                        color: "#999",
+                                        textAlign: "center",
+                                        letterSpacing: "0.3px",
+                                    }}
+                                >
+                                    Scan to check in
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Footer */}
+                        <div
+                            style={{
+                                background: "#f8f9fa",
+                                borderTop: "0.5px solid #e0e0e0",
+                                padding: "9px 24px",
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                            }}
+                        >
+                            <span style={{ fontSize: "13px", color: "#bbb" }}>
+                                © {new Date().getFullYear()} EventFlow · All
+                                Rights Reserved.
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* ── Action buttons ── */}
+                    <div
+                        style={{
+                            display: "flex",
+                            gap: "10px",
+                            marginTop: "24px",
+                        }}
+                    >
+                        <button
+                            type="button"
+                            onClick={handleDownload}
+                            disabled={isDownloading || !ticket.qrDataUrl}
+                            className="btn btn-info flex-grow-1 text-white fw-semibold"
+                        >
+                            {isDownloading ? "Downloading…" : "Download Ticket"}
+                        </button>
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="btn btn-secondary"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
 };
 
+const InfoField = ({ label, value, mono, accent }) => (
+    <div>
+        <p
+            style={{
+                margin: "0 0 2px",
+                fontSize: "12px",
+                fontWeight: 700,
+                color: "#888",
+                textTransform: "uppercase",
+                letterSpacing: "0.5px",
+            }}
+        >
+            {label}
+        </p>
+        <p
+            style={{
+                margin: 0,
+                fontSize: "14px",
+                fontWeight: 500,
+                color: accent || "#202124",
+                fontFamily: mono ? "monospace" : "inherit",
+                wordBreak: "break-all",
+            }}
+        >
+            {value || "—"}
+        </p>
+    </div>
+);
+
+// ── Main Component ────────────────────────────────────────────────────────────
 const RecentBookings = ({ scope = "user" }) => {
     const [bookings, setBookings] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState("");
-    const [selectedQrCode, setSelectedQrCode] = useState(null);
+    const [selectedTicket, setSelectedTicket] = useState(null);
     const [isGeneratingQr, setIsGeneratingQr] = useState(false);
-    const [qrGenerationError, setQrGenerationError] = useState("");
 
-    const handleDownloadQr = (qrDataUrl, ticketCode) => {
-        if (!qrDataUrl) return;
-        const link = document.createElement("a");
-        link.href = qrDataUrl;
-        link.download = `ticket-${ticketCode || "qr"}.png`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    };
-
-    const openQrCode = (booking) => {
-        const ticketCode = (
+    const openTicket = (booking) => {
+        const ticketCode = formatTicketCode(
             booking?.ticketCode ||
-            booking?.reference ||
-            booking?.paymentReference ||
-            booking?._id ||
-            ""
-        )
-            .toString()
-            .trim();
+                booking?.reference ||
+                booking?.paymentReference ||
+                booking?._id ||
+                "",
+        );
 
-        if (!ticketCode) {
-            return;
-        }
+        if (!ticketCode) return;
 
-        const checkInUrl = formatTicketCode(ticketCode);
-        setQrGenerationError("");
-        setIsGeneratingQr(Boolean(checkInUrl));
-        setSelectedQrCode({
+        setSelectedTicket({
             qrDataUrl: "",
-            checkInUrl,
             ticketCode,
             userName: booking.userName,
             userEmail: booking.userEmail,
             eventTitle: booking.eventTitle,
-            checkedIn: booking.checkedIn,
+            eventDate: booking.eventDate,
+            eventTime: booking.eventTime,
+            eventLocation: booking.eventLocation,
+            organizerName: booking.organizerName,
+            ticketTypeName: booking.ticketTypeName,
+            status: booking.status,
         });
 
-        if (!checkInUrl) {
-            setIsGeneratingQr(false);
-            return;
-        }
+        setIsGeneratingQr(true);
 
-        QRCode.toDataURL(checkInUrl, {
+        QRCode.toDataURL(ticketCode, {
             errorCorrectionLevel: "M",
             margin: 2,
             width: 320,
         })
             .then((qrDataUrl) => {
-                setSelectedQrCode((current) => {
-                    if (!current || current.ticketCode !== ticketCode) {
-                        return current;
-                    }
-
-                    return {
-                        ...current,
-                        qrDataUrl,
-                    };
-                });
-            })
-            .catch((error) => {
-                console.error("Unable to generate QR code", error);
-                setQrGenerationError(
-                    "Unable to generate the ticket QR code right now.",
+                setSelectedTicket((prev) =>
+                    prev?.ticketCode === ticketCode
+                        ? { ...prev, qrDataUrl }
+                        : prev,
                 );
             })
-            .finally(() => {
-                setIsGeneratingQr(false);
-            });
+            .catch((err) => console.error("QR generation failed", err))
+            .finally(() => setIsGeneratingQr(false));
     };
 
     useEffect(() => {
@@ -152,9 +446,8 @@ const RecentBookings = ({ scope = "user" }) => {
                 ? event.ticketTypes
                 : [];
             const unitPrice = Number(
-                ticketTypes.find(
-                    (ticket) => ticket?.name === booking?.ticketTypeName,
-                )?.ticketPrice || 0,
+                ticketTypes.find((t) => t?.name === booking?.ticketTypeName)
+                    ?.ticketPrice || 0,
             );
             const groupKey =
                 booking?.paymentReference ||
@@ -168,12 +461,19 @@ const RecentBookings = ({ scope = "user" }) => {
                 return;
             }
 
-            // Extract user details
             const userName =
                 booking?.user?.firstName || booking?.user?.name || "User";
             const userLastName = booking?.user?.lastName || "";
             const fullUserName = `${userName}${userLastName ? ` ${userLastName}` : ""}`;
-            const userEmail = booking?.user?.email || "N/A";
+
+            // Organiser name
+            const createdBy = event?.createdBy || {};
+            const organizerFirst =
+                createdBy?.firstName || createdBy?.name || "";
+            const organizerLast = createdBy?.lastName || "";
+            const organizerName =
+                `${organizerFirst}${organizerLast ? ` ${organizerLast}` : ""}`.trim() ||
+                "Google Developer Groups";
 
             groups.set(groupKey, {
                 id: groupKey,
@@ -195,12 +495,12 @@ const RecentBookings = ({ scope = "user" }) => {
                 ticketCode: booking?.ticketCode || "",
                 reference:
                     booking?.reference || booking?.paymentReference || "",
-                qrCode: booking?.qrCode || null,
                 createdAt: formatBookedDateTime(booking?.createdAt),
                 userName: fullUserName,
-                userEmail: userEmail,
+                userEmail: booking?.user?.email || "N/A",
                 checkedIn: booking?.status === "checked-in" ? "Yes" : "No",
-
+                ticketTypeName: booking?.ticketTypeName || "General Admission",
+                organizerName,
                 eventDate: event?.startDateTime
                     ? new Date(event.startDateTime).toLocaleDateString(
                           "en-US",
@@ -211,7 +511,6 @@ const RecentBookings = ({ scope = "user" }) => {
                           },
                       )
                     : "Date TBD",
-
                 eventTime: event?.startDateTime
                     ? new Date(event.startDateTime).toLocaleTimeString(
                           "en-US",
@@ -220,10 +519,17 @@ const RecentBookings = ({ scope = "user" }) => {
                               minute: "2-digit",
                           },
                       )
-                    : "Time TBD",
-
-                eventLocation:
-                    event?.location || event?.venue || "Venue not specified",
+                    : "",
+                // eventLocation: event?.location || event?.venue || "Venue not specified",
+                eventLocation: (() => {
+                    const loc = event?.location;
+                    if (!loc) return event?.venue || "Venue not specified";
+                    if (typeof loc === "string") return loc;
+                    const { venue, address, city, state, country } = loc;
+                    return [venue, address, city, state, country]
+                        .filter(Boolean)
+                        .join(", ");
+                })(),
             });
         });
 
@@ -232,10 +538,9 @@ const RecentBookings = ({ scope = "user" }) => {
 
     const handleCopyTicketCode = (ticketCode) => {
         if (!ticketCode || !navigator.clipboard) return;
-
-        navigator.clipboard.writeText(ticketCode).catch((error) => {
-            console.error("Unable to copy ticket code", error);
-        });
+        navigator.clipboard
+            .writeText(ticketCode)
+            .catch((err) => console.error("Copy failed", err));
     };
 
     return (
@@ -246,7 +551,7 @@ const RecentBookings = ({ scope = "user" }) => {
                         className="spinner-border text-info"
                         role="status"
                         aria-hidden="true"
-                    ></div>
+                    />
                     <p className="mt-3 mb-0 text-secondary fw-semibold">
                         Loading{" "}
                         {scope === "organizer"
@@ -282,7 +587,7 @@ const RecentBookings = ({ scope = "user" }) => {
                             <th>AMOUNT</th>
                             <th>STATUS</th>
                             <th>TICKET CODE</th>
-                            <th>QR CODE</th>
+                            <th>TICKET</th>
                             <th>DATE BOOKED</th>
                         </tr>
                     </thead>
@@ -324,17 +629,11 @@ const RecentBookings = ({ scope = "user" }) => {
                                 <td>
                                     <button
                                         type="button"
-                                        onClick={() => openQrCode(booking)}
+                                        onClick={() => openTicket(booking)}
                                         className="btn btn-sm btn-outline-info"
-                                        title="View QR Code"
-                                        disabled={
-                                            !booking.ticketCode &&
-                                            !booking.reference &&
-                                            !booking.paymentReference &&
-                                            !booking._id
-                                        }
+                                        disabled={!booking.ticketCode}
                                     >
-                                        View QR Code
+                                        View Ticket
                                     </button>
                                 </td>
                                 <td>{booking.createdAt}</td>
@@ -343,113 +642,13 @@ const RecentBookings = ({ scope = "user" }) => {
                     </tbody>
                 </table>
             )}
-            {selectedQrCode && (
-                <div
-                    className="modal d-block"
-                    style={{
-                        backgroundColor: "rgba(0, 0, 0, 0.5)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        position: "fixed",
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        zIndex: 9999,
-                    }}
-                    onClick={() => setSelectedQrCode(null)}
-                >
-                    <div
-                        className="modal-content bg-white rounded-4 p-4"
-                        style={{
-                            maxWidth: "400px",
-                            width: "90%",
-                            textAlign: "center",
-                            margin: "50px auto",
-                        }}
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <div className="d-flex justify-content-between align-items-center mb-3">
-                            <h5 className="m-0">Ticket QR Code</h5>
-                            <button
-                                type="button"
-                                className="btn btn-close"
-                                onClick={() => setSelectedQrCode(null)}
-                                aria-label="Close"
-                            ></button>
-                        </div>
-                        <div className="d-flex justify-content-center align-items-center mb-3">
-                            {isGeneratingQr && !selectedQrCode.qrDataUrl ? (
-                                <div className="py-5 text-center w-100">
-                                    <div
-                                        className="spinner-border text-info"
-                                        role="status"
-                                        aria-hidden="true"
-                                    ></div>
-                                    <p className="mt-3 mb-0 text-secondary fw-semibold">
-                                        Generating QR code...
-                                    </p>
-                                </div>
-                            ) : (
-                                <img
-                                    src={selectedQrCode.qrDataUrl}
-                                    alt="QR Code"
-                                    style={{
-                                        width: "100%",
-                                        maxWidth: "300px",
-                                        borderRadius: "8px",
-                                        border: "1px solid #ddd",
-                                        marginBottom: "16px",
-                                    }}
-                                />
-                            )}
-                        </div>
-                        {qrGenerationError && (
-                            <div
-                                className="alert alert-warning text-start"
-                                role="alert"
-                            >
-                                {qrGenerationError}
-                            </div>
-                        )}
-                        <p className="mb-2">
-                            <strong>Ticket Code:</strong>{" "}
-                            {selectedQrCode.ticketCode}
-                        </p>
-                        <p className="text-secondary mb-3 fs-6">
-                            Scan this code to verify your ticket at the event
-                            entrance.
-                        </p>
-                        <div className="d-flex gap-2">
-                            <button
-                                type="button"
-                                className="btn btn-info flex-grow-1"
-                                onClick={() =>
-                                    handleDownloadQr(
-                                        selectedQrCode.qrDataUrl,
-                                        selectedQrCode.ticketCode,
-                                    )
-                                }
-                                disabled={!selectedQrCode.qrDataUrl}
-                            >
-                                Download QR
-                            </button>
-                            <button
-                                type="button"
-                                className="btn btn-secondary"
-                                onClick={() => {
-                                    setSelectedQrCode(null);
-                                    setQrGenerationError("");
-                                }}
-                            >
-                                Close
-                            </button>
-                        </div>
-                    </div>
-                </div>
+
+            {selectedTicket && (
+                <TicketModal
+                    ticket={selectedTicket}
+                    onClose={() => setSelectedTicket(null)}
+                />
             )}
-            
         </div>
     );
 };

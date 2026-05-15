@@ -15,6 +15,7 @@
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
     "formik": "^2.4.9",
+    "html2canvas": "^1.4.1",
     "html5-qrcode": "^2.3.8",
     "qrcode": "^1.5.4",
     "react": "^19.2.4",
