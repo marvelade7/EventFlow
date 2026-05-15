@@ -178,7 +178,8 @@ const ScannerPage = () => {
                         ...updatedBooking,
                         checkedIn: true,
                         checkedInAt:
-                            updatedBooking.checkedInAt || new Date().toISOString(),
+                            updatedBooking.checkedInAt ||
+                            new Date().toISOString(),
                         status: "checked-in",
                     }));
                 }
@@ -217,15 +218,21 @@ const ScannerPage = () => {
     const postTicketCode = (ticketCode) => {
         setTicketState("verifying");
 
-        const normalizedCode = (ticketCode || "").toString().trim().toUpperCase();
-        console.log("Scanning ticket code:", { raw: ticketCode, normalized: normalizedCode });
+        const normalizedCode = (ticketCode || "")
+            .toString()
+            .trim()
+            .toUpperCase();
+        console.log("Scanning ticket code:", {
+            raw: ticketCode,
+            normalized: normalizedCode,
+        });
 
         const token = localStorage.getItem("token");
 
         // Show what's being scanned
         console.log("Sending to API:", {
             url: `${API_BASE_URL}/bookings/verify-qr`,
-            payload: { ticketCode: normalizedCode }
+            payload: { ticketCode: normalizedCode },
         });
 
         return axios
@@ -243,13 +250,13 @@ const ScannerPage = () => {
             .then((res) => {
                 const data = res?.data;
 
-                console.log("Verification response received:", {
-                    status: res?.status,
-                    hasBooking: !!data?.booking,
-                    bookingStatus: data?.booking?.status,
-                    ticketCode: data?.booking?.ticketCode,
-                    paymentStatus: data?.booking?.paymentStatus
-                });
+                // console.log("Verification response received:", {
+                //     status: res?.status,
+                //     hasBooking: !!data?.booking,
+                //     bookingStatus: data?.booking?.status,
+                //     ticketCode: data?.booking?.ticketCode,
+                //     paymentStatus: data?.booking?.paymentStatus,
+                // });
 
                 if (!data?.booking) {
                     console.log("Response missing booking field");
@@ -263,7 +270,12 @@ const ScannerPage = () => {
 
                 const status = booking.status || booking.state;
 
-                console.log("Setting ticket state. Status:", status, "CheckedIn:", booking.checkedIn);
+                console.log(
+                    "Setting ticket state. Status:",
+                    status,
+                    "CheckedIn:",
+                    booking.checkedIn,
+                );
 
                 if (status === "checked-in" || booking.checkedIn) {
                     console.log("Setting state to: already_checked_in");
@@ -274,13 +286,13 @@ const ScannerPage = () => {
                     setTicketState("valid");
                 }
 
-                return data; 
+                return data;
             })
             .catch((err) => {
                 console.error("Ticket verification failed:", {
                     status: err?.response?.status,
                     message: err?.response?.data?.message,
-                    error: err?.message
+                    error: err?.message,
                 });
 
                 const status = err?.response?.status;
@@ -296,7 +308,7 @@ const ScannerPage = () => {
                     return null;
                 }
 
-                setTicketState("invalid");
+                // setTicketState("invalid");
                 setErrorTimer();
 
                 return null;
@@ -305,7 +317,7 @@ const ScannerPage = () => {
 
     const setErrorTimer = () => {
         if (errorTimerRef.current) window.clearTimeout(errorTimerRef.current);
-        
+
         errorTimerRef.current = window.setTimeout(() => {
             setTicketState("idle");
         }, 4000);
@@ -408,9 +420,6 @@ const ScannerPage = () => {
         return (
             <div className="scanner-result-card scanner-result-card--success">
                 <div className="scanner-result-header">
-                    {/* <div className="scanner-result-icon-wrap scanner-result-icon-wrap--success">
-                        <i className="bi bi-shield-check scanner-result-icon" />
-                    </div> */}
                     <div className="scanner-result-stack">
                         <p className="scanner-result-eyebrow">
                             Ticket verified
@@ -469,7 +478,10 @@ const ScannerPage = () => {
                 >
                     {isCheckingIn ? (
                         <span className="scanner-btn-spinner-wrap">
-                            <span className="scanner-btn-spinner" aria-hidden="true" />
+                            <span
+                                className="scanner-btn-spinner"
+                                aria-hidden="true"
+                            />
                             Confirming...
                         </span>
                     ) : (
@@ -498,7 +510,6 @@ const ScannerPage = () => {
                         <p className="scanner-topbar-eyebrow">Ticket scanner</p>
                         <h1 className="scanner-topbar-title">Scan Tickets</h1>
                     </div>
-                    
                 </header>
 
                 <section className="scanner-stage">
