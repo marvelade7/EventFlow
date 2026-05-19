@@ -279,7 +279,7 @@ const ScannerPage = () => {
                 }
 
                 const booking = data.booking;
-                setScannedTicket(booking);
+                setScannedTicket({ ...booking, ticketCount: data.totalTickets || 1 });
 
                 const status = booking.status || booking.state;
 
