@@ -398,6 +398,7 @@ const RecentBookings = ({ scope = "user" }) => {
             organizerName: booking.organizerName,
             ticketTypeName: booking.ticketTypeName,
             status: booking.status,
+            ticketCount: booking.ticketCount,
         });
 
         setIsGeneratingQr(true);

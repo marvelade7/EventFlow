@@ -134,6 +134,15 @@ const getAvailableTickets = (ticket) => {
     return `${Math.max(quantity - sold, 0)} available`;
 };
 
+const isEventSoldOut = (event) => {
+    const tickets = getTicketTypes(event);
+    if (!tickets.length) return false;
+    return tickets.every((t) => {
+        const available = Number(t?.quantity || 0) - Number(t?.sold || 0);
+        return available <= 0;
+    });
+};
+
 const BrowseEventPage = () => {
     const { sidebarOpen, toggleSidebar } = useOutletContext();
     const navigate = useNavigate();
@@ -164,7 +173,12 @@ const BrowseEventPage = () => {
                 setEvents(eventList);
             })
             .catch((err) => {
-                if (err.name === "CanceledError" || err.code === "ERR_CANCELED" || !isActive) return;
+                if (
+                    err.name === "CanceledError" ||
+                    err.code === "ERR_CANCELED" ||
+                    !isActive
+                )
+                    return;
                 console.error(
                     "Error fetching events:",
                     err.response?.data || err.message,
@@ -322,6 +336,7 @@ const BrowseEventPage = () => {
                             {filteredEvents.map((event, index) => {
                                 const category = getCategory(event);
                                 const eventId = getEventId(event, index);
+                                const soldOut = isEventSoldOut(event);
 
                                 return (
                                     <BrowseEvent
@@ -341,7 +356,6 @@ const BrowseEventPage = () => {
                                         creatorAvatar={
                                             event?.createdBy?.profilePic
                                         }
-                                        button="Book Now"
                                         anim="fade-up"
                                         delay={index * 70}
                                         btnStyle={{
@@ -351,7 +365,10 @@ const BrowseEventPage = () => {
                                         isLiked={Boolean(likedEvents[eventId])}
                                         likeCount={getLikeCount(event, eventId)}
                                         onLike={() => handleLikeEvent(eventId)}
+                                        isSoldOut={soldOut}
+                                        button="Book Now"
                                         onAction={() => {
+                                            if (soldOut) return;
                                             localStorage.setItem(
                                                 "checkoutEvent",
                                                 JSON.stringify(event),
@@ -597,6 +614,12 @@ const BrowseEventPage = () => {
                                               <button
                                                   type="button"
                                                   onClick={() => {
+                                                      if (
+                                                          isEventSoldOut(
+                                                              selectedEvent,
+                                                          )
+                                                      )
+                                                          return;
                                                       localStorage.setItem(
                                                           "checkoutEvent",
                                                           JSON.stringify(
@@ -614,11 +637,20 @@ const BrowseEventPage = () => {
                                                   }}
                                                   style={{
                                                       backgroundColor:
-                                                          "rgb(27,181,204)",
+                                                          isEventSoldOut(
+                                                              selectedEvent,
+                                                          )
+                                                              ? "#adb5bd"
+                                                              : "rgb(27,181,204)",
                                                   }}
+                                                  disabled={isEventSoldOut(
+                                                      selectedEvent,
+                                                  )}
                                                   className="btn rounded-3 text-white py-2 fw-semibold px-3"
                                               >
-                                                  Book Now
+                                                  {isEventSoldOut(selectedEvent)
+                                                      ? "Sold Out"
+                                                      : "Book Now"}
                                               </button>
                                           </div>
                                       </div>

@@ -106,7 +106,10 @@ const extractUserIdentifier = (value, visited = new Set()) => {
             return directValue;
         }
         if (directValue && typeof directValue === "object") {
-            const nestedIdentifier = extractUserIdentifier(directValue, visited);
+            const nestedIdentifier = extractUserIdentifier(
+                directValue,
+                visited,
+            );
             if (nestedIdentifier) return nestedIdentifier;
         }
     }
@@ -129,7 +132,8 @@ const getUserIdFromToken = (token) => {
         if (parts.length < 2) return "";
 
         const normalized = parts[1].replace(/-/g, "+").replace(/_/g, "/");
-        const padded = normalized + "=".repeat((4 - (normalized.length % 4)) % 4);
+        const padded =
+            normalized + "=".repeat((4 - (normalized.length % 4)) % 4);
         const payload = JSON.parse(atob(padded));
 
         return (
@@ -145,6 +149,13 @@ const getUserIdFromToken = (token) => {
     } catch (error) {
         return "";
     }
+};
+
+const getTicketAvailable = (ticket) => {
+    const quantity = Number(ticket?.quantity);
+    const sold = Number(ticket?.sold || 0);
+    if (!Number.isFinite(quantity)) return Infinity;
+    return Math.max(quantity - sold, 0);
 };
 
 const CheckoutPage = () => {
@@ -203,7 +214,8 @@ const CheckoutPage = () => {
             .then((res) => {
                 const userData = res.data?.user || res.data?.data?.user || {};
                 const isVerified = Boolean(userData?.isVerified);
-                const resolvedUserId = userData?._id || userData?.id || userData?.userId || "";
+                const resolvedUserId =
+                    userData?._id || userData?.id || userData?.userId || "";
 
                 setBookingUserId(resolvedUserId);
 
@@ -220,7 +232,9 @@ const CheckoutPage = () => {
             .catch((err) => {
                 setVerificationStatus("blocked");
                 if (err.response?.status === 401) {
-                    setVerificationMessage("Your session expired. Sign in again to continue.");
+                    setVerificationMessage(
+                        "Your session expired. Sign in again to continue.",
+                    );
                     return;
                 }
                 setVerificationMessage(
@@ -240,14 +254,23 @@ const CheckoutPage = () => {
     const serviceFee = freeEvent ? 0 : subtotal ? subtotal * 0.1 : 0;
     const total = subtotal + serviceFee;
     const currentStep =
-        paymentStatus === "success" ? 3 : paymentStatus === "processing" ? 2 : 1;
+        paymentStatus === "success"
+            ? 3
+            : paymentStatus === "processing"
+              ? 2
+              : 1;
     const bookingBlocked = verificationStatus !== "verified";
 
     const handleQuantityChange = (index, delta) => {
         setQuantities((prev) => {
             const next = { ...prev };
             const currentValue = Number(next[index] || 0);
-            const updatedValue = Math.max(currentValue + delta, 0);
+            const ticket = ticketTypes[index];
+            const maxAvailable = getTicketAvailable(ticket);
+            const updatedValue = Math.min(
+                Math.max(currentValue + delta, 0),
+                maxAvailable,
+            );
             next[index] = updatedValue;
             return next;
         });
@@ -300,38 +323,41 @@ const CheckoutPage = () => {
             );
         }
 
-        return axios
-            .get(apiUrl("/users/dashboard"), authConfig)
-            .then((res) => {
-                const responseData = res.data || {};
-                const userData =
-                    responseData?.user ||
-                    responseData?.data?.user ||
-                    responseData?.data ||
-                    responseData?.userData ||
-                    {};
-                const token = localStorage.getItem("token");
-                const tokenUserId = getUserIdFromToken(token);
-                const resolvedUserId =
-                    extractUserIdentifier(userData) ||
-                    extractUserIdentifier(responseData) ||
-                    tokenUserId ||
-                    "";
+        return axios.get(apiUrl("/users/dashboard"), authConfig).then((res) => {
+            const responseData = res.data || {};
+            const userData =
+                responseData?.user ||
+                responseData?.data?.user ||
+                responseData?.data ||
+                responseData?.userData ||
+                {};
+            const token = localStorage.getItem("token");
+            const tokenUserId = getUserIdFromToken(token);
+            const resolvedUserId =
+                extractUserIdentifier(userData) ||
+                extractUserIdentifier(responseData) ||
+                tokenUserId ||
+                "";
 
-                if (tokenUserId) {
-                    console.log("Resolved booking user id from token payload.");
-                }
+            if (tokenUserId) {
+                console.log("Resolved booking user id from token payload.");
+            }
 
-                if (resolvedUserId) {
-                    setBookingUserId(resolvedUserId);
-                    return resolvedUserId;
-                }
+            if (resolvedUserId) {
+                setBookingUserId(resolvedUserId);
+                return resolvedUserId;
+            }
 
-                console.error("Could not resolve booking user id from dashboard response", responseData);
-                return Promise.reject(
-                    new Error("Could not read your user id from the dashboard response. Please sign in again."),
-                );
-            });
+            console.error(
+                "Could not resolve booking user id from dashboard response",
+                responseData,
+            );
+            return Promise.reject(
+                new Error(
+                    "Could not read your user id from the dashboard response. Please sign in again.",
+                ),
+            );
+        });
     };
 
     let selectedItems = ticketTypes
@@ -346,7 +372,12 @@ const CheckoutPage = () => {
     if (selectedItems.length === 0 && freeEvent && ticketTypes.length === 0) {
         selectedItems = [
             {
-                ticketTypeName: (selectedEvent?.ticketTypes && selectedEvent.ticketTypes[0] && (selectedEvent.ticketTypes[0].name || selectedEvent.ticketTypes[0].title)) || 'Free',
+                ticketTypeName:
+                    (selectedEvent?.ticketTypes &&
+                        selectedEvent.ticketTypes[0] &&
+                        (selectedEvent.ticketTypes[0].name ||
+                            selectedEvent.ticketTypes[0].title)) ||
+                    "Free",
                 quantity: 1,
             },
         ];
@@ -402,29 +433,35 @@ const CheckoutPage = () => {
         }
 
         const token = localStorage.getItem("token");
-        
+
         const initPaymentUrl = apiUrl("/payments/initialize-payment");
 
         return resolveBookingUserId()
-            .then((userId) => axios.post(
-                initPaymentUrl,
-                buildInitPaymentPayload(ticketTypeName, userId, quantity),
-                withUserHeaders(authConfig, userId),
-            ))
+            .then((userId) =>
+                axios.post(
+                    initPaymentUrl,
+                    buildInitPaymentPayload(ticketTypeName, userId, quantity),
+                    withUserHeaders(authConfig, userId),
+                ),
+            )
             .then((initRes) => {
                 console.log("Initialize payment response:", initRes.data);
                 const reference = initRes.data?.reference;
                 if (!reference) {
-                    return Promise.reject(new Error("Payment reference was not returned."));
+                    return Promise.reject(
+                        new Error("Payment reference was not returned."),
+                    );
                 }
 
                 const successUrl = apiUrl("/bookings/payment/success");
 
-                return resolveBookingUserId().then((userId) => axios.post(
-                    successUrl,
-                    buildPaymentSuccessPayload(reference, userId, quantity),
-                    withUserHeaders(authConfig, userId),
-                ));
+                return resolveBookingUserId().then((userId) =>
+                    axios.post(
+                        successUrl,
+                        buildPaymentSuccessPayload(reference, userId, quantity),
+                        withUserHeaders(authConfig, userId),
+                    ),
+                );
             })
             .catch((err) => {
                 throw err;
@@ -479,7 +516,11 @@ const CheckoutPage = () => {
         }
 
         if (!eventId) {
-            const localBooking = createLocalBookingResult(selectedEvent, total, freeEvent);
+            const localBooking = createLocalBookingResult(
+                selectedEvent,
+                total,
+                freeEvent,
+            );
             setPaymentStatus("success");
             setPaymentMessage(
                 freeEvent
@@ -491,7 +532,9 @@ const CheckoutPage = () => {
 
         if (!getAuthConfig()) {
             setPaymentStatus("error");
-            setPaymentMessage("Your session has expired. Please sign in again.");
+            setPaymentMessage(
+                "Your session has expired. Please sign in again.",
+            );
             return;
         }
 
@@ -502,15 +545,21 @@ const CheckoutPage = () => {
 
         const availabilityPromise = freeEvent
             ? Promise.resolve([])
-            : Promise.all(selectedItems.map((item) => checkTicketAvailability(item)));
+            : Promise.all(
+                  selectedItems.map((item) => checkTicketAvailability(item)),
+              );
 
         availabilityPromise
             .then((availabilityResponses) => {
                 if (!freeEvent) {
-                    const unavailable = availabilityResponses.find((response, index) => {
-                        const remaining = Number(response?.data?.remaining ?? 0);
-                        return remaining < selectedItems[index].quantity;
-                    });
+                    const unavailable = availabilityResponses.find(
+                        (response, index) => {
+                            const remaining = Number(
+                                response?.data?.remaining ?? 0,
+                            );
+                            return remaining < selectedItems[index].quantity;
+                        },
+                    );
 
                     if (unavailable) {
                         return Promise.reject(
@@ -536,7 +585,8 @@ const CheckoutPage = () => {
                     JSON.stringify({
                         reference: bookingReference,
                         eventId,
-                        eventTitle: selectedEvent?.title || FALLBACK_EVENT.title,
+                        eventTitle:
+                            selectedEvent?.title || FALLBACK_EVENT.title,
                         total,
                         createdAt: new Date().toISOString(),
                         bookingCount: bookings.length,
@@ -580,21 +630,45 @@ const CheckoutPage = () => {
                 className="d-flex align-items-start gap-4 checkout-layout"
                 style={{ margin: "40px auto", width: "70%" }}
             >
-                <div className="d-flex flex-column gap-4 checkout-left" style={{ width: "62%" }}>
+                <div
+                    className="d-flex flex-column gap-4 checkout-left"
+                    style={{ width: "62%" }}
+                >
                     <div className="d-flex align-items-center gap-3 shadow-sm py-4 px-4 rounded-3 bg-white">
                         <img
-                            src={selectedEvent?.bannerImage || FALLBACK_EVENT.bannerImage}
+                            src={
+                                selectedEvent?.bannerImage ||
+                                FALLBACK_EVENT.bannerImage
+                            }
                             alt={selectedEvent?.title || FALLBACK_EVENT.title}
-                            style={{ width: "100px", height: "80px", objectFit: "cover", borderRadius: "12px" }}
+                            style={{
+                                width: "100px",
+                                height: "80px",
+                                objectFit: "cover",
+                                borderRadius: "12px",
+                            }}
                         />
                         <div>
-                            <h5 className="m-0">{selectedEvent?.title || FALLBACK_EVENT.title}</h5>
-                            <p className="m-0">{formatDateTime(selectedEvent?.startDateTime || FALLBACK_EVENT.startDateTime)}</p>
-                            <p className="m-0">{selectedEvent?.venue || FALLBACK_EVENT.venue}</p>
+                            <h5 className="m-0">
+                                {selectedEvent?.title || FALLBACK_EVENT.title}
+                            </h5>
+                            <p className="m-0">
+                                {formatDateTime(
+                                    selectedEvent?.startDateTime ||
+                                        FALLBACK_EVENT.startDateTime,
+                                )}
+                            </p>
+                            <p className="m-0">
+                                {selectedEvent?.venue || FALLBACK_EVENT.venue}
+                            </p>
                         </div>
                     </div>
 
-                    <form id="checkout-payment-form" onSubmit={handlePaymentSubmit} className="d-flex flex-column gap-3 shadow-sm py-4 px-4 rounded-3 bg-white">
+                    <form
+                        id="checkout-payment-form"
+                        onSubmit={handlePaymentSubmit}
+                        className="d-flex flex-column gap-3 shadow-sm py-4 px-4 rounded-3 bg-white"
+                    >
                         <div>
                             <h5 className="mb-1">Select Tickets</h5>
                             <p className="text-secondary mb-0">
@@ -605,29 +679,69 @@ const CheckoutPage = () => {
                         </div>
 
                         {ticketTypes.map((ticket, index) => {
-                            const price = Number(ticket?.ticketPrice ?? ticket?.price ?? 0);
+                            const price = Number(
+                                ticket?.ticketPrice ?? ticket?.price ?? 0,
+                            );
                             const quantity = quantities[index] || 0;
+                            const available = getTicketAvailable(ticket);
+                            const ticketSoldOut = available <= 0;
 
                             return (
-                                <div key={`${ticket?.title || "ticket"}-${index}`} className="d-flex align-items-center justify-content-between border rounded-3 py-3 px-3">
+                                <div
+                                    key={`${ticket?.title || "ticket"}-${index}`}
+                                    className="d-flex align-items-center justify-content-between border rounded-3 py-3 px-3"
+                                >
                                     <div>
-                                        <h6 className="mb-1">{ticket?.title || `Ticket ${index + 1}`}</h6>
-                                        <p className="mb-2">{ticket?.description || "Standard event access"}</p>
-                                        <p style={{ color: "rgb(223,127,7)" }} className="m-0 fs-5 fw-bold">{formatMoney(price)}</p>
+                                        <h6 className="mb-1">
+                                            {ticket?.title ||
+                                                `Ticket ${index + 1}`}
+                                        </h6>
+                                        <p className="mb-2">
+                                            {ticket?.description ||
+                                                "Standard event access"}
+                                        </p>
+                                        <p
+                                            style={{ color: "rgb(223,127,7)" }}
+                                            className="m-0 fs-5 fw-bold"
+                                        >
+                                            {formatMoney(price)}
+                                        </p>
+                                        {/* Show availability */}
+                                        <p
+                                            className="mb-2 text-secondary"
+                                            style={{ fontSize: ".85em" }}
+                                        >
+                                            {ticketSoldOut
+                                                ? "Sold out"
+                                                : available === Infinity
+                                                  ? "Available"
+                                                  : `${available} left`}
+                                        </p>
                                     </div>
                                     <div className="d-flex align-items-center gap-3">
                                         <button
                                             type="button"
-                                            onClick={() => handleQuantityChange(index, -1)}
+                                            onClick={() =>
+                                                handleQuantityChange(index, -1)
+                                            }
                                             className="btn btn-light border-secondary fs-5 py-0 px-2 fw-semibold"
+                                            disabled={quantity === 1}
                                         >
                                             -
                                         </button>
-                                        <p className="m-0 fw-semibold">{quantity}</p>
+                                        <p className="m-0 fw-semibold">
+                                            {quantity}
+                                        </p>
                                         <button
                                             type="button"
-                                            onClick={() => handleQuantityChange(index, 1)}
+                                            onClick={() =>
+                                                handleQuantityChange(index, 1)
+                                            }
                                             className="btn btn-light border-secondary fs-5 py-0 px-2 fw-semibold"
+                                            disabled={
+                                                ticketSoldOut ||
+                                                quantity >= available
+                                            } // cap at available
                                         >
                                             +
                                         </button>
@@ -637,24 +751,33 @@ const CheckoutPage = () => {
                         })}
 
                         {freeEvent ? (
-                            <div className="alert alert-success mb-0" role="alert">
+                            <div
+                                className="alert alert-success mb-0"
+                                role="alert"
+                            >
                                 No payment needed for this event.
                             </div>
                         ) : (
                             <div className="row g-3 mt-1">
                                 <div className="col-md-6">
-                                    <label className="form-label fw-semibold">Cardholder name</label>
+                                    <label className="form-label fw-semibold">
+                                        Cardholder name
+                                    </label>
                                     <input
                                         type="text"
                                         className="form-control"
                                         value={paymentDetails.cardName}
-                                        onChange={handlePaymentChange("cardName")}
+                                        onChange={handlePaymentChange(
+                                            "cardName",
+                                        )}
                                         placeholder="Alex Johnson"
                                         required
                                     />
                                 </div>
                                 <div className="col-md-6">
-                                    <label className="form-label fw-semibold">Email</label>
+                                    <label className="form-label fw-semibold">
+                                        Email
+                                    </label>
                                     <input
                                         type="email"
                                         className="form-control"
@@ -665,20 +788,26 @@ const CheckoutPage = () => {
                                     />
                                 </div>
                                 <div className="col-md-6">
-                                    <label className="form-label fw-semibold">Card number</label>
+                                    <label className="form-label fw-semibold">
+                                        Card number
+                                    </label>
                                     <input
                                         type="text"
                                         inputMode="numeric"
                                         className="form-control"
                                         value={paymentDetails.cardNumber}
-                                        onChange={handlePaymentChange("cardNumber")}
+                                        onChange={handlePaymentChange(
+                                            "cardNumber",
+                                        )}
                                         placeholder="4242 4242 4242 4242"
                                         maxLength="19"
                                         required
                                     />
                                 </div>
                                 <div className="col-md-3">
-                                    <label className="form-label fw-semibold">Expiry</label>
+                                    <label className="form-label fw-semibold">
+                                        Expiry
+                                    </label>
                                     <input
                                         type="text"
                                         className="form-control"
@@ -690,7 +819,9 @@ const CheckoutPage = () => {
                                     />
                                 </div>
                                 <div className="col-md-3">
-                                    <label className="form-label fw-semibold">CVC</label>
+                                    <label className="form-label fw-semibold">
+                                        CVC
+                                    </label>
                                     <input
                                         type="text"
                                         inputMode="numeric"
@@ -712,19 +843,23 @@ const CheckoutPage = () => {
                         ) : null}
 
                         {verificationStatus === "blocked" ? (
-                            <div className="alert alert-warning mb-0" role="alert">
+                            <div
+                                className="alert alert-warning mb-0"
+                                role="alert"
+                            >
                                 {verificationMessage}
                             </div>
                         ) : null}
 
                         {paymentMessage ? (
                             <div
-                                className={`alert mb-0 ${paymentStatus === "success"
-                                    ? "alert-success"
-                                    : paymentStatus === "error"
-                                        ? "alert-danger"
-                                        : "alert-info"
-                                    }`}
+                                className={`alert mb-0 ${
+                                    paymentStatus === "success"
+                                        ? "alert-success"
+                                        : paymentStatus === "error"
+                                          ? "alert-danger"
+                                          : "alert-info"
+                                }`}
                                 role="alert"
                             >
                                 {paymentMessage}
@@ -735,7 +870,9 @@ const CheckoutPage = () => {
                             <div className="d-flex gap-2">
                                 <button
                                     type="button"
-                                    onClick={() => navigate("/dashboard/tickets")}
+                                    onClick={() =>
+                                        navigate("/dashboard/tickets")
+                                    }
                                     className="btn btn-dark fw-semibold px-3 py-2"
                                 >
                                     View Tickets
@@ -759,64 +896,96 @@ const CheckoutPage = () => {
                                 </button>
                                 <button
                                     type="submit"
-                                    style={{ backgroundColor: "rgb(223,127,7)", fontSize: "1.05em" }}
+                                    style={{
+                                        backgroundColor: "rgb(223,127,7)",
+                                        fontSize: "1.05em",
+                                    }}
                                     className="btn py-2 px-3 rounded-3 text-white fw-semibold"
-                                    disabled={paymentStatus === "processing" || bookingBlocked}
+                                    disabled={
+                                        paymentStatus === "processing" ||
+                                        bookingBlocked
+                                    }
                                 >
                                     {paymentStatus === "processing"
                                         ? "Processing..."
                                         : freeEvent
-                                            ? "Confirm Booking"
-                                            : "Continue to Payment"}
+                                          ? "Confirm Booking"
+                                          : "Continue to Payment"}
                                 </button>
                             </div>
                         )}
                     </form>
                 </div>
 
-                <div style={{ position: "sticky", top: "70px", width: "38%"  }} className="d-flex flex-column gap-3 shadow-sm py-4 px-3 rounded-3 bg-white checkout-right">
+                <div
+                    style={{ position: "sticky", top: "70px", width: "38%" }}
+                    className="d-flex flex-column gap-3 shadow-sm py-4 px-3 rounded-3 bg-white checkout-right"
+                >
                     <h5>Order Summary</h5>
                     {ticketTypes.map((ticket, index) => {
                         const quantity = quantities[index] || 0;
                         if (!quantity) return null;
 
-                        const price = Number(ticket?.ticketPrice ?? ticket?.price ?? 0);
+                        const price = Number(
+                            ticket?.ticketPrice ?? ticket?.price ?? 0,
+                        );
 
                         return (
-                            <div key={`summary-${ticket?.title || "ticket"}-${index}`} className="d-flex align-items-center justify-content-between">
-                                <p className="m-0">{ticket?.title || `Ticket ${index + 1}`} x {quantity}</p>
-                                <p className="m-0 fw-semibold">{formatMoney(price * quantity)}</p>
+                            <div
+                                key={`summary-${ticket?.title || "ticket"}-${index}`}
+                                className="d-flex align-items-center justify-content-between"
+                            >
+                                <p className="m-0">
+                                    {ticket?.title || `Ticket ${index + 1}`} x{" "}
+                                    {quantity}
+                                </p>
+                                <p className="m-0 fw-semibold">
+                                    {formatMoney(price * quantity)}
+                                </p>
                             </div>
                         );
                     })}
                     <div className="d-flex align-items-center justify-content-between">
                         <p className="m-0">Service fee</p>
-                        <p className="m-0 fw-semibold">{formatMoney(serviceFee)}</p>
+                        <p className="m-0 fw-semibold">
+                            {formatMoney(serviceFee)}
+                        </p>
                     </div>
                     <hr />
                     <div className="d-flex align-items-center justify-content-between">
                         <p className="m-0 fs-5 fw-semibold">Total</p>
-                        <p style={{ color: "rgb(223,127,7)" }} className="m-0 fw-semibold fs-5">{formatMoney(total)}</p>
+                        <p
+                            style={{ color: "rgb(223,127,7)" }}
+                            className="m-0 fw-semibold fs-5"
+                        >
+                            {formatMoney(total)}
+                        </p>
                     </div>
                     <p className="text-secondary mb-0">
-                        {selectedCount} ticket{selectedCount === 1 ? "" : "s"} selected.
+                        {selectedCount} ticket{selectedCount === 1 ? "" : "s"}{" "}
+                        selected.
                     </p>
                     <button
                         type="submit"
                         form="checkout-payment-form"
-                        style={{ backgroundColor: "rgb(223,127,7)", fontSize: "1.05em" }}
+                        style={{
+                            backgroundColor: "rgb(223,127,7)",
+                            fontSize: "1.05em",
+                        }}
                         className="btn py-2 px-3 rounded-3 text-white fw-semibold mt-2"
-                        disabled={paymentStatus === "processing" || bookingBlocked}
+                        disabled={
+                            paymentStatus === "processing" || bookingBlocked
+                        }
                     >
                         {paymentStatus === "processing"
                             ? "Processing..."
                             : paymentStatus === "success"
-                                ? freeEvent
-                                    ? "Booking confirmed"
-                                    : "Payment completed"
-                                : freeEvent
-                                    ? "Confirm free booking"
-                                    : "Pay now"}
+                              ? freeEvent
+                                  ? "Booking confirmed"
+                                  : "Payment completed"
+                              : freeEvent
+                                ? "Confirm free booking"
+                                : "Pay now"}
                     </button>
                 </div>
             </div>
