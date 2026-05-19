@@ -217,6 +217,10 @@ const TicketModal = ({ ticket, onClose }) => {
                                         mono
                                     />
                                     <InfoField
+                                        label="Tickets"
+                                        value={`${ticket.ticketCount || 1} ticket${(ticket.ticketCount || 1) > 1 ? "s" : ""}`}
+                                    />
+                                    <InfoField
                                         label="Status"
                                         value={ticket.status}
                                         accent={
@@ -290,7 +294,8 @@ const TicketModal = ({ ticket, onClose }) => {
                             style={{
                                 background: "#f8f9fa",
                                 borderTop: "0.5px solid #e0e0e0",
-                                padding: "clamp(7px, 1.2vw, 9px) clamp(10px, 2.4vw, 24px)",
+                                padding:
+                                    "clamp(7px, 1.2vw, 9px) clamp(10px, 2.4vw, 24px)",
                                 display: "flex",
                                 justifyContent: "center",
                                 alignItems: "center",

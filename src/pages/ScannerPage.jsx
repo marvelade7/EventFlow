@@ -11,6 +11,7 @@ const defaultTicket = {
     ticketType: "Ticket type",
     ticketCode: "Ticket code",
     checkedInTime: "Check in time",
+    ticketCount: 1,
     avatarUrl:
         "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=220&q=80",
 };
@@ -41,6 +42,10 @@ const getDisplayTicket = (booking = {}) => {
             booking?.reference ||
             booking?.paymentReference ||
             defaultTicket.ticketCode,
+        ticketCount:
+            booking?.ticketCount ||
+            booking?.quantity ||
+            defaultTicket.ticketCount,
         checkedInTime:
             booking?.checkedInAt ||
             booking?.checkedInTime ||
@@ -266,14 +271,6 @@ const ScannerPage = () => {
             .then((res) => {
                 const data = res?.data;
 
-                // console.log("Verification response received:", {
-                //     status: res?.status,
-                //     hasBooking: !!data?.booking,
-                //     bookingStatus: data?.booking?.status,
-                //     ticketCode: data?.booking?.ticketCode,
-                //     paymentStatus: data?.booking?.paymentStatus,
-                // });
-
                 if (!data?.booking) {
                     console.log("Response missing booking field");
                     setTicketState("invalid");
@@ -446,13 +443,6 @@ const ScannerPage = () => {
                             entry.
                         </p>
                     </div>
-                    {/* <div className="scanner-result-avatar-wrap">
-                        <img
-                            className="scanner-result-avatar"
-                            src={ticket.avatarUrl}
-                            alt={ticket.attendeeName}
-                        />
-                    </div> */}
                 </div>
 
                 <div className="scanner-result-details">
@@ -482,6 +472,14 @@ const ScannerPage = () => {
                         </span>
                         <span className="scanner-detail-code">
                             {ticket.ticketCode}
+                        </span>
+                    </div>
+                    <div className="scanner-detail-row">
+                        <span className="scanner-detail-label">
+                            Number of Tickets
+                        </span>
+                        <span className="scanner-detail-code">
+                            {ticket.ticketCount || 1}
                         </span>
                     </div>
                 </div>
