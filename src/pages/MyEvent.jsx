@@ -33,7 +33,7 @@ const getPriceLabel = (event) => {
     if (prices.length === 0) return "TBD";
 
     const lowestPrice = Math.min(...prices);
-    return `₦${lowestPrice.toLocaleString()}`;
+    return `$${lowestPrice.toLocaleString()}`;
 };
 
 const getEventTicketPrice = (event) => {
