@@ -107,7 +107,8 @@ const UserDashboard = () => {
         activeTickets: 0,
         eventsAttended: 0,
     });
-    const [isLoadingDashboardStats, setIsLoadingDashboardStats] = useState(true);
+    const [isLoadingDashboardStats, setIsLoadingDashboardStats] =
+        useState(true);
     const [dashboardStatsError, setDashboardStatsError] = useState("");
 
     useEffect(() => {
@@ -229,6 +230,9 @@ const UserDashboard = () => {
 
     useEffect(() => {
         const token = localStorage.getItem("token");
+        console.log("🔑 Token:", token); // is there a token?
+        console.log("👤 userId:", userId);
+
         if (!token) {
             setIsLoadingDashboardStats(false);
             return;
@@ -240,7 +244,7 @@ const UserDashboard = () => {
         fetchDashboardStats({ token, signal: controller.signal })
             .then((stats) => {
                 if (!isActive) return;
-
+                console.log('stats received', stats);
                 setDashboardStats({
                     totalEvents: Number(stats?.totalEvents || 0),
                     activeTickets: Number(stats?.activeTickets || 0),
@@ -248,7 +252,11 @@ const UserDashboard = () => {
                 });
             })
             .catch((err) => {
-                if (err.name === "CanceledError" || err.code === "ERR_CANCELED" || !isActive) {
+                if (
+                    err.name === "CanceledError" ||
+                    err.code === "ERR_CANCELED" ||
+                    !isActive
+                ) {
                     return;
                 }
 
@@ -326,7 +334,6 @@ const UserDashboard = () => {
                                 ></button>
                             </div>
                         )}
-                        
 
                         <div className="d-flex align-items-center justify-items-between gap-3 pt-3 pb-5 mx-4 dashboard-stats">
                             <div
@@ -344,8 +351,14 @@ const UserDashboard = () => {
                                         padding: "5px 10px",
                                         borderRadius: "7px",
                                     }}
-                                    status={isLoadingDashboardStats ? "..." : "Live"}
-                                    num={isLoadingDashboardStats ? "..." : dashboardStats.totalEvents}
+                                    status={
+                                        isLoadingDashboardStats ? "..." : "Live"
+                                    }
+                                    num={
+                                        isLoadingDashboardStats
+                                            ? "..."
+                                            : dashboardStats.totalEvents
+                                    }
                                     title="Upcoming Events"
                                     statusStyle={{
                                         color: "green",
@@ -370,8 +383,14 @@ const UserDashboard = () => {
                                         padding: "5px 10px",
                                         borderRadius: "7px",
                                     }}
-                                    status={isLoadingDashboardStats ? "..." : "Live"}
-                                    num={isLoadingDashboardStats ? "..." : dashboardStats.activeTickets}
+                                    status={
+                                        isLoadingDashboardStats ? "..." : "Live"
+                                    }
+                                    num={
+                                        isLoadingDashboardStats
+                                            ? "..."
+                                            : dashboardStats.activeTickets
+                                    }
                                     title="Active Tickets"
                                     statusStyle={{
                                         color: "green",
@@ -397,8 +416,14 @@ const UserDashboard = () => {
                                         padding: "5px 10px",
                                         borderRadius: "7px",
                                     }}
-                                    status={isLoadingDashboardStats ? "..." : "Live"}
-                                    num={isLoadingDashboardStats ? "..." : dashboardStats.eventsAttended}
+                                    status={
+                                        isLoadingDashboardStats ? "..." : "Live"
+                                    }
+                                    num={
+                                        isLoadingDashboardStats
+                                            ? "..."
+                                            : dashboardStats.eventsAttended
+                                    }
                                     title="Events Attended"
                                     statusStyle={{
                                         color: "black",
@@ -508,7 +533,13 @@ const UserDashboard = () => {
                             data-aos="fade-up"
                             data-aos-delay="80"
                         >
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div
+                                style={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                }}
+                            >
                                 <BrowseEventsHead
                                     title="Bookings for Your Events"
                                     style={{ fontSize: "1.3em" }}
