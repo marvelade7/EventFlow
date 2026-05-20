@@ -83,6 +83,12 @@ const getStatusBadge = (status) => {
     return statusColors[status] || "bg-secondary";
 };
 
+const capitalizeStatus = (status) => {
+    if (!status) return "Upcoming";
+    const s = String(status);
+    return s.charAt(0).toUpperCase() + s.slice(1);
+};
+
 const MyEvent = () => {
     const { sidebarOpen, toggleSidebar } = useOutletContext();
     const navigate = useNavigate();
@@ -403,9 +409,9 @@ const MyEvent = () => {
                                         <td>{event?.category || "N/A"}</td>
                                         <td>{formatEventDate(event?.startDateTime)}</td>
                                         <td>
-                                            <span className={`badge ${getStatusBadge(event?.status)}`}>
-                                                {event?.status || "upcoming"}
-                                            </span>
+                                                <span className={`badge ${getStatusBadge(event?.status)}`} style={{fontSize: '0.9rem'}}>
+                                                    {capitalizeStatus(event?.status)}
+                                                </span>
                                         </td>
                                         <td>{event?.ticketsSold ?? 0}</td>
                                         <td>{Number(event?.totalRevenue || 0).toLocaleString(undefined, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })}</td>

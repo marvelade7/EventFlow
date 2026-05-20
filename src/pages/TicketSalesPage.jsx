@@ -22,6 +22,10 @@ const TicketSalesPage = () => {
 
     const [event, setEvent] = useState(null);
     const [bookings, setBookings] = useState([]);
+    const [salesMapState, setSalesMapState] = useState({});
+    const [totalSoldState, setTotalSoldState] = useState(0);
+    const [totalRevenueState, setTotalRevenueState] = useState(0);
+    const [ticketQuantities, setTicketQuantities] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
@@ -61,8 +65,48 @@ const TicketSalesPage = () => {
                     return String(bkEventId) === String(eventId) || String(bk.event) === String(eventId);
                 });
 
+                // build ticket price lookup from event data
+                const ticketPriceMapLocal = (evt?.ticketTypes || []).reduce((acc, t) => {
+                    const n = (t?.name || "General Admission").toString().trim().toLowerCase();
+                    acc[n] = Number(t?.ticketPrice ?? t?.price ?? 0);
+                    return acc;
+                }, {});
+
+                const getBookingAmountLocal = (bk) => {
+                    const raw = bk.amountPaid ?? bk.amount ?? 0;
+                    const parsed = Number(raw) || 0;
+                    if (parsed > 0) return parsed;
+                    const key = (bk.ticketTypeName || bk.ticketType || "General Admission").toString().trim().toLowerCase();
+                    return ticketPriceMapLocal[key] || 0;
+                };
+
+                // aggregate
+                const map = {};
+                let totalSold = 0;
+                let totalRevenue = 0;
+
+                bks.forEach((bk) => {
+                    const name = (bk.ticketTypeName || bk.ticketType || "General Admission").toString();
+                    const paid = getBookingAmountLocal(bk);
+                    if (!map[name]) map[name] = { sold: 0, revenue: 0 };
+                    map[name].sold += 1;
+                    map[name].revenue += paid;
+                    totalSold += 1;
+                    totalRevenue += paid;
+                });
+
+                const ticketQuantitiesLocal = (evt?.ticketTypes || []).reduce((acc, t) => {
+                    const name = (t?.name || "General Admission").toString();
+                    acc[name] = Number(t?.quantity || t?.qty || 0);
+                    return acc;
+                }, {});
+
                 setEvent(evt);
                 setBookings(bks);
+                setSalesMapState(map);
+                setTotalSoldState(totalSold);
+                setTotalRevenueState(totalRevenue);
+                setTicketQuantities(ticketQuantitiesLocal);
             } catch (err) {
                 if (err.name === "CanceledError") return;
                 console.error("TicketSales fetch error:", err);
@@ -94,32 +138,10 @@ const TicketSalesPage = () => {
         return ticketPriceMap[key] || 0;
     };
 
-    const aggregateByTicketType = () => {
-        const map = {};
-        let totalSold = 0;
-        let totalRevenue = 0;
-
-        bookings.forEach((b) => {
-            const name = (b.ticketTypeName || b.ticketType || "General Admission").toString();
-            const paid = getBookingAmount(b);
-
-            if (!map[name]) map[name] = { sold: 0, revenue: 0 };
-            map[name].sold += 1;
-            map[name].revenue += paid;
-            totalSold += 1;
-            totalRevenue += paid;
-        });
-
-        return { map, totalSold, totalRevenue };
-    };
-
-    const { map: salesMap, totalSold, totalRevenue } = aggregateByTicketType();
-
-    const ticketQuantities = (event?.ticketTypes || []).reduce((acc, t) => {
-        const name = (t?.name || "General Admission").toString();
-        acc[name] = Number(t?.quantity || t?.qty || 0);
-        return acc;
-    }, {});
+    // use precomputed state values to ensure spinner waits until derived values are ready
+    const salesMap = salesMapState || {};
+    const totalSold = totalSoldState;
+    const totalRevenue = totalRevenueState;
 
     const getInitials = (name) => {
         if (!name) return "?";
