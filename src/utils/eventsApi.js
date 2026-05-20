@@ -37,7 +37,7 @@ export const fetchDashboardStats = ({ token, signal } = {}) => {
 
     // backend provides dashboard stats from bookings router
     const url = apiUrl(`/bookings/dashboard-stats`);
-    console.log('fetching dashboard stats from:', url);
+    // console.log('fetching dashboard stats from:', url);
 
     return axios
         .get(url, {
@@ -45,11 +45,11 @@ export const fetchDashboardStats = ({ token, signal } = {}) => {
             headers,
         })
         .then((res) => {
-            console.log(res);
+            // console.log(res);
             const data = res.data || {};
-            console.log('Up coming events: ' + data.upcomingEventCount);
-            console.log('Active tickets: ' + data.activeTicketCount);
-            console.log('Attended events: ' + data.attendedEventCount);
+            // console.log('Up coming events: ' + data.upcomingEventCount);
+            // console.log('Active tickets: ' + data.activeTicketCount);
+            // console.log('Attended events: ' + data.attendedEventCount);
             // normalize to shapes expected by frontend
             return {
                 totalEvents: Number(data?.upcomingEventCount || data?.totalEvents || 0),

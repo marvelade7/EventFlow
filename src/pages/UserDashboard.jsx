@@ -230,8 +230,6 @@ const UserDashboard = () => {
 
     useEffect(() => {
         const token = localStorage.getItem("token");
-        console.log("🔑 Token:", token); // is there a token?
-        console.log("👤 userId:", userId);
 
         if (!token) {
             setIsLoadingDashboardStats(false);
@@ -244,7 +242,6 @@ const UserDashboard = () => {
         fetchDashboardStats({ token, signal: controller.signal })
             .then((stats) => {
                 if (!isActive) return;
-                console.log('stats received', stats);
                 setDashboardStats({
                     totalEvents: Number(stats?.totalEvents || 0),
                     activeTickets: Number(stats?.activeTickets || 0),

@@ -19,6 +19,7 @@ import MyTicketPage from "./pages/MyTicketPage";
 import BrowseEventPage from "./pages/BrowseEventPage";
 import EmailVerification from "./pages/EmailVerification";
 import ResetPassword from "./pages/ResetPassword";
+import TicketSalesPage from "./pages/TicketSalesPage";
 import { ProfileProvider } from "./context/ProfileContext";
 // import CheckInPage from "./pages/CheckInPage";
 import ScannerPage from "./pages/ScannerPage";
@@ -63,6 +64,7 @@ const App = () => {
                     <Route path="tickets" element={<MyTicketPage />} />
                     <Route path="browse-event" element={<BrowseEventPage />} />
                     <Route path="scanner" element={<ScannerPage />} />
+                    <Route path="ticket-sales/:eventId" element={<TicketSalesPage />} />
                 </Route>
 
                 <Route path="/admin-auth" element={<AdminAuthPage />} />

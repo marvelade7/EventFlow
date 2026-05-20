@@ -90,6 +90,8 @@ const MyEvent = () => {
     const [myEvents, setMyEvents] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
     const [selectedEvent, setSelectedEvent] = useState(null);
     const [deleteConfirm, setDeleteConfirm] = useState(null);
     const [deleteLoading, setDeleteLoading] = useState(false);
@@ -108,8 +110,11 @@ const MyEvent = () => {
             return () => controller.abort();
         }
 
+        setIsLoading(true);
+        setError("");
+
         axios
-            .get(EVENTS_BY_USER_ENDPOINT, {
+            .get(`${EVENTS_BY_USER_ENDPOINT}?page=${currentPage}&limit=10`, {
                 signal: controller.signal,
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -117,7 +122,17 @@ const MyEvent = () => {
                 },
             })
             .then((res) => {
-                setMyEvents(Array.isArray(res.data?.events) ? res.data.events : []);
+                const events = Array.isArray(res.data?.events) ? res.data.events : [];
+                // ensure ticketsSold and totalRevenue exist with defaults
+                const normalized = events.map((ev) => ({
+                    ...ev,
+                    ticketsSold: Number(ev?.ticketsSold || 0),
+                    totalRevenue: Number(ev?.totalRevenue || 0),
+                }));
+
+                setMyEvents(normalized);
+                setCurrentPage(Number(res.data?.currentPage || currentPage));
+                setTotalPages(Number(res.data?.totalPages || 1));
             })
             .catch((err) => {
                 if (err.name !== "CanceledError") {
@@ -130,7 +145,7 @@ const MyEvent = () => {
             });
 
         return () => controller.abort();
-    }, []);
+    }, [currentPage]);
 
     const handleEditEvent = (event) => {
         setEditingEvent(event);
@@ -375,6 +390,8 @@ const MyEvent = () => {
                                     <th>Category</th>
                                     <th>Start Date</th>
                                     <th>Status</th>
+                                    <th>Tickets Sold</th>
+                                    <th>Revenue</th>
                                     <th>Ticket Price</th>
                                     <th>Actions</th>
                                 </tr>
@@ -390,6 +407,8 @@ const MyEvent = () => {
                                                 {event?.status || "upcoming"}
                                             </span>
                                         </td>
+                                        <td>{event?.ticketsSold ?? 0}</td>
+                                        <td>{Number(event?.totalRevenue || 0).toLocaleString(undefined, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })}</td>
                                         <td>{getPriceLabel(event)}</td>
                                         <td>
                                             <div className="btn-group btn-group-sm gap-3" role="group">
@@ -462,6 +481,19 @@ const MyEvent = () => {
                             </div>
                         </div>
                     </div>
+                </div>
+            ) : null}
+
+            {/* Pagination controls */}
+            {totalPages > 1 ? (
+                <div className="px-4 pb-4 d-flex justify-content-end align-items-center gap-2">
+                    <button className="btn btn-sm btn-outline-secondary" onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage <= 1}>
+                        Prev
+                    </button>
+                    <span className="text-secondary">Page {currentPage} of {totalPages}</span>
+                    <button className="btn btn-sm btn-outline-secondary" onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage >= totalPages}>
+                        Next
+                    </button>
                 </div>
             ) : null}
 
