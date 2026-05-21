@@ -1,0 +1,177 @@
+# EventIQ
+
+EventIQ is a modern event management frontend built with React and Vite. It brings together event discovery, ticket booking, event creation, attendee check-in, and dashboard management in one experience.
+
+**Production link:** https://marvel-event-flow.vercel.app
+
+The application is designed for two main workflows:
+
+- Attendees can browse events, sign up, sign in, book tickets, manage their profile, and view their bookings.
+- Organizers can create events, edit event details, track event performance, manage ticket sales, and verify QR-code tickets at the door.
+
+## What the project does
+
+EventIQ acts as the user interface for a larger event platform. It connects to a backend API for authentication, event data, bookings, payments, email verification, password reset, and scanner-based check-in.
+
+At a glance, the app supports:
+
+- Public event discovery on the landing page
+- Authentication and account recovery flows
+- A protected user dashboard with booking and event tools
+- Event creation and event editing
+- Checkout and payment initiation
+- Booking history and ticket management
+- QR scanner-based attendee check-in
+- An admin dashboard for moderation and platform oversight
+
+## Main features
+
+### Public experience
+
+- A landing page with a hero section, featured events, and explanatory sections.
+- Browseable event cards with category filtering.
+- Clear calls to action for users who want to sign up or host an event.
+
+### Authentication and account flows
+
+- Sign up and sign in screens.
+- Email verification.
+- Forgot password and reset password flows.
+- Token-based route protection for authenticated areas.
+
+### User dashboard
+
+- Personalized dashboard shell with sidebar navigation.
+- Event summary cards and upcoming event previews.
+- Profile management.
+- Booking and ticket pages.
+- Event browsing and checkout from within the dashboard.
+
+### Organizer tools
+
+- Create a new event.
+- Edit an existing event from the organizer event page.
+- Upload banner images and manage ticket pricing.
+- View ticket sales for a specific event.
+- Use the scanner page to verify tickets and check attendees in.
+
+### Admin area
+
+- A separate admin dashboard entry point.
+- Moderation-style overview panels for events, users, and posts.
+- A dedicated auth page for the admin flow.
+
+## Tech stack
+
+- React 19
+- Vite
+- React Router
+- Axios
+- Bootstrap and Bootstrap Icons
+- Formik and Yup for form handling and validation
+- AOS for scroll animations
+- html5-qrcode and qrcode for scanning and ticket workflows
+- html2canvas for image capture or export-style interactions
+
+## Project structure
+
+```text
+src/
+	components/      Reusable UI pieces for navigation, cards, forms, and dashboard sections
+	context/         Shared state, including profile data
+	pages/           Route-level screens for the landing page, auth, dashboards, checkout, and scanner
+	utils/           API helpers and small utility functions
+	App.jsx          Application routes and protected route handling
+	main.jsx         App bootstrap and router setup
+```
+
+## Routes
+
+Some of the main routes in the app are:
+
+- `/` - landing page
+- `/signup` - registration
+- `/signin` - login
+- `/verify-email` - email verification
+- `/forgot-password` - password recovery request
+- `/reset-password/:token` - password reset form
+- `/dashboard` - protected user dashboard
+- `/dashboard/profile` - profile management
+- `/dashboard/my-event` - organizer event management
+- `/dashboard/create-event` - event creation
+- `/dashboard/checkout` - checkout flow
+- `/dashboard/tickets` - ticket history
+- `/dashboard/browse-event` - event browsing
+- `/dashboard/scanner` - QR check-in scanner
+- `/dashboard/ticket-sales/:eventId` - event ticket sales view
+- `/admin-auth` - admin login
+- `/admin-dashboard` - admin overview
+
+## Getting started
+
+### Prerequisites
+
+- Node.js 18 or newer
+- npm
+
+### Install dependencies
+
+```bash
+npm install
+```
+
+### Run the app locally
+
+```bash
+npm run dev
+```
+
+### Build for production
+
+```bash
+npm run build
+```
+
+### Preview the production build
+
+```bash
+npm run preview
+```
+
+### Lint the codebase
+
+```bash
+npm run lint
+```
+
+## Environment configuration
+
+The app reads the backend base URL from `VITE_API_BASE_URL`.
+
+If it is not set, the frontend falls back to the default deployed API used throughout the project.
+
+Example:
+
+```bash
+VITE_API_BASE_URL=https://your-api.example.com/api
+```
+
+## How the app is organized
+
+The app is built around a shared layout and a route-based experience:
+
+- Public pages focus on discovery and conversion.
+- Protected dashboard pages reuse the same shell, sidebar, and top navigation.
+- Shared API helpers keep most network calls in one place.
+- Event, ticket, and scanner pages handle the core organizer workflow.
+
+## Notes
+
+- The user dashboard uses protected routing and loads account data from the backend after login.
+- The landing page fetches live events and filters them by category.
+- The scanner page is meant for organizer check-in at the venue and depends on QR-code data from bookings.
+- Some admin pages are currently structured with local sample data, which makes the interface easy to explore even without a live admin backend.
+
+## Why this project exists
+
+EventIQ is meant to make event operations feel simpler on both sides of the experience. Users can discover and book events quickly, while organizers get the tools they need to publish events, track attendance, and manage the ticketing lifecycle without switching between multiple systems.
