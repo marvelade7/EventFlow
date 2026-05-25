@@ -1,6 +1,6 @@
-# EventIQ
+# EventFlow
 
-EventIQ is a modern event management frontend built with React and Vite. It brings together event discovery, ticket booking, event creation, attendee check-in, and dashboard management in one experience.
+EventFlow is a modern event management frontend built with React and Vite. It brings together event discovery, ticket booking, event creation, attendee check-in, and dashboard management in one experience.
 
 **Production link:** https://marvel-event-flow.vercel.app
 
@@ -11,7 +11,7 @@ The application is designed for two main workflows:
 
 ## What the project does
 
-EventIQ acts as the user interface for a larger event platform. It connects to a backend API for authentication, event data, bookings, payments, email verification, password reset, and scanner-based check-in.
+EventFlow acts as the user interface for a larger event platform. It connects to a backend API for authentication, event data, bookings, payments, email verification, password reset, and scanner-based check-in.
 
 At a glance, the app supports:
 
@@ -61,6 +61,13 @@ At a glance, the app supports:
 - Moderation-style overview panels for events, users, and posts.
 - A dedicated auth page for the admin flow.
 
+### Theme customization
+
+- **Dark mode support** across all dashboard pages, modals, forms, and UI components.
+- Theme toggle button in the dashboard navbar for quick switching between light and dark modes.
+- Persistent theme preference stored in browser localStorage.
+- Professional gray background in dark mode for comfortable viewing at any time of day.
+
 ## Tech stack
 
 - React 19
@@ -78,7 +85,7 @@ At a glance, the app supports:
 ```text
 src/
 	components/      Reusable UI pieces for navigation, cards, forms, and dashboard sections
-	context/         Shared state, including profile data
+	context/         Shared state, including profile data and theme context
 	pages/           Route-level screens for the landing page, auth, dashboards, checkout, and scanner
 	utils/           API helpers and small utility functions
 	App.jsx          Application routes and protected route handling
@@ -171,7 +178,8 @@ The app is built around a shared layout and a route-based experience:
 - The landing page fetches live events and filters them by category.
 - The scanner page is meant for organizer check-in at the venue and depends on QR-code data from bookings.
 - Some admin pages are currently structured with local sample data, which makes the interface easy to explore even without a live admin backend.
+- Theme preference (light/dark mode) is automatically persisted to localStorage and restored on the next visit.
 
 ## Why this project exists
 
-EventIQ is meant to make event operations feel simpler on both sides of the experience. Users can discover and book events quickly, while organizers get the tools they need to publish events, track attendance, and manage the ticketing lifecycle without switching between multiple systems.
+EventFlow is meant to make event operations feel simpler on both sides of the experience. Users can discover and book events quickly, while organizers get the tools they need to publish events, track attendance, and manage the ticketing lifecycle without switching between multiple systems.

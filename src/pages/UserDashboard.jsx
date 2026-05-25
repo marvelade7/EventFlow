@@ -9,7 +9,7 @@ import BrowseEventsHead from "../components/BrowseEventsHead";
 import RecentBookings from "../components/RecentBookings";
 import aos from "aos";
 import "aos/dist/aos.css";
-import { useNavigate, useOutlet, useLocation } from "react-router-dom";
+import { useNavigate, useOutlet, useLocation, Link } from "react-router-dom";
 import axios from "axios";
 import { ProfileContext } from "../context/ProfileContext";
 import { fetchEvents, fetchDashboardStats } from "../utils/eventsApi";

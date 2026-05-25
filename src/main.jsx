@@ -4,6 +4,7 @@ import './index.css';
 import './mobile.css';
 import App from './App.jsx';
 import { BrowserRouter } from 'react-router-dom';
+import { ThemeProvider } from './context/ThemeContext.jsx';
 
 // Unregister any existing service workers to prevent workbox warnings
 if ('serviceWorker' in navigator) {
@@ -17,7 +18,9 @@ if ('serviceWorker' in navigator) {
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
+    <ThemeProvider>
       <App />
+    </ThemeProvider>
     </BrowserRouter>
   </StrictMode>,
 );

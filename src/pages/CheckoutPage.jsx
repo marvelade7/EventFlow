@@ -453,7 +453,8 @@ const CheckoutPage = () => {
                     );
                 }
 
-                const successUrl = apiUrl("/bookings/payment/success");
+                const successUrl = "http://localhost:5000/api/bookings/payment/success"
+                // const successUrl = apiUrl("/bookings/payment/success");
 
                 return resolveBookingUserId().then((userId) =>
                     axios.post(

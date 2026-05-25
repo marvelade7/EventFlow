@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Avatar from './Avatar';
+import { useTheme } from "../context/ThemeContext";
 
 const DashNavbar = ({
     title,
@@ -10,6 +11,7 @@ const DashNavbar = ({
     lastName,
     avatar,
 }) => {
+    const { darkMode, toggleDarkMode } = useTheme();
     const navigate = useNavigate();
     const [showProfileMenu, setShowProfileMenu] = useState(false);
 

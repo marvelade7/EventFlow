@@ -48,6 +48,10 @@ const SignUp = () => {
             const normalizedEmail = values.email.trim().toLowerCase();
             // console.log(values);
             axios
+                // .post("https://event-flow-backend.vercel.app/api/users/register", {
+                //     ...values,
+                //     email: normalizedEmail,
+                // })
                 .post("https://eventflow-backend-fwv4.onrender.com/api/users/register", {
                     ...values,
                     email: normalizedEmail,

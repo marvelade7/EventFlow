@@ -40,6 +40,12 @@ const ForgotPassword = () => {
         setSubmitted(false);
 
         axios
+            // .post("http://localhost:5000/api/users/forgot-password", {
+            //     email: email.trim().toLowerCase(),
+            // })
+            // .post("https://event-flow-backend.vercel.app/api/users/forgot-password", {
+            //     email: email.trim().toLowerCase(),
+            // })
             .post("https://eventflow-backend-fwv4.onrender.com/api/users/forgot-password", {
                 email: email.trim().toLowerCase(),
             })

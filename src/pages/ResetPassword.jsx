@@ -42,6 +42,13 @@ const ResetPassword = () => {
         setSuccessMsg("");
 
         axios
+            // .post(
+            //     `https://event-flow-backend.vercel.app/api/users/reset-password/${token}`,
+            //     {
+            //         token,
+            //         newPassword,
+            //     }
+            // )
             .post(
                 `https://eventflow-backend-fwv4.onrender.com/api/users/reset-password/${token}`,
                 {
