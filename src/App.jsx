@@ -43,6 +43,11 @@ const ProtectedRoute = ({ element }) => {
     return token ? element : <Navigate to="/signin" replace />;
 };
 
+const ProtectedAdminRoute = ({ element }) => {
+    const adminToken = localStorage.getItem("adminToken");
+    return adminToken ? element : <Navigate to="/admin/login" replace />;
+};
+
 const App = () => {
     return (
         <>
@@ -74,7 +79,7 @@ const App = () => {
                 </Route>
 
                 <Route path="/admin/login" element={<AdminAuthPage />} />
-                <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                <Route path="/admin/dashboard" element={<ProtectedAdminRoute element={<AdminDashboard />} />} />
                 <Route path="*" element={<Error404 />} />
             </Routes>
             </ProfileProvider>

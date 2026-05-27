@@ -8,7 +8,7 @@ const AdminTopbar = ({
     onSearchChange,
 }) => {
     return (
-        <div className="dash-navbar admin-topbar">
+        <div className="dash-navbar admin-topbar p-4">
             <div className="d-flex align-items-center gap-2">
                 <button
                     type="button"
@@ -34,16 +34,12 @@ const AdminTopbar = ({
                         placeholder="Search users, events, posts..."
                     />
                 </div>
-                <Link to="/create-event" className="text-decoration-none">
+                {/* <Link to="/create-event" className="text-decoration-none">
                     <button className="btn admin-create-btn text-white fw-semibold">
                         <i className="bi bi-plus-circle me-2"></i>
                         Create Event
                     </button>
-                </Link>
-                <div className="admin-alert-pill">
-                    <i className="bi bi-bell"></i>
-                    6 alerts
-                </div>
+                </Link> */}
             </div>
         </div>
     );
