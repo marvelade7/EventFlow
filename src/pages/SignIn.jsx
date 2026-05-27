@@ -47,6 +47,11 @@ const SignIn = () => {
     };
 
     const signInWithGoogle = () => {
+        if (!auth || !googleProvider) {
+            setErrorMsg("Google sign-in is unavailable because Firebase is not configured.");
+            return;
+        }
+
         signInWithPopup(auth, googleProvider)
             .then((result) => {
                 setUser(result.user);
@@ -81,6 +86,11 @@ const SignIn = () => {
     };
 
     const handleSignOut = () => {
+            if (!auth) {
+                setUser(null);
+                return;
+            }
+
             signOut(auth)
                 .then(() => {
                     setUser(null);
@@ -91,6 +101,8 @@ const SignIn = () => {
         };
     
         useEffect(() => {
+            if (!auth) return;
+
             const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
                 setUser(currentUser);
             });
