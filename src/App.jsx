@@ -73,8 +73,8 @@ const App = () => {
                     <Route path="ticket-sales/:eventId" element={<TicketSalesPage />} />
                 </Route>
 
-                <Route path="/admin-auth" element={<AdminAuthPage />} />
-                <Route path="/admin-dashboard" element={<AdminDashboard />} />
+                <Route path="/admin/login" element={<AdminAuthPage />} />
+                <Route path="/admin/dashboard" element={<AdminDashboard />} />
                 <Route path="*" element={<Error404 />} />
             </Routes>
             </ProfileProvider>
