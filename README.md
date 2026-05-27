@@ -191,3 +191,11 @@ The app is built around a shared layout and a route-based experience:
 ## Why this project exists
 
 EventFlow is meant to make event operations feel simpler on both sides of the experience. Users can discover and book events quickly, while organizers get the tools they need to publish events, track attendance, and manage the ticketing lifecycle without switching between multiple systems.
+
+## Contributing
+
+Contributions are welcome — open an issue or submit a pull request. Please include a clear description of the change and any steps required to reproduce or test it locally.
+
+## License
+
+This repository is provided under the MIT License. See the `LICENSE` file for details.
