@@ -9,6 +9,21 @@ const AdminManageEvents = ({ searchTerm = "", onActivity }) => {
     const [error, setError] = useState("");
     const navigate = useNavigate();
 
+    const formatLocation = (location) => {
+        if (!location) return "-";
+        if (typeof location === "string") return location;
+        if (typeof location !== "object") return String(location);
+
+        const parts = [location.venue, location.address, location.city, location.country].filter(Boolean);
+        return parts.length ? parts.join(", ") : "-";
+    };
+
+    const formatTextValue = (value, fallback = "-") => {
+        if (value == null) return fallback;
+        if (typeof value === "string" || typeof value === "number") return String(value);
+        return fallback;
+    };
+
     useEffect(() => {
         const adminToken = localStorage.getItem("adminToken");
         if (!adminToken) {
@@ -39,7 +54,7 @@ const AdminManageEvents = ({ searchTerm = "", onActivity }) => {
 
     const filteredEvents = useMemo(() => {
         return events.filter((event) =>
-            `${event.title || ""} ${event.organizer || ""} ${event.status || ""}`
+            `${formatTextValue(event.name, "")} ${formatTextValue(event.organiserName, "")} ${formatLocation(event.location)} ${formatTextValue(event.category, "")} ${formatTextValue(event.status, "")}`
                 .toLowerCase()
                 .includes(searchTerm.toLowerCase()),
         );
@@ -48,7 +63,7 @@ const AdminManageEvents = ({ searchTerm = "", onActivity }) => {
     const handleDeleteEvent = (eventId) => {
         const target = events.find((event) => event._id === eventId || event.id === eventId);
         setEvents((prev) => prev.filter((event) => (event._id || event.id) !== eventId));
-        if (target && onActivity) onActivity(`Deleted event "${target.title || target.name || "Untitled"}".`);
+        if (target && onActivity) onActivity(`Deleted event "${target.name || "Untitled"}".`);
     };
 
     const handleToggleEventStatus = (eventId) => {
@@ -64,7 +79,7 @@ const AdminManageEvents = ({ searchTerm = "", onActivity }) => {
             ),
         );
 
-        if (onActivity) onActivity(`${nextStatus} event "${target.title || target.name || "Untitled"}".`);
+        if (onActivity) onActivity(`${nextStatus} event "${target.name || "Untitled"}".`);
     };
 
     if (loading) {
@@ -86,12 +101,15 @@ const AdminManageEvents = ({ searchTerm = "", onActivity }) => {
 
             {error ? <p className="text-danger mb-3">{error}</p> : null}
 
-            <div className="table-responsive">
-                <table className="table admin-table align-middle mb-0">
+            <div style={{ overflowX: "auto", width: "100%", display: "block" }}>
+                <table className="table admin-table align-middle mb-0" style={{ width: "100%", minWidth: "1200px" }}>
                     <thead>
                         <tr>
                             <th>Event</th>
                             <th>Organizer</th>
+                            <th>Date</th>
+                            <th>Location</th>
+                            <th>Category</th>
                             <th>Created</th>
                             <th>Status</th>
                             <th>Actions</th>
@@ -100,15 +118,24 @@ const AdminManageEvents = ({ searchTerm = "", onActivity }) => {
                     <tbody>
                         {filteredEvents.map((event, index) => {
                             const eventId = event._id || event.id;
-                            const title = event.title || event.name || "Untitled event";
-                            const organizer = event.organizer?.name || event.organizer || event.user?.name || event.createdBy || "Unknown";
-                            const status = event.status || event.visibility || "Draft";
+                            const title = formatTextValue(event.name, "Untitled event");
+                            const organizer = formatTextValue(
+                                event.organiserName || (event.organiser ? `${event.organiser.firstName || ""} ${event.organiser.lastName || ""}`.trim() : null),
+                                "Unknown",
+                            );
+                            const status = formatTextValue(event.status, "Draft");
+                            const eventDate = event.date ? new Date(event.date).toLocaleDateString() : "-";
                             const createdDate = event.createdAt ? new Date(event.createdAt).toLocaleDateString() : "-";
+                            const location = formatLocation(event.location);
+                            const category = formatTextValue(event.category, "-");
 
                             return (
                                 <tr key={eventId || `${title}-${index}`} data-aos="fade-up" data-aos-delay={Math.min(index * 60, 220)}>
                                     <td className="fw-semibold">{title}</td>
                                     <td>{organizer}</td>
+                                    <td>{eventDate}</td>
+                                    <td>{location}</td>
+                                    <td>{category}</td>
                                     <td>{createdDate}</td>
                                     <td>
                                         <span className={`admin-status-chip ${status.toLowerCase().replace(/\s+/g, "-")}`}>
