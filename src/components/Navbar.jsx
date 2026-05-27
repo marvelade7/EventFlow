@@ -70,10 +70,6 @@ const Navbar = ({scrollToBrowse, scrollToContact, scrollToHero, scrollToWorks}) 
                             </li>
                         </ul>
                         <div className="d-flex gap-3 align-items-center" role="search">
-                            <div className="d-flex align-items-center gap-2 me-2">
-                                <Link to="/privacy-policy" className="nav-link small">Privacy</Link>
-                                <Link to="/terms-and-conditions" className="nav-link small">Terms</Link>
-                            </div>
                             <Link to='/signin'><button style={currentStyle} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} className='btn px-3'>Sign In</button></Link>
                             <Link to='/signup'><button className="btn btn-warning px-3 fw-semibold " type="button">Get Started</button></Link>
                         </div>
