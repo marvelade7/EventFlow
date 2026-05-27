@@ -74,8 +74,8 @@ const AdminManageUsers = ({ searchTerm = "", onActivity }) => {
 
             {error ? <p className="text-danger mb-3">{error}</p> : null}
 
-            <div className="table-responsive">
-                <table className="table admin-table align-middle mb-0">
+            <div style={{ overflowX: "auto", width: "100%", display: "block" }}>
+                <table className="table admin-table align-middle mb-0" style={{ width: "100%", minWidth: "1200px" }}>
                     <thead>
                         <tr>
                             <th>Avatar</th>
