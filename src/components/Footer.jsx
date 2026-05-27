@@ -47,8 +47,8 @@ const Footer = ({ onSubscribe }) => {
             <div className='d-flex align-items-center justify-content-between mt-5 pt-4 border-top border-secondary'>
                 <p>&copy; 2026 EventFlow. All rights reserved.</p>
                 <div className='d-flex align-items-center gap-3'>
-                    <p>Privacy</p>
-                    <p>Terms</p>
+                    <Link to="/privacy-policy" className="text-decoration-none text-secondary">Privacy</Link>
+                    <Link to="/terms-and-conditions" className="text-decoration-none text-secondary">Terms</Link>
                     <p>Support</p>
                 </div>
             </div>

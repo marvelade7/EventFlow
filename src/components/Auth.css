@@ -60,3 +60,22 @@ input:focus,
 .small p.text-success {
     transform: translateX(3px);
 }
+
+.continueWithGoogle {
+    background-color: #fff;
+    color: #000;
+    border: 1px solid #ccc;
+    transition: all 0.2s ease;
+}
+
+.continueWithGoogle:hover {
+    background-color: #f5f5f5;
+    border-color: #999;
+    color: #000;
+}
+
+.continueWithGoogle:active {
+    background-color: #e0e0e0;
+    border-color: #666;
+    color: #000;
+}

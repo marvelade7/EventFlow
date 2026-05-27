@@ -23,6 +23,9 @@ import TicketSalesPage from "./pages/TicketSalesPage";
 import { ProfileProvider } from "./context/ProfileContext";
 // import CheckInPage from "./pages/CheckInPage";
 import ScannerPage from "./pages/ScannerPage";
+import EventDetails from "./pages/EventDetails";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsAndConditions from "./pages/TermsAndConditions";
 
 const ScrollToTop = () => {
     const { pathname } = useLocation();
@@ -54,6 +57,9 @@ const App = () => {
                 <Route path="/login" element={<Navigate to="/signin" replace />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password/:token" element={<ResetPassword />} />
+                <Route path="get-events/:eventId" element={<EventDetails />} />
+                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
                 {/* <Route path="/check-in/:ticketCode" element={<ProtectedRoute element={<CheckInPage />} />} /> */}
 
                 <Route path="/dashboard" element={<ProtectedRoute element={<UserDashboard />} />}>

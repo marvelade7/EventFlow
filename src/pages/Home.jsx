@@ -11,6 +11,7 @@ import BrowseEventsFilter from "../components/BrowseEventsFilter";
 import aos from "aos";
 import "aos/dist/aos.css";
 import { fetchEvents } from "../utils/eventsApi";
+import { isEventSoldOut } from "../utils/eventAvailability";
 
 const categoryIcons = {
     music: "bi bi-music-note-beamed",
@@ -226,6 +227,7 @@ const Home = () => {
                         {featuredEvents.map((event, index) => {
                             const category = getCategory(event);
                             const eventId = event?._id || `${category}-${index}`;
+                            const soldOut = isEventSoldOut(event);
 
                             return (
                                 <BrowseEvent
@@ -241,6 +243,7 @@ const Home = () => {
                                     delay={index * 70}
                                     cardTo="/signup"
                                     showActionButton={false}
+                                    isSoldOut={soldOut}
                                 />
                             );
                         })}

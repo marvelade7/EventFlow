@@ -31,6 +31,8 @@ At a glance, the app supports:
 - A landing page with a hero section, featured events, and explanatory sections.
 - Browseable event cards with category filtering.
 - Clear calls to action for users who want to sign up or host an event.
+- Dedicated Terms & Conditions and Privacy Policy pages linked from the navbar, footer, and auth screens.
+- Public event detail pages with banner imagery, ticket info, host details, and booking actions.
 
 ### Authentication and account flows
 
@@ -102,6 +104,9 @@ Some of the main routes in the app are:
 - `/verify-email` - email verification
 - `/forgot-password` - password recovery request
 - `/reset-password/:token` - password reset form
+- `/privacy-policy` - privacy policy page
+- `/terms-and-conditions` - terms and conditions page
+- `/get-events/:eventId` - public event details page
 - `/dashboard` - protected user dashboard
 - `/dashboard/profile` - profile management
 - `/dashboard/my-event` - organizer event management
@@ -171,6 +176,8 @@ The app is built around a shared layout and a route-based experience:
 - Protected dashboard pages reuse the same shell, sidebar, and top navigation.
 - Shared API helpers keep most network calls in one place.
 - Event, ticket, and scanner pages handle the core organizer workflow.
+- Shared event cards surface sold-out status consistently across the app.
+- Event links can be copied from supported event lists and event detail views.
 
 ## Notes
 
@@ -179,6 +186,7 @@ The app is built around a shared layout and a route-based experience:
 - The scanner page is meant for organizer check-in at the venue and depends on QR-code data from bookings.
 - Some admin pages are currently structured with local sample data, which makes the interface easy to explore even without a live admin backend.
 - Theme preference (light/dark mode) is automatically persisted to localStorage and restored on the next visit.
+- Auth flows preserve a pending booking so users can continue to checkout after signing in or signing up.
 
 ## Why this project exists
 

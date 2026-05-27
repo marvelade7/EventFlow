@@ -8,13 +8,15 @@ import * as yup from "yup";
 import axios from "axios";
 import aos from "aos";
 import "aos/dist/aos.css";
+import { signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
+import { auth, googleProvider } from "../firebase";
 
 const SignUp = () => {
     useEffect(() => {
         window.scrollTo({ top: 0, left: 0, behavior: "auto" });
-        aos.init({ 
+        aos.init({
             duration: 1000,
-            once: true, 
+            once: true,
         });
     }, []);
 
@@ -23,6 +25,77 @@ const SignUp = () => {
     const [errorMsg, setErrorMsg] = useState("");
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [notifications, setNotifications] = useState([]);
+    const [user, setUser] = useState(null);
+
+    const continuePendingBooking = () => {
+        const pendingBookingEvent = localStorage.getItem("pendingBookingEvent");
+
+        if (!pendingBookingEvent) {
+            navigate("/dashboard", { replace: true });
+            return;
+        }
+
+        try {
+            const event = JSON.parse(pendingBookingEvent);
+            localStorage.setItem("checkoutEvent", JSON.stringify(event));
+            localStorage.removeItem("pendingBookingEvent");
+            navigate("/dashboard/checkout", { state: { event }, replace: true });
+        } catch (error) {
+            console.error("Invalid pending booking event:", error);
+            localStorage.removeItem("pendingBookingEvent");
+            navigate("/dashboard", { replace: true });
+        }
+    };
+
+    const signInWithGoogle = () => {
+        signInWithPopup(auth, googleProvider)
+            .then((result) => {
+                setUser(result.user);
+
+                return axios.post(
+                    "https://eventflow-backend-fwv4.onrender.com/api/users/google-auth",
+                    {
+                        firstName: result.user.displayName.split(" ")[0],
+                        lastName: result.user.displayName.split(" ")[1] || "",
+                        email: result.user.email,
+                        photoURL: result.user.photoURL,
+                    },
+                )
+                .then((res) => {
+                    console.log(res.data);
+                    localStorage.setItem("token", res.data.token);
+                    localStorage.setItem("userId", res.data.user._id);
+                    continuePendingBooking();
+                })
+                .catch((error) => {
+                    console.error("Google auth error:", error);
+                    setErrorMsg(
+                        error.response?.data?.message ||
+                            "Google authentication failed. Please try again.",
+                    );
+                });
+            })
+            .catch((error) => {
+                console.error("Sign-in error:", error);
+            });
+    };
+
+    const handleSignOut = () => {
+        signOut(auth)
+            .then(() => {
+                setUser(null);
+            })
+            .catch((error) => {
+                console.error("Sign-out error:", error);
+            });
+    };
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            setUser(currentUser);
+        });
+        return () => unsubscribe(); // cleanup on unmount
+    }, []);
 
     const showNotification = (message, type = "info") => {
         const id = Date.now();
@@ -43,7 +116,7 @@ const SignUp = () => {
             confirmPassword: "",
             terms: false,
         },
-        onSubmit: (values, {resetForm}) => {
+        onSubmit: (values, { resetForm }) => {
             setLoading(true);
             const normalizedEmail = values.email.trim().toLowerCase();
             // console.log(values);
@@ -52,26 +125,35 @@ const SignUp = () => {
                 //     ...values,
                 //     email: normalizedEmail,
                 // })
-                .post("https://eventflow-backend-fwv4.onrender.com/api/users/register", {
-                    ...values,
-                    email: normalizedEmail,
-                })
+                .post(
+                    "https://eventflow-backend-fwv4.onrender.com/api/users/register",
+                    {
+                        ...values,
+                        email: normalizedEmail,
+                    },
+                )
                 .then((res) => {
                     setLoading(false);
                     console.log(res.data.user);
                     console.log(res.data.message);
                     setErrorMsg("");
-                    resetForm()
+                    resetForm();
                     // Store email in localStorage for verification page
                     localStorage.setItem("verificationEmail", normalizedEmail);
-                    showNotification("Registration successful! Please verify your email.", "success");
+                    showNotification(
+                        "Registration successful! Please verify your email.",
+                        "success",
+                    );
                     setTimeout(() => {
                         setShowSuccessModal(true);
                     }, 500);
                 })
                 .catch((err) => {
                     setLoading(false);
-                    showNotification(err.response?.data?.message || "Something went wrong", "error");
+                    showNotification(
+                        err.response?.data?.message || "Something went wrong",
+                        "error",
+                    );
                 });
         },
         validateOnMount: true, // 👈 important
@@ -131,7 +213,8 @@ const SignUp = () => {
 
     const handleVerifyEmail = () => {
         setShowSuccessModal(false);
-        const storedEmail = localStorage.getItem("verificationEmail") || formik.values.email;
+        const storedEmail =
+            localStorage.getItem("verificationEmail") || formik.values.email;
         navigate(`/verify-email?email=${encodeURIComponent(storedEmail)}`, {
             state: { email: storedEmail },
         });
@@ -149,8 +232,7 @@ const SignUp = () => {
     return (
         <div>
             <div className="d-flex align-items-stretch auth-layout auth-page">
-                
-                    <LeftPanel
+                <LeftPanel
                     head="EventFlow Join the community of event lovers"
                     p="Discover, book, and experience events like never before."
                     texthead="Why Choose EventFlow for your event ticketing?"
@@ -176,7 +258,7 @@ const SignUp = () => {
                             Join thousands of event lovers
                         </p>
                         <form
-                            data-aos = 'fade-up'
+                            data-aos="fade-up"
                             action="register"
                             method="post"
                             onSubmit={formik.handleSubmit}
@@ -439,14 +521,14 @@ const SignUp = () => {
                                     }`}
                                 />
                                 <label htmlFor="terms" className="m-0">
-                                    I agree to the{" "}
-                                    <span style={{cursor: 'pointer'}} className="text-primary">
+                                    I agree to the {" "}
+                                    <Link to="/terms-and-conditions" className="text-primary">
                                         Terms of Service
-                                    </span>{" "}
-                                    and{" "}
-                                    <span style={{cursor: 'pointer'}} className="text-primary">
+                                    </Link>{" "}
+                                    and {" "}
+                                    <Link to="/privacy-policy" className="text-primary">
                                         Privacy Policy
-                                    </span>
+                                    </Link>
                                 </label>
                             </div>
                             {formik.touched.terms && formik.errors.terms && (
@@ -490,7 +572,10 @@ const SignUp = () => {
                                 <hr className="w-25" />
                             </div>
 
-                            <div className="btn d-flex align-items-center justify-content-center gap-3 rounded-3 border p-3 my-3  ">
+                            <div
+                                onClick={signInWithGoogle}
+                                className="btn continueWithGoogle d-flex align-items-center justify-content-center gap-3 rounded-3 border p-3 my-3  "
+                            >
                                 {/* <i className='bi bi-google'></i> */}
                                 <img src={googleIcon} width="30" />
                                 <p className="m-0">Continue with Google</p>
@@ -517,7 +602,10 @@ const SignUp = () => {
                         role="dialog"
                         aria-modal="true"
                     >
-                        <div className="modal-dialog modal-dialog-centered" role="document">
+                        <div
+                            className="modal-dialog modal-dialog-centered"
+                            role="document"
+                        >
                             <div className="modal-content border-0 shadow rounded-4">
                                 <div className="modal-body p-4 text-center">
                                     <div
@@ -525,20 +613,27 @@ const SignUp = () => {
                                         style={{
                                             width: "56px",
                                             height: "56px",
-                                            backgroundColor: "rgba(25,135,84,.12)",
+                                            backgroundColor:
+                                                "rgba(25,135,84,.12)",
                                         }}
                                     >
                                         <i className="bi bi-check2-circle text-success fs-3"></i>
                                     </div>
-                                    <h5 className="fw-semibold mb-2">Account Created Successfully</h5>
+                                    <h5 className="fw-semibold mb-2">
+                                        Account Created Successfully
+                                    </h5>
                                     <p className="text-secondary mb-4">
-                                        Your EventFlow account is ready. Would you like to verify your email now?
+                                        Your EventFlow account is ready. Would
+                                        you like to verify your email now?
                                     </p>
                                     <div className="d-flex gap-3 justify-content-center">
                                         <button
                                             type="button"
                                             className="btn text-white fw-semibold px-4"
-                                            style={{ backgroundColor: "rgb(226,131,8)" }}
+                                            style={{
+                                                backgroundColor:
+                                                    "rgb(226,131,8)",
+                                            }}
                                             onClick={handleVerifyEmail}
                                         >
                                             Verify Email Now
@@ -546,7 +641,10 @@ const SignUp = () => {
                                         <button
                                             type="button"
                                             className="btn border border-2 fw-semibold px-4"
-                                            style={{ borderColor: "rgb(226,131,8)", color: "rgb(226,131,8)" }}
+                                            style={{
+                                                borderColor: "rgb(226,131,8)",
+                                                color: "rgb(226,131,8)",
+                                            }}
                                             onClick={handleContinueToSignIn}
                                         >
                                             Skip to Sign In
@@ -586,14 +684,15 @@ const SignUp = () => {
                                 notification.type === "success"
                                     ? "success"
                                     : notification.type === "error"
-                                    ? "danger"
-                                    : "info"
+                                      ? "danger"
+                                      : "info"
                             } d-flex align-items-center gap-2 mb-0`}
                             role="alert"
                             style={{
                                 boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
                                 borderRadius: "8px",
-                                animation: "slideOut 0.3s ease-in-out 2.7s forwards",
+                                animation:
+                                    "slideOut 0.3s ease-in-out 2.7s forwards",
                             }}
                         >
                             {notification.type === "success" && (

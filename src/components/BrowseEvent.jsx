@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { getEventLink } from "../utils/eventLink";
 
 const BrowseEvent = ({
     img,
@@ -27,10 +28,22 @@ const BrowseEvent = ({
     creatorAvatar,
     createdAt,
     isSoldOut = false,
+    eventId,
+    showCopyLink = false,
 }) => {
     const navigate = useNavigate();
+    const [isCopied, setIsCopied] = useState(false);
+    const copyTimeoutRef = useRef(null);
 
     const clickableCard = Boolean(cardTo || onCardClick);
+
+    useEffect(() => {
+        return () => {
+            if (copyTimeoutRef.current) {
+                window.clearTimeout(copyTimeoutRef.current);
+            }
+        };
+    }, []);
 
     const handleCardClick = () => {
         if (onCardClick) {
@@ -39,6 +52,25 @@ const BrowseEvent = ({
         }
         if (cardTo) {
             navigate(cardTo);
+        }
+    };
+
+    const handleCopyLink = async (e) => {
+        e.stopPropagation();
+
+        if (!eventId) return;
+
+        try {
+            await navigator.clipboard.writeText(getEventLink(eventId));
+            setIsCopied(true);
+            if (copyTimeoutRef.current) {
+                window.clearTimeout(copyTimeoutRef.current);
+            }
+            copyTimeoutRef.current = window.setTimeout(() => {
+                setIsCopied(false);
+            }, 1500);
+        } catch (error) {
+            console.error("Failed to copy event link:", error);
         }
     };
 
@@ -104,47 +136,58 @@ const BrowseEvent = ({
                             <i className="bi bi-geo-alt-fill me-1 "></i>
                             {venue}
                         </p>
-                        <div className="d-flex align-items-center justify-content-between gap-2 mt-4">
+                        <div className="d-flex align-items-center justify-content-between gap-2 mt-4 flex-wrap">
                             <p
                                 style={{ color: "rgb(27,181,204)" }}
                                 className=" fw-bold m-0 fs-5"
                             >
                                 {price}
                             </p>
-                            {/* {showActionButton &&
-                                (actionTo ? (
-                                    <Link
-                                        to={actionTo}
-                                        className="text-decoration-none"
-                                        onClick={(e) => e.stopPropagation()}
-                                    >
-                                        <button
-                                            style={btnStyle}
-                                            className="btn rounded-3 py-1 px-3 fw-semibold text-white"
-                                        >
-                                            {button}
-                                        </button>
-                                    </Link>
-                                ) : (
+                            <div className="d-flex align-items-center gap-2 ms-auto flex-wrap justify-content-end">
+                                {showCopyLink && eventId ? (
                                     <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            if (onAction) onAction();
-                                        }}
-                                        style={btnStyle}
-                                        className="btn rounded-3 py-1 px-3 fw-semibold text-white"
+                                        type="button"
+                                        onClick={handleCopyLink}
+                                        className="btn btn-outline-secondary rounded-circle d-inline-flex align-items-center justify-content-center px-2 py-1"
+                                        aria-label={isCopied ? "Link copied" : "Copy event link"}
+                                        title={isCopied ? "Copied" : "Copy link"}
                                     >
-                                        {button}
+                                        <i
+                                            className={`bi ${isCopied ? "bi-check2" : "bi-link-45deg"}`}
+                                        ></i>
                                     </button>
-                                ))} */}
-                            {showActionButton &&
-                                (actionTo ? (
-                                    <Link
-                                        to={actionTo}
-                                        className="text-decoration-none"
-                                        onClick={(e) => e.stopPropagation()}
-                                    >
+                                ) : null}
+                                {showActionButton &&
+                                    (actionTo ? (
+                                        <Link
+                                            to={actionTo}
+                                            className="text-decoration-none"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            <button
+                                                style={
+                                                    isSoldOut
+                                                        ? {
+                                                              backgroundColor:
+                                                                  "#adb5bd",
+                                                          }
+                                                        : btnStyle
+                                                }
+                                                className="btn rounded-3 py-1 px-3 fw-semibold text-white"
+                                                disabled={isSoldOut}
+                                            >
+                                                {isSoldOut
+                                                    ? "Sold Out"
+                                                    : button}
+                                            </button>
+                                        </Link>
+                                    ) : (
                                         <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                if (!isSoldOut && onAction)
+                                                    onAction();
+                                            }}
                                             style={
                                                 isSoldOut
                                                     ? {
@@ -158,25 +201,8 @@ const BrowseEvent = ({
                                         >
                                             {isSoldOut ? "Sold Out" : button}
                                         </button>
-                                    </Link>
-                                ) : (
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            if (!isSoldOut && onAction)
-                                                onAction();
-                                        }}
-                                        style={
-                                            isSoldOut
-                                                ? { backgroundColor: "#adb5bd" }
-                                                : btnStyle
-                                        }
-                                        className="btn rounded-3 py-1 px-3 fw-semibold text-white"
-                                        disabled={isSoldOut}
-                                    >
-                                        {isSoldOut ? "Sold Out" : button}
-                                    </button>
-                                ))}
+                                    ))}
+                            </div>
                         </div>
 
                         {creatorName || creatorAvatar ? (

@@ -6,8 +6,10 @@ import CreateEventNav from "../components/CreateEventNav";
 import BrowseEvent from "../components/BrowseEvent";
 import BrowseEventsFilter from "../components/BrowseEventsFilter";
 import BrowseEventsHead from "../components/BrowseEventsHead";
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { fetchEvents } from "../utils/eventsApi";
+import { isEventSoldOut } from "../utils/eventAvailability";
+import { getEventLink } from "../utils/eventLink";
 
 const categoryIcons = {
     music: "bi bi-music-note-beamed",
@@ -134,24 +136,17 @@ const getAvailableTickets = (ticket) => {
     return `${Math.max(quantity - sold, 0)} available`;
 };
 
-const isEventSoldOut = (event) => {
-    const tickets = getTicketTypes(event);
-    if (!tickets.length) return false;
-    return tickets.every((t) => {
-        const available = Number(t?.quantity || 0) - Number(t?.sold || 0);
-        return available <= 0;
-    });
-};
-
 const BrowseEventPage = () => {
     const { sidebarOpen, toggleSidebar } = useOutletContext();
     const navigate = useNavigate();
+    const { eventId } = useParams();
     const [events, setEvents] = useState([]);
     const [selectedEvent, setSelectedEvent] = useState(null);
     const [activeCategory, setActiveCategory] = useState("All");
     const [likedEvents, setLikedEvents] = useState({});
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
+    const [copiedEventId, setCopiedEventId] = useState("");
 
     useEffect(() => {
         aos.init({
@@ -232,6 +227,18 @@ const BrowseEventPage = () => {
         };
     }, [selectedEvent]);
 
+    useEffect(() => {
+        if (!eventId || events.length === 0) return;
+
+        const matchedEvent = events.find(
+            (event) => String(event?._id) === String(eventId),
+        );
+
+        if (matchedEvent) {
+            setSelectedEvent(matchedEvent);
+        }
+    }, [eventId, events]);
+
     const categories = useMemo(() => {
         const eventCategories = events
             .map((event) => getCategory(event))
@@ -251,6 +258,27 @@ const BrowseEventPage = () => {
             ...prev,
             [eventId]: !prev[eventId],
         }));
+    };
+
+    const handleCopyLink = async (eventId) => {
+        if (!eventId) return;
+
+        try {
+            await navigator.clipboard.writeText(getEventLink(eventId));
+            setCopiedEventId(eventId);
+            window.setTimeout(() => setCopiedEventId(""), 1500);
+        } catch (error) {
+            console.error("Failed to copy event link:", error);
+        }
+    };
+
+    const closeSelectedEvent = () => {
+        if (eventId) {
+            navigate("/dashboard/browse-event", { replace: true });
+            return;
+        }
+
+        setSelectedEvent(null);
     };
 
     const getLikeCount = (event, eventId) => {
@@ -341,6 +369,8 @@ const BrowseEventPage = () => {
                                 return (
                                     <BrowseEvent
                                         key={eventId}
+                                            eventId={eventId}
+                                            showCopyLink
                                         img={getEventImage(event)}
                                         title={getEventTitle(event)}
                                         venue={getVenue(event)}
@@ -396,7 +426,7 @@ const BrowseEventPage = () => {
                               tabIndex="-1"
                               role="dialog"
                               aria-modal="true"
-                              onClick={() => setSelectedEvent(null)}
+                              onClick={closeSelectedEvent}
                               style={{
                                   position: "fixed",
                                   inset: 0,
@@ -450,9 +480,7 @@ const BrowseEventPage = () => {
                                               </div>
                                               <button
                                                   type="button"
-                                                  onClick={() =>
-                                                      setSelectedEvent(null)
-                                                  }
+                                                  onClick={closeSelectedEvent}
                                                   className="btn btn-light border rounded-circle browse-modal-close"
                                                   aria-label="Close event details"
                                               >
@@ -602,6 +630,31 @@ const BrowseEventPage = () => {
                                           ) : null}
 
                                           <div className="d-flex align-items-center justify-content-end gap-3 mt-4">
+                                              <button
+                                                  type="button"
+                                                  onClick={() =>
+                                                      handleCopyLink(
+                                                          selectedEvent?._id,
+                                                      )
+                                                  }
+                                                  className="btn btn-outline-secondary rounded-circle d-inline-flex align-items-center justify-content-center px-2 py-1"
+                                                  aria-label={
+                                                      copiedEventId ===
+                                                      selectedEvent?._id
+                                                          ? "Link copied"
+                                                          : "Copy event link"
+                                                  }
+                                                  title={
+                                                      copiedEventId ===
+                                                      selectedEvent?._id
+                                                          ? "Copied"
+                                                          : "Copy link"
+                                                  }
+                                              >
+                                                  <i
+                                                      className={`bi ${copiedEventId === selectedEvent?._id ? "bi-check2" : "bi-link-45deg"}`}
+                                                  ></i>
+                                              </button>
                                               <button
                                                   type="button"
                                                   onClick={() =>

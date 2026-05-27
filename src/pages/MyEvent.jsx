@@ -209,7 +209,6 @@ const MyEvent = () => {
 
         setUpdateLoading(true);
 
-        // const updateUrl = `http://localhost:5000/api/events/update-event/${eventId}`;
         const updateUrl = `https://eventflow-backend-fwv4.onrender.com/api/events/update-event/${eventId}`;
         console.log("[MyEvent] Update URL:", updateUrl);
 

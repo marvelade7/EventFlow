@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Logo from './Logo';
 // import logo from '../assets/images/logo.png'
 
 const Navbar = ({scrollToBrowse, scrollToContact, scrollToHero, scrollToWorks}) => {
+    const navigate = useNavigate();
+
     const nav = {
         position: 'sticky',
         top: 0,
@@ -32,6 +34,17 @@ const Navbar = ({scrollToBrowse, scrollToContact, scrollToHero, scrollToWorks}) 
         backgroundColor: 'black',
         border: '1px solid black'
     };
+
+    const handleNavAction = (action) => {
+        if (typeof action === 'function') {
+            action();
+            return;
+        }
+
+        // Fallback for pages that render Navbar without Home scroll callbacks.
+        navigate('/');
+    };
+
     const currentStyle = isHovered ? { ...defaultStyle, ...hoverStyle } : { ...defaultStyle };
     return (
         <>
@@ -43,22 +56,26 @@ const Navbar = ({scrollToBrowse, scrollToContact, scrollToHero, scrollToWorks}) 
                     </button>
                     <div className="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul className="navbar-nav mx-auto mb-3 gap-3 mb-lg-0">
-                            <li onClick={scrollToHero} className="nav-item">
-                                <button className="nav-link active" aria-current="page" href="#">Home</button>
+                            <li className="nav-item">
+                                <button onClick={() => handleNavAction(scrollToHero)} type='button' className="nav-link active" aria-current="page">Home</button>
                             </li>
-                            <li onClick={scrollToBrowse} className="nav-item">
-                                <button className="nav-link active" href="#">Browse Events</button>
+                            <li className="nav-item">
+                                <button onClick={() => handleNavAction(scrollToBrowse)} type='button' className="nav-link active">Browse Events</button>
                             </li>
-                            <li onClick={scrollToWorks} className="nav-item">
-                                <button className="nav-link active" href="#">How It Works</button>
+                            <li className="nav-item">
+                                <button onClick={() => handleNavAction(scrollToWorks)} type='button' className="nav-link active">How It Works</button>
                             </li>
-                            <li onClick={scrollToContact} className="nav-item">
-                                <button className="nav-link active" href="#">Contact</button>
+                            <li className="nav-item">
+                                <button onClick={() => handleNavAction(scrollToContact)} type='button' className="nav-link active">Contact</button>
                             </li>
                         </ul>
-                        <div className="d-flex gap-3" role="search">
-                            <Link to='signin'><button style={currentStyle} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} className='btn px-3'>Sign In</button></Link>
-                            <Link to='signup'><button className="btn btn-warning px-3 fw-semibold " type="submit">Get Started</button></Link>
+                        <div className="d-flex gap-3 align-items-center" role="search">
+                            <div className="d-flex align-items-center gap-2 me-2">
+                                <Link to="/privacy-policy" className="nav-link small">Privacy</Link>
+                                <Link to="/terms-and-conditions" className="nav-link small">Terms</Link>
+                            </div>
+                            <Link to='/signin'><button style={currentStyle} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} className='btn px-3'>Sign In</button></Link>
+                            <Link to='/signup'><button className="btn btn-warning px-3 fw-semibold " type="button">Get Started</button></Link>
                         </div>
                     </div>
                 </div>

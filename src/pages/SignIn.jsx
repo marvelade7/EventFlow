@@ -7,6 +7,8 @@ import axios from "axios";
 import aos from "aos";
 import "aos/dist/aos.css";
 import { ProfileContext } from "../context/ProfileContext";
+import { signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
+import { auth, googleProvider } from "../firebase";
 
 const SignIn = () => {
     useEffect(() => {
@@ -23,6 +25,77 @@ const SignIn = () => {
     const [errorMsg, setErrorMsg] = useState("");
     const [loading, setLoading] = useState(false);
     const { setUser } = useContext(ProfileContext);
+
+    const continuePendingBooking = () => {
+        const pendingBookingEvent = localStorage.getItem("pendingBookingEvent");
+
+        if (!pendingBookingEvent) {
+            navigate("/dashboard", { replace: true });
+            return;
+        }
+
+        try {
+            const event = JSON.parse(pendingBookingEvent);
+            localStorage.setItem("checkoutEvent", JSON.stringify(event));
+            localStorage.removeItem("pendingBookingEvent");
+            navigate("/dashboard/checkout", { state: { event }, replace: true });
+        } catch (error) {
+            console.error("Invalid pending booking event:", error);
+            localStorage.removeItem("pendingBookingEvent");
+            navigate("/dashboard", { replace: true });
+        }
+    };
+
+    const signInWithGoogle = () => {
+        signInWithPopup(auth, googleProvider)
+            .then((result) => {
+                setUser(result.user);
+
+                return axios
+                    .post(
+                        "https://eventflow-backend-fwv4.onrender.com/api/users/google-auth",
+                        {
+                            firstName: result.user.displayName.split(" ")[0],
+                            lastName: result.user.displayName.split(" ")[1] || "",
+                            email: result.user.email,
+                            photoURL: result.user.photoURL,
+                        },
+                    )
+                    .then((res) => {
+                        console.log(res.data);
+                        localStorage.setItem("token", res.data.token);
+                        localStorage.setItem("userId", res.data.user._id);
+                        continuePendingBooking();
+                    })
+                    .catch((error) => {
+                        console.error("Google auth error:", error);
+                        setErrorMsg(
+                            error.response?.data?.message ||
+                                "Google authentication failed. Please try again.",
+                        );
+                    });
+            })
+            .catch((error) => {
+                console.error("Sign-in error:", error);
+            });
+    };
+
+    const handleSignOut = () => {
+            signOut(auth)
+                .then(() => {
+                    setUser(null);
+                })
+                .catch((error) => {
+                    console.error("Sign-out error:", error);
+                });
+        };
+    
+        useEffect(() => {
+            const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+                setUser(currentUser);
+            });
+            return () => unsubscribe(); // cleanup on unmount
+        }, []);
 
     const signin = (e) => {
         e.preventDefault();
@@ -42,7 +115,8 @@ const SignIn = () => {
                     response.data?.token ||
                     response.data?.accessToken ||
                     response.data?.data?.token;
-                const userData = response.data?.user || response.data?.data?.user || {};
+                const userData =
+                    response.data?.user || response.data?.data?.user || {};
 
                 if (token) {
                     // Store user data in context
@@ -51,7 +125,7 @@ const SignIn = () => {
                     if (userData && userData._id) {
                         localStorage.setItem("userId", userData._id);
                     }
-                    navigate("/dashboard", { replace: true });
+                    continuePendingBooking();
                 } else {
                     setErrorMsg("Login failed. Please check your credentials.");
                 }
@@ -177,13 +251,20 @@ const SignIn = () => {
 
                         <button
                             type="button"
-                            className="btn d-flex align-items-center justify-content-center gap-3 rounded-3 border p-3 my-3 w-100"
+                            onClick={signInWithGoogle}
+                            className="btn continueWithGoogle d-flex align-items-center justify-content-center gap-3 rounded-3 border p-3 my-3 w-100"
                         >
                             <img src={googleIcon} width="30" />
                             <p className="m-0">Continue with Google</p>
                         </button>
 
-                        <p className="m-0 text-center">
+                        <p className="text-center small mt-2 mb-0">
+                            By continuing, you agree to our {" "}
+                            <Link to="/terms-and-conditions" className="text-primary">Terms</Link> and {" "}
+                            <Link to="/privacy-policy" className="text-primary">Privacy Policy</Link>.
+                        </p>
+
+                        <p className="m-0 text-center mt-3">
                             Don't have an account?{" "}
                             <Link to="/signup">
                                 <span className="text-primary fw-semibold">

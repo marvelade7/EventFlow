@@ -13,6 +13,7 @@ import { useNavigate, useOutlet, useLocation, Link } from "react-router-dom";
 import axios from "axios";
 import { ProfileContext } from "../context/ProfileContext";
 import { fetchEvents, fetchDashboardStats } from "../utils/eventsApi";
+import { isEventSoldOut } from "../utils/eventAvailability";
 
 const categoryIcons = {
     music: "bi bi-music-note-beamed",
@@ -445,6 +446,7 @@ const UserDashboard = () => {
                                 style={{ fontSize: "1.5em" }}
                                 title="Upcoming Events"
                                 view="View all"
+                                onViewAll={() => navigate("/dashboard/browse-event")}
                             />
                             {isLoadingUpcomingEvents ? (
                                 <div className="text-center py-4">
@@ -482,10 +484,13 @@ const UserDashboard = () => {
                                         const eventId =
                                             event?._id ||
                                             `${category}-${index}`;
+                                        const soldOut = isEventSoldOut(event);
 
                                         return (
                                             <BrowseEvent
                                                 key={eventId}
+                                                eventId={eventId}
+                                                showCopyLink
                                                 img={getEventImage(event)}
                                                 title={getEventTitle(event)}
                                                 venue={getVenue(event)}
@@ -500,11 +505,13 @@ const UserDashboard = () => {
                                                 button="Book Now"
                                                 anim="fade-up"
                                                 delay={(index + 1) * 70}
+                                                isSoldOut={soldOut}
                                                 btnStyle={{
                                                     backgroundColor:
                                                         "rgb(27,181,204)",
                                                 }}
                                                 onAction={() => {
+                                                    if (soldOut) return;
                                                     localStorage.setItem(
                                                         "checkoutEvent",
                                                         JSON.stringify(event),
