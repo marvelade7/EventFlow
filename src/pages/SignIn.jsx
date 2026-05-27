@@ -67,7 +67,7 @@ const SignIn = () => {
                         },
                     )
                     .then((res) => {
-                        console.log(res.data);
+                        // console.log(res.data);
                         localStorage.setItem("token", res.data.token);
                         localStorage.setItem("userId", res.data.user._id);
                         continuePendingBooking();

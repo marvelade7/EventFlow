@@ -67,7 +67,7 @@ const SignUp = () => {
                     },
                 )
                 .then((res) => {
-                    console.log(res.data);
+                    // console.log(res.data);
                     localStorage.setItem("token", res.data.token);
                     localStorage.setItem("userId", res.data.user._id);
                     continuePendingBooking();
@@ -146,8 +146,8 @@ const SignUp = () => {
                 )
                 .then((res) => {
                     setLoading(false);
-                    console.log(res.data.user);
-                    console.log(res.data.message);
+                    // console.log(res.data.user);
+                    // console.log(res.data.message);
                     setErrorMsg("");
                     resetForm();
                     // Store email in localStorage for verification page
